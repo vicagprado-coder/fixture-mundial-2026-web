@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: fixture-mundial-2026
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn web_app:app --workers 1 --threads 8 --timeout 180
+    envVars:
+      - key: FIXTURE_DATA_DIR
+        value: /tmp/fixture_mundial_2026

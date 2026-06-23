@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "mode": "backend_manual_txt_v77",
+  "total_urls": 1238,
+  "total_jobs": 1238,
+  "downloaded": 1220,
+  "skipped": 0,
+  "failed": 18,
+  "errors_sample": [
+    {
+      "idPlayer": "395321",
+      "error": "TimeoutError: The read operation timed out",
+      "url": "https://digitalhub.fifa.com/transform/87ce677a-e78d-474c-bfd7-b7dc77e89e62/ITO-Junya_395321"
+    },
+    {
+      "idPlayer": "395414",
+      "error": "TimeoutError: The read operation timed out",
+      "url": "https://digitalhub.fifa.com/transform/ddda0414-89fe-4118-9830-8ef417990db4/LO-CELSO-Giovani_395414"
+    },
+    {
+      "idPlayer": "395755",
+      "error": "TimeoutError: The read operation timed out",
+      "url": "https://digitalhub.fifa.com/transform/20f762ed-3248-4b2d-8a4c-5f1e3891291f/EL-KAJOUI-Munir_395755"
+    },
+    {
+      "idPlayer": "395860",
+      "error": "TimeoutError: The read operation timed out",
+      "url": "https://digitalhub.fifa.com/transform/90b92e39-b717-40c5-a2ab-05616ca017c8/MAHDY-SOLIMAN_395860"
+    },
+    {
+      "idPlayer": "395984",
+      "error": "TimeoutError: The read operation timed out",
+      "url": "https://digitalhub.fifa.com/transform/8d294899-e656-4484-91b7-99d646bc590c/ZWANE-Themba_395984"
+    },
+    {
+      "idPlayer": "395986",
+      "error": "TimeoutError: The read operation timed out",
+      "url": "https://digitalhub.fifa.com/transform/b95f9142-251c-4943-911c-9c8d7ad8dd1c/WILLIAMS-Ronwen_395986"
+    },
+    {
+      "idPlayer": "396158",
+      "error": "TimeoutError: The read operation timed out",
+      "url": "https://digitalhub.fifa.com/transform/0e08174c-879f-4de0-9709-8fdc59357236/REBIN-GHAREEB_396158"
+    },
+    {
+      "idPlayer": "400634",
+      "error": "TimeoutError: The read operation timed out",
+      "url": "https://digitalhub.fifa.com/transform/b1581870-6bef-4c29-9a06-f306bbf03ca8/ALVAREZ-Edson_400634"
+    }
+  ],
+  "dir": "assets/players",
+  "log_file": "data/player_image_download_log.jsonl",
+  "started_at": "2026-06-23 11:49:04",
+  "finished_at": "2026-06-23 11:55:29",
+  "message": "Descarga finalizada: 1220 guardadas, 18 fallidas, 0 omitidas."
+}
