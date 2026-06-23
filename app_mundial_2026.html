@@ -2398,11 +2398,19 @@ var NEXT_BLUEPRINTS={
  r2:[{matchNo:'M104',homeSeed:'W101',awaySeed:'W102',srcHome:'M101',srcAway:'M102',srcMode:'winner'}]
 };
 function groupStageComplete(){return doneCount(matches)>=matches.length}
-function resolveSeed(seed,useTeams){seed=String(seed||'');var m=seed.match(/^([12])([A-L])$/);if(!m)return seed;var rows=table(m[2]);var idx=m[1]==='1'?0:1;return useTeams&&rows[idx]?rows[idx].team:seed}
+function safeGroupMathProfile(team){try{return groupMathProfile(team)}catch(e){return null}}
+function guaranteedFirstTeam(g){var teams=GROUPS[g]||[],out=[];for(var i=0;i<teams.length;i++){var p=safeGroupMathProfile(teams[i]);if(p&&p.guaranteedTop1)out.push(teams[i])}return out.length===1?out[0]:''}
+function guaranteedTop2Teams(g){var teams=GROUPS[g]||[],out=[];for(var i=0;i<teams.length;i++){var p=safeGroupMathProfile(teams[i]);if(p&&p.guaranteedTop2)out.push(teams[i])}return out}
+function directSlotTeam(g,pos){var rows=table(g)||[];if(!rows[pos-1])return '';if(groupComplete(g))return rows[pos-1].team;var first=guaranteedFirstTeam(g);if(pos===1)return first||'';if(pos===2){var top2=guaranteedTop2Teams(g);if(first&&top2.length===2){return top2.filter(function(t){return t!==first})[0]||''}return ''}return ''}
+function resolveSeed(seed,useTeams){seed=String(seed||'');var m=seed.match(/^([12])([A-L])$/);if(!m)return seed;if(!useTeams)return seed;var exact=directSlotTeam(m[2],Number(m[1]));return exact||seed}
 function currentThirdRoute(){var thirds=allThirds().slice(0,8);var key=thirds.map(function(x){return x.g}).sort().join('');var ready=groupStageComplete()&&thirds.length===8&&!!THIRD_PLACE_ROUTE_BY_KEY[key];return {ready:ready,key:key,map:ready?THIRD_PLACE_ROUTE_BY_KEY[key]:null,thirds:thirds}}
-function thirdDestinationForGroup(g,route){route=route||currentThirdRoute();if(!route.ready)return null;for(var col in route.map){if(route.map[col]==='3'+g){var meta=R32_THIRD_DESTINATIONS[col]||{};return {column:col,matchNo:meta.matchNo||'',vs:col,groups:meta.groups||''}}}return null}
-function resolveThirdByColumn(col,useTeams){var route=currentThirdRoute();if(!useTeams||!route.ready)return 'MEJORES TERCEROS';var val=route.map[col];if(!val)return 'MEJORES TERCEROS';var g=String(val).replace('3','');var row=table(g)[2];return row?row.team:'MEJORES TERCEROS'}
+function safeCurrentThirdRoute(){try{return currentThirdRoute()}catch(e){return {ready:false,key:'',map:null,thirds:[],error:e&&e.message?e.message:String(e)}}}
+function thirdDestinationForGroup(g,route){route=route||safeCurrentThirdRoute();if(!route.ready)return null;for(var col in route.map){if(route.map[col]==='3'+g){var meta=R32_THIRD_DESTINATIONS[col]||{};return {column:col,matchNo:meta.matchNo||'',vs:col,groups:meta.groups||''}}}return null}
+function resolveThirdByColumn(col,useTeams){var route=safeCurrentThirdRoute();if(!useTeams||!route.ready)return 'MEJORES TERCEROS';var val=route.map[col];if(!val)return 'MEJORES TERCEROS';var g=String(val).replace('3','');var row=table(g)[2];return row?row.team:'MEJORES TERCEROS'}
 function blueprintMatch(bp,roundKey,i,useTeams){return {id:roundKey+'-'+(i+1),matchNo:bp.matchNo||'',homeSeed:bp.homeSeed||'',awaySeed:bp.awaySeed||'',thirdColumn:bp.thirdColumn||'',thirdGroups:bp.thirdGroups||'',srcHome:bp.srcHome||'',srcAway:bp.srcAway||'',home:(bp.thirdColumn&&false)?'':resolveSeed(bp.homeSeed,useTeams),away:bp.thirdColumn?resolveThirdByColumn(bp.thirdColumn,useTeams):resolveSeed(bp.awaySeed,useTeams),hg:null,ag:null,ph:null,pa:null}}
+function koTeamResolved(txt){return !!findTeamKey(txt)}
+function knownR32Count(){ensureKnockoutRounds();var c=0;(knockoutRounds.r32||[]).forEach(function(m){if(koTeamResolved(m.home)||koTeamResolved(m.away))c++});return c}
+function qualifiedSummaryForRondas(){var st=[];try{st=allMathStatuses()}catch(e){st=[]}var top1=st.filter(function(x){return x.status==='qualified'&&String(x.route||'').indexOf('1.º')>=0});var top2=st.filter(function(x){return x.status==='qualified'&&String(x.route||'').indexOf('Top 2')>=0});var terceros=st.filter(function(x){return x.status==='qualified'&&String(x.route||'').indexOf('tercero')>=0});return {top1:top1,top2:top2,terceros:terceros,total:st.filter(function(x){return x.status==='qualified'}).length}}
 function blankKoMatch(roundKey,i){var bp=(roundKey==='r32'?R32_BLUEPRINT[i]:(NEXT_BLUEPRINTS[roundKey]||[])[i])||{};return blueprintMatch(bp,roundKey,i,false)}
 function baseKnockoutRounds(){var obj={};ROUND_CONFIG.forEach(function(r){obj[r.key]=[];for(var i=0;i<r.matches;i++)obj[r.key].push(blankKoMatch(r.key,i))});return obj}
 function normalizeKoValue(v){return (v===null||v===undefined||v==='')?null:Math.max(0,parseInt(v,10))}
@@ -2418,7 +2426,7 @@ window.saveKnockout=function(roundKey,idx){updateKnockoutFromInputs(roundKey,idx
 window.clearKnockoutMatch=function(roundKey,idx){ensureKnockoutRounds();knockoutRounds[roundKey][idx]=blankKoMatch(roundKey,idx);save(false);render();toast('Partido de ronda limpiado')}
 window.clearAllKnockout=function(){if(confirm('¿Quieres limpiar todas las rondas eliminatorias?')){knockoutRounds=baseKnockoutRounds();save(false);render();toast('Rondas eliminatorias reiniciadas')}}
 function buildR32Matches(useTeams){var arr=[];for(var i=0;i<R32_BLUEPRINT.length;i++)arr.push(blueprintMatch(R32_BLUEPRINT[i],'r32',i,!!useTeams));return arr}
-window.loadQualifiedToR32=function(){ensureKnockoutRounds();var useTeams=groupStageComplete();knockoutRounds.r32=buildR32Matches(useTeams);['r16','r8','r4','r3','r2'].forEach(function(k){knockoutRounds[k]=(baseKnockoutRounds()[k]||[])});save(false);render();toast(useTeams?'Cruces FIFA cargados con equipos':'Cruces FIFA cargados con posiciones y MEJORES TERCEROS')}
+window.loadQualifiedToR32=function(){ensureKnockoutRounds();var before=knownR32Count();knockoutRounds.r32=buildR32Matches(true);['r16','r8','r4','r3','r2'].forEach(function(k){knockoutRounds[k]=(baseKnockoutRounds()[k]||[])});var after=knownR32Count();save(false);render();toast(after?'Cruces FIFA actualizados con '+after+' llaves que ya tienen clasificados detectados':'Cruces FIFA cargados con posiciones pendientes')}
 function mapWinnersByMatch(roundKey){var out={};(knockoutRounds[roundKey]||[]).forEach(function(m){if(m.matchNo)out[m.matchNo]=winnerFromKo(m)});return out}
 window.advanceRound=function(roundKey){
   ensureKnockoutRounds();
@@ -2491,12 +2499,13 @@ function renderRondas(){
   var champ=finalWinner();
   var runner=finalLoser();
   var third=thirdPlaceWinner();
-  var filledR32=(knockoutRounds.r32||[]).filter(function(m){return (m.home&&m.home.trim())||(m.away&&m.away.trim())}).length;
+  var filledR32=knownR32Count();
   var decided=0,total=0;Object.keys(knockoutRounds||{}).forEach(function(k){(knockoutRounds[k]||[]).forEach(function(m){total++;if(winnerFromKo(m))decided++;})});
-  var champLabel=champ?esc(name(findTeamKey(champ))||champ):'—';var route=currentThirdRoute();
-  var html='<div class="rondasIntro"><h2>Fixture eliminatorio FIFA</h2><div class="rondasStatus"><div class="rondasChip">'+filledR32+'/16<small>R32 cargados</small></div><div class="rondasChip">'+decided+'/'+total+'<small>Llaves definidas</small></div><div class="rondasChip">'+champLabel+'<small>Campeón</small></div></div></div>';
+  var champLabel=champ?esc(name(findTeamKey(champ))||champ):'—';var route=safeCurrentThirdRoute();var qs=qualifiedSummaryForRondas();
+  var html='<div class="rondasIntro"><h2>Fixture eliminatorio FIFA</h2><div class="rondasStatus"><div class="rondasChip">'+filledR32+'/16<small>R32 con equipos</small></div><div class="rondasChip">'+qs.total+'<small>clasificados detectados</small></div><div class="rondasChip">'+champLabel+'<small>Campeón</small></div></div></div>';
   html+='<div class="koActions"><button class="btn" onclick="window.loadQualifiedToR32()">Cargar cruces FIFA</button><button class="btn gold" onclick="window.refreshRoundGroupResults()">Actualizar grupos</button><button class="btn red" onclick="window.clearAllKnockout()">Reiniciar</button></div>';
-  html+='<div class="rulesMini">Ronda de 32 oficial M73-M88. Los cupos de terceros se muestran como <b>MEJORES TERCEROS</b> hasta completar todos los grupos. Las semifinales M101 y M102 envían ganadores a la Final M104 y perdedores al partido por 3er puesto M103. Combinación de terceros: '+(route.ready?esc(route.key):'pendiente')+'.</div>';
+  html+='<div class="rulesMini"><b>v103:</b> Rondas ya puede cargar parcialmente los equipos clasificados matemáticamente. Si un 1.º de grupo está asegurado por regla FIFA/desempate directo, se coloca en su llave. Si el 2.º o los mejores terceros aún no están definidos, quedan como posición pendiente. Combinación de terceros: '+(route.ready?esc(route.key):'pendiente')+'.</div>';
+  if(qs.total){html+='<div class="card"><b>Clasificados detectados para cruces:</b><div class="mathMetaRow"><span class="mathMeta">1.º asegurados: '+qs.top1.length+'</span><span class="mathMeta">Top 2 asegurados: '+qs.top2.length+'</span><span class="mathMeta">Mejores terceros asegurados: '+qs.terceros.length+'</span></div></div>'}
   html+='<div class="bracketViewport"><div class="bracketGrid">'+renderRound('Ronda de 32','r32')+renderRound('Ronda de 16','r16')+renderRound('Cuartos','r8')+renderRound('Semifinal','r4')+renderRound('3er puesto','r3')+renderRound('Final','r2')+'</div></div>';
   html+=renderFinalPodium();
   html+='<div class="championCard '+(champ?'':'empty')+'"><div class="championMain"><div class="championFlag">'+(champ?teamVisualFromText(champ):'<span class="flagBlank"></span>')+'</div><div><p class="championSub">Campeón</p><h2 class="championTitle">'+(champ?esc(name(findTeamKey(champ))||champ):'Por definir')+'</h2><p class="championSub">'+(runner?'Segundo puesto: '+esc(name(findTeamKey(runner))||runner):'Segundo puesto por definir')+' · '+(third?'Tercer puesto: '+esc(name(findTeamKey(third))||third):'Tercer puesto por definir')+'</p></div></div></div>';

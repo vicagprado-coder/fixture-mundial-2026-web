@@ -55,3 +55,11 @@ FIXTURE_DATA_DIR=/tmp/fixture_mundial_2026
 ```
 
 Para persistencia real en producción, usar un disco persistente o base de datos externa.
+
+
+## v103 - Corrección rondas / clasificados
+
+- Rondas ya no depende de que todos los grupos estén completos para mostrar equipos detectados.
+- Si un 1.º de grupo está matemáticamente asegurado por regla FIFA/desempate directo, se carga en su cruce.
+- Si el 2.º o mejores terceros siguen pendientes, se mantiene la posición FIFA como placeholder.
+- Paquete web limpio, sin auditorías ni archivos .bat.
