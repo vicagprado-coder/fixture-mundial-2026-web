@@ -1460,7 +1460,7 @@ async function apiCall(name,payload){
   if(res.status===401){authState={authenticated:false,user:null};updateEditModeUI();var data=null;try{data=await res.json()}catch(_e){}throw new Error((data&&data.error)||'Debes iniciar sesión para registrar o actualizar datos.')}
   if(!res.ok)throw new Error('Backend HTTP no disponible ('+res.status+')'); return await res.json();
 }
-async function save(silent){if(!canEdit()){setPersistStatus('Modo visualización: inicia sesión para guardar cambios.',false);if(!silent)showLoginModal();return}try{localStorage.setItem(STORAGE,JSON.stringify(statePayload()))}catch(e){}try{var r=await apiCall('save_results',statePayload());backendReady=!!(r&&r.ok);if(r&&r.ok){setPersistStatus('Guardado en archivo persistente: '+(r.path||'servidor web/resultados_fixture_2026.json'),true);if(!silent)toast('Guardado en archivo JSON')}else{setPersistStatus('Guardado solo en navegador: '+(r&&r.error?r.error:'sin backend'),false)}}catch(e){backendReady=false;setPersistStatus('Guardado solo en navegador. Verifica que el backend web esté activo',false)}}
+async function save(silent){if(!canEdit()){setPersistStatus('Modo visualización: inicia sesión para guardar cambios.',false);if(!silent)showLoginModal();return}try{localStorage.setItem(STORAGE,JSON.stringify(statePayload()))}catch(e){}try{var r=await apiCall('save_results',statePayload());backendReady=!!(r&&r.ok);if(r&&r.ok){setPersistStatus('Guardado persistente en '+(r.path||'servidor web'),true);if(!silent)toast((r.storage==='supabase')?'Guardado en Supabase':'Guardado en servidor')}else{setPersistStatus('Guardado solo en navegador: '+(r&&r.error?r.error:'sin backend'),false)}}catch(e){backendReady=false;setPersistStatus('Guardado solo en navegador. Verifica que el backend web esté activo',false)}}
 function saveDebounced(){clearTimeout(saveTimer);saveTimer=setTimeout(function(){save(true)},450)}
 
 async function cacheFlagsLocal(auto){
@@ -1479,7 +1479,7 @@ async function cacheFlagsLocal(auto){
 }
 window.cacheFlagsLocal=cacheFlagsLocal;
 
-async function loadFromPython(){if(backendLoadedOnce)return;backendLoadedOnce=true;try{var r=await apiCall('load_results',{});backendReady=!!(r&&r.ok);if(r&&r.ok&&r.data&&r.data.matches){applyPayload(r.data);try{localStorage.setItem(STORAGE,JSON.stringify(statePayload()))}catch(e){}render();setPersistStatus('Datos cargados desde '+(r.path||'archivo JSON'),true);toast('Datos cargados desde archivo')}else{await save(true)}}catch(e){setPersistStatus('Modo sin backend: se guarda en navegador. Internet no disponible.',false)}}
+async function loadFromPython(){if(backendLoadedOnce)return;backendLoadedOnce=true;try{var r=await apiCall('load_results',{});backendReady=!!(r&&r.ok);if(r&&r.ok&&r.data&&r.data.matches){applyPayload(r.data);try{localStorage.setItem(STORAGE,JSON.stringify(statePayload()))}catch(e){}render();setPersistStatus('Datos cargados desde '+(r.path||'persistencia'),true);toast((r.storage==='supabase')?'Datos cargados desde Supabase':'Datos cargados')}else{await save(true)}}catch(e){setPersistStatus('Modo sin backend: se guarda en navegador. Internet no disponible.',false)}}
 function isDone(m){return m.hg!==null&&m.ag!==null&&!isNaN(m.hg)&&!isNaN(m.ag)}
 function toast(msg){var t=document.getElementById('toast');t.innerHTML=esc(msg);t.className='toast show';setTimeout(function(){t.className='toast'},1700)}
 function canEdit(){return !!(authState&&authState.authenticated)}

@@ -8,3 +8,17 @@ services:
     envVars:
       - key: FIXTURE_DATA_DIR
         value: /tmp/fixture_mundial_2026
+      - key: APP_LOGIN_USER
+        value: vglasinovich
+      - key: APP_LOGIN_PASSWORD
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_TABLE
+        value: app_state
+      - key: APP_STATE_KEY
+        value: fixture_mundial_2026

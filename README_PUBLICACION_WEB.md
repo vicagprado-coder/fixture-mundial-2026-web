@@ -92,3 +92,53 @@ Si no se definen, la app usa las credenciales configuradas por defecto para esta
 ## v107
 - Corrige la vista Rondas: se definió correctamente `lock` en los cruces eliminatorios.
 - En modo lectura, los inputs de rondas quedan deshabilitados; con sesión iniciada se habilitan.
+
+## v108 - Persistencia durable con Supabase
+
+Esta versión ya no depende únicamente del archivo JSON temporal de Render. Si configuras Supabase, los resultados, rondas, jugadores, estadísticas FIFA y análisis se guardan en una tabla PostgreSQL externa.
+
+### Variables de entorno necesarias en Render
+
+Configura en Render > Environment:
+
+- `SUPABASE_URL`: URL del proyecto Supabase, ejemplo `https://xxxxx.supabase.co`
+- `SUPABASE_SERVICE_ROLE_KEY`: Service role key del proyecto Supabase
+- `SUPABASE_TABLE`: `app_state`
+- `APP_STATE_KEY`: `fixture_mundial_2026`
+- `APP_LOGIN_USER`: `vglasinovich`
+- `APP_LOGIN_PASSWORD`: tu contraseña de edición
+- `SECRET_KEY`: cualquier valor largo aleatorio para la sesión Flask
+
+### SQL para crear la tabla en Supabase
+
+Ejecuta esto en Supabase > SQL Editor:
+
+```sql
+create table if not exists public.app_state (
+  key text primary key,
+  data jsonb not null,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.app_state enable row level security;
+```
+
+La app escribe desde el backend usando `SUPABASE_SERVICE_ROLE_KEY`, por eso esa clave solo debe ir en Render como variable de entorno y nunca en el HTML.
+
+### Migración inicial
+
+Después del deploy v108:
+
+1. Abre la web en el mismo navegador donde ya tenías tus resultados.
+2. Inicia sesión.
+3. Presiona `Guardar` una vez.
+4. Ese guardado sube el estado actual a Supabase.
+5. Desde ese momento los siguientes usuarios/navegadores cargarán la data desde Supabase.
+
+### Verificación
+
+Abre:
+
+`/api/storage/status`
+
+Debe responder con `storage: supabase`, `supabase_configured: true` y `has_data: true` después del primer guardado.

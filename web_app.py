@@ -12,9 +12,11 @@ from __future__ import annotations
 import json
 import mimetypes
 import os
+import time
 from pathlib import Path
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional
 
+import requests
 from flask import Flask, Response, jsonify, make_response, request, send_from_directory, session
 
 # Importa toda la lógica existente sin usar archivos BAT ni consola local.
@@ -30,6 +32,127 @@ app.config["JSON_AS_ASCII"] = False
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "fixture-mundial-2026-web-session-v105")
 APP_LOGIN_USER = os.environ.get("APP_LOGIN_USER", "vglasinovich")
 APP_LOGIN_PASSWORD = os.environ.get("APP_LOGIN_PASSWORD", "vicglasi061290")
+
+
+# Persistencia durable opcional con Supabase/Postgres.
+# Si estas variables existen en Render, la app guarda ahí en lugar de depender
+# del disco temporal de Render. Si no existen, conserva el JSON local como fallback.
+SUPABASE_URL = (os.environ.get("SUPABASE_URL") or "").strip().rstrip("/")
+SUPABASE_SERVICE_ROLE_KEY = (os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or "").strip()
+SUPABASE_TABLE = (os.environ.get("SUPABASE_TABLE") or "app_state").strip()
+APP_STATE_KEY = (os.environ.get("APP_STATE_KEY") or "fixture_mundial_2026").strip()
+
+
+def _supabase_enabled() -> bool:
+    return bool(SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY and SUPABASE_TABLE and APP_STATE_KEY)
+
+
+def _supabase_headers(extra: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+    headers = {
+        "apikey": SUPABASE_SERVICE_ROLE_KEY,
+        "Authorization": f"Bearer {SUPABASE_SERVICE_ROLE_KEY}",
+        "Content-Type": "application/json",
+    }
+    if extra:
+        headers.update(extra)
+    return headers
+
+
+def _supabase_endpoint(query: str = "") -> str:
+    return f"{SUPABASE_URL}/rest/v1/{SUPABASE_TABLE}{query}"
+
+
+def _merge_payload_preserving_good_data(payload: Dict[str, Any], existing: Dict[str, Any] | None) -> Dict[str, Any]:
+    """Evita que una respuesta parcial de FIFA reduzca datos ya buenos."""
+    payload = dict(payload or {})
+    existing = existing if isinstance(existing, dict) else {}
+    try:
+        if isinstance(payload.get("fifaTeamStats"), dict) and isinstance(existing.get("fifaTeamStats"), dict):
+            payload["fifaTeamStats"] = api._merge_fifa_team_stats(payload.get("fifaTeamStats") or {}, existing.get("fifaTeamStats") or {})
+        if isinstance(payload.get("fifaPlayerStats"), dict) and isinstance(existing.get("fifaPlayerStats"), dict):
+            payload["fifaPlayerStats"] = api._merge_fifa_player_stats_payload(payload.get("fifaPlayerStats") or {}, existing.get("fifaPlayerStats") or {})
+    except Exception:
+        # Si por alguna razón el merge protector falla, no se bloquea el guardado completo.
+        pass
+    return payload
+
+
+def _supabase_load() -> Dict[str, Any]:
+    if not _supabase_enabled():
+        return {"ok": False, "storage": "local", "error": "Supabase no configurado"}
+    try:
+        url = _supabase_endpoint(f"?key=eq.{APP_STATE_KEY}&select=key,data,updated_at&limit=1")
+        r = requests.get(url, headers=_supabase_headers(), timeout=20)
+        if r.status_code >= 400:
+            return {"ok": False, "storage": "supabase", "error": r.text, "status_code": r.status_code}
+        rows = r.json() if r.text else []
+        if rows:
+            data = rows[0].get("data")
+            return {"ok": True, "data": data, "path": f"Supabase:{SUPABASE_TABLE}/{APP_STATE_KEY}", "storage": "supabase", "updated_at": rows[0].get("updated_at")}
+        return {"ok": True, "data": None, "path": f"Supabase:{SUPABASE_TABLE}/{APP_STATE_KEY}", "storage": "supabase", "empty": True}
+    except Exception as exc:
+        return {"ok": False, "storage": "supabase", "error": str(exc)}
+
+
+def _supabase_save(payload: Dict[str, Any]) -> Dict[str, Any]:
+    if not _supabase_enabled():
+        return {"ok": False, "storage": "local", "error": "Supabase no configurado"}
+    existing_res = _supabase_load()
+    existing = existing_res.get("data") if existing_res.get("ok") else None
+    payload = _merge_payload_preserving_good_data(payload or {}, existing)
+    payload["saved_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    body = {"key": APP_STATE_KEY, "data": payload, "updated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
+    try:
+        r = requests.post(
+            _supabase_endpoint("?on_conflict=key"),
+            headers=_supabase_headers({"Prefer": "resolution=merge-duplicates,return=representation"}),
+            data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
+            timeout=30,
+        )
+        if r.status_code >= 400:
+            return {"ok": False, "storage": "supabase", "error": r.text, "status_code": r.status_code}
+        # Backup local temporal para diagnóstico. La fuente durable es Supabase.
+        try:
+            api.save_results(payload)
+        except Exception:
+            pass
+        return {"ok": True, "path": f"Supabase:{SUPABASE_TABLE}/{APP_STATE_KEY}", "storage": "supabase", "saved_at": payload["saved_at"]}
+    except Exception as exc:
+        return {"ok": False, "storage": "supabase", "error": str(exc)}
+
+
+def _persistent_load(payload: Dict[str, Any] | None = None) -> Dict[str, Any]:
+    if _supabase_enabled():
+        res = _supabase_load()
+        if res.get("ok") and res.get("data"):
+            return res
+        # Si Supabase aún está vacío, se intenta leer el JSON local como respaldo inicial.
+        local = api.load_results(payload or {})
+        if local.get("ok") and local.get("data"):
+            local["storage"] = "local_fallback"
+            local["path"] = local.get("path") or "JSON local"
+            local["message"] = "Supabase configurado pero vacío; se cargó respaldo local. Presiona Guardar con sesión iniciada para migrarlo."
+            return local
+        return res
+    local = api.load_results(payload or {})
+    local["storage"] = "local"
+    return local
+
+
+def _persistent_save(payload: Dict[str, Any]) -> Dict[str, Any]:
+    if _supabase_enabled():
+        res = _supabase_save(payload or {})
+        if res.get("ok"):
+            return res
+        # Si falla Supabase, no se pierde la operación: se guarda en JSON local temporal.
+        local = api.save_results(payload or {})
+        local["storage"] = "local_fallback"
+        local["warning"] = "No se pudo guardar en Supabase; quedó en JSON temporal de Render."
+        local["supabase_error"] = res.get("error")
+        return local
+    local = api.save_results(payload or {})
+    local["storage"] = "local"
+    return local
 
 
 def _json(payload: Dict[str, Any], status: int = 200) -> Response:
@@ -64,7 +187,7 @@ def add_common_headers(response: Response) -> Response:
 def _serve_html() -> Response:
     html = HTML_FILE.read_text(encoding="utf-8")
     try:
-        state = api.load_results().get("data")
+        state = _persistent_load().get("data")
     except Exception:
         state = None
     boot = (
@@ -135,7 +258,7 @@ def _payload() -> Dict[str, Any]:
 
 
 GET_MAP: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
-    "load": lambda p: api.load_results(p),
+    "load": lambda p: _persistent_load(p),
     "cache_flags": lambda p: api.cache_flags(p),
     "player_image_status": lambda p: api.player_image_status(p),
     "player_image_log": lambda p: api.player_image_log(p),
@@ -146,7 +269,7 @@ GET_MAP: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
 PUBLIC_POST_ACTIONS = {"player_image_status", "player_image_log", "player_image_manual_download_status"}
 
 POST_MAP: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
-    "save": api.save_results,
+    "save": _persistent_save,
     "analyze_full": api.analyze_full,
     "analyze": api.analyze_internet,
     "sync": api.sync_from_internet,
@@ -204,9 +327,49 @@ def api_status() -> Response:
         "user": session.get("user") if _is_authenticated() else None,
         "data_file": str(fixture_backend.DATA_FILE),
         "backup_file": str(fixture_backend.LOCAL_DATA_FILE),
+        "storage": "supabase" if _supabase_enabled() else "local",
+        "supabase_configured": _supabase_enabled(),
+        "supabase_table": SUPABASE_TABLE if _supabase_enabled() else None,
+        "app_state_key": APP_STATE_KEY if _supabase_enabled() else None,
         "flags_dir": str(fixture_backend.FLAGS_DIR),
         "player_images_dir": str(fixture_backend.PLAYER_IMAGES_DIR),
     })
+
+
+
+@app.route("/api/storage/status", methods=["GET"])
+def api_storage_status() -> Response:
+    res = _persistent_load({})
+    return _json({
+        "ok": True,
+        "storage": "supabase" if _supabase_enabled() else "local",
+        "supabase_configured": _supabase_enabled(),
+        "table": SUPABASE_TABLE if _supabase_enabled() else None,
+        "key": APP_STATE_KEY if _supabase_enabled() else None,
+        "has_data": bool(res.get("data")),
+        "loaded_from": res.get("storage"),
+        "path": res.get("path"),
+        "message": res.get("message"),
+        "error": res.get("error"),
+    })
+
+
+@app.route("/api/storage/migrate", methods=["POST", "OPTIONS"])
+def api_storage_migrate() -> Response:
+    if request.method == "OPTIONS":
+        return _json({"ok": True})
+    blocked = _auth_required()
+    if blocked is not None:
+        return blocked
+    if not _supabase_enabled():
+        return _json({"ok": False, "error": "Supabase no configurado en Render."}, 400)
+    local = api.load_results({})
+    data = local.get("data")
+    if not data:
+        return _json({"ok": False, "error": "No se encontró data local para migrar."}, 404)
+    saved = _supabase_save(data)
+    status = 200 if saved.get("ok") else 500
+    return _json(saved, status)
 
 
 @app.route("/api/close", methods=["POST", "OPTIONS"])

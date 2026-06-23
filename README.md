@@ -95,3 +95,10 @@ Si no se definen, la app usa las credenciales configuradas por defecto para esta
 ## v107
 - Corrige la vista Rondas: se definió correctamente `lock` en los cruces eliminatorios.
 - En modo lectura, los inputs de rondas quedan deshabilitados; con sesión iniciada se habilitan.
+
+
+## v108
+- Persistencia durable con Supabase/PostgreSQL.
+- Fallback a JSON local si Supabase no está configurado o falla.
+- Protección para no reducir estadísticas FIFA/planteles con respuestas parciales.
+- Endpoints nuevos: `/api/storage/status` y `/api/storage/migrate`.
