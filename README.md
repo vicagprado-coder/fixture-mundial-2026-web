@@ -59,7 +59,14 @@ Para persistencia real en producción, usar un disco persistente o base de datos
 
 ## v103 - Corrección rondas / clasificados
 
-- Rondas ya no depende de que todos los grupos estén completos para mostrar equipos detectados.
-- Si un 1.º de grupo está matemáticamente asegurado por regla FIFA/desempate directo, se carga en su cruce.
-- Si el 2.º o mejores terceros siguen pendientes, se mantiene la posición FIFA como placeholder.
-- Paquete web limpio, sin auditorías ni archivos .bat.
+- La sección Rondas carga cruces FIFA aunque la fase de grupos no esté completa.
+- Si un equipo ya aseguró el 1.º lugar o Top 2 por regla FIFA/desempate directo, se detecta para los cruces.
+- Los cupos todavía no definidos quedan como posiciones pendientes.
+- El paquete se mantiene limpio, sin auditorías ni archivos locales .bat.
+
+
+## v104 - Rondas en español y mayúsculas
+
+- Los equipos en la sección Rondas se muestran en español y en mayúsculas.
+- Si el valor interno viene en inglés, por ejemplo `Germany`, se visualiza como `ALEMANIA`.
+- Al guardar una ronda, el equipo se normaliza internamente para mantener la lógica de ganadores y avance.

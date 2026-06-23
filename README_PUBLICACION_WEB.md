@@ -60,3 +60,10 @@ En hosting gratuito, el guardado en archivos puede reiniciarse si la plataforma 
 - No se incluyen `.bat` en esta versión limpia.
 - El botón `Cerrar` en web no apaga el servidor; solo sirve como cierre/retorno visual.
 - El backend queda activo para que la app siga disponible por link.
+
+
+## v104 - Rondas en español y mayúsculas
+
+- Los equipos en la sección Rondas se muestran en español y en mayúsculas.
+- Si el valor interno viene en inglés, por ejemplo `Germany`, se visualiza como `ALEMANIA`.
+- Al guardar una ronda, el equipo se normaliza internamente para mantener la lógica de ganadores y avance.
