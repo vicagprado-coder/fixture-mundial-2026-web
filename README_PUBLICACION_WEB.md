@@ -87,3 +87,8 @@ Si no se definen, la app usa las credenciales configuradas por defecto para esta
 - La actualización ya no reduce equipos ni jugadores si FIFA devuelve una respuesta parcial.
 - Se prueban todas las variantes de slug configuradas para resolver IdTeam.
 - El guardado del backend conserva el último dato bueno de FIFA cuando el navegador/API trae menos datos.
+
+
+## v107
+- Corrige la vista Rondas: se definió correctamente `lock` en los cruces eliminatorios.
+- En modo lectura, los inputs de rondas quedan deshabilitados; con sesión iniciada se habilitan.
