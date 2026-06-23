@@ -1257,6 +1257,23 @@ body.players-detail-open{overflow-y:auto!important}
 .closingScreen .box{border-radius:28px;background:linear-gradient(135deg,rgba(0,176,80,.94),rgba(0,71,255,.94));padding:28px;box-shadow:0 22px 48px rgba(0,0,0,.25)}
 @media(max-width:780px){.persistText{white-space:normal}.tabClose{min-width:72px!important}}
 
+
+/* --- v105 sesión de edición --- */
+.authBtn{border:0;border-radius:18px;padding:12px 15px;font-weight:1000;cursor:pointer;color:#fff;background:linear-gradient(135deg,#0047ff,#00b050);box-shadow:0 10px 22px rgba(0,71,255,.18);white-space:nowrap}
+.authBtn.viewer{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.authBtn.out{background:linear-gradient(135deg,#e30613,#ff5b00)}
+.authStatus{display:inline-flex;align-items:center;gap:7px;border-radius:18px;padding:10px 12px;background:rgba(255,255,255,.92);color:var(--navy);font-weight:1000;border:1px solid rgba(255,255,255,.65);white-space:nowrap}
+.authStatus.viewer{color:#6b7280}.authStatus.editor{color:#067a3b}
+.readOnlyNotice{border-radius:18px;background:#fffbea;border:1px solid #f4df8b;color:#775900;font-weight:900;padding:10px 12px;margin:0 0 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.readOnlyNotice button{border:0;border-radius:999px;background:var(--blue);color:#fff;font-weight:1000;padding:8px 10px;cursor:pointer}
+body.readOnlyMode .score,body.readOnlyMode .koScore,body.readOnlyMode .koTeamInput{background:#f4f6fb!important;color:#728096!important;border-style:dashed!important;cursor:not-allowed!important}
+button:disabled,input:disabled{opacity:.58!important;cursor:not-allowed!important;filter:grayscale(.08)}
+.loginOverlay{position:fixed;inset:0;background:rgba(5,18,52,.72);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:9999;padding:18px}
+.loginOverlay.show{display:flex}.loginBox{width:min(420px,96vw);border-radius:28px;background:#fff;padding:22px;box-shadow:0 30px 70px rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.85)}
+.loginBox h2{margin:0;color:var(--navy);font-size:24px}.loginBox p{margin:6px 0 16px;color:var(--muted);font-weight:850;line-height:1.35}.loginBox label{display:block;color:var(--navy);font-weight:1000;margin:10px 0 6px}.loginBox input{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:16px;padding:13px 14px;font-size:15px;font-weight:900;color:var(--navy);outline:none}.loginBox input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(0,71,255,.10)}
+.loginActions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}.loginError{display:none;margin-top:10px;border-radius:14px;padding:10px;background:#fff0f1;color:var(--red);font-weight:900}.loginError.show{display:block}
+@media(max-width:780px){.authStatus{display:none}.toolbar{gap:7px}.authBtn{padding:10px 11px;font-size:12px}}
+
 </style>
 </head>
 <body>
@@ -1277,6 +1294,8 @@ body.players-detail-open{overflow-y:auto!important}
   <div class="toolbar">
     <label class="search"><span>🔎</span><input id="search" placeholder="Buscar selección, código o slug FIFA: ARG, BEL, IRN, ir-iran..." autocomplete="off"></label>
     <button class="miniBtn" id="clearBtn">Limpiar</button>
+    <span class="authStatus viewer" id="authStatus">👁️ Solo visualización</span>
+    <button class="authBtn viewer" id="loginBtn" title="Iniciar sesión para registrar datos">🔐 Iniciar sesión</button>
     <button class="miniBtn saveNow" id="saveNowBtn" title="Guardar resultados en JSON">💾 Guardar</button>
     <button class="miniBtn syncNow" id="fullAnalysisBtn" title="Consulta FIFA nuevamente y recalcula el análisis">🧠 Actualizar análisis</button>
   </div>
@@ -1308,6 +1327,18 @@ body.players-detail-open{overflow-y:auto!important}
   <button class="tab tabClose" data-action="closeApp" title="Guardar y cerrar el programa"><b>✖</b>Cerrar</button>
 </div>
 <div class="toast" id="toast"></div>
+<div class="loginOverlay" id="loginOverlay" aria-hidden="true">
+  <form class="loginBox" id="loginForm">
+    <h2>🔐 Iniciar sesión</h2>
+    <p>Sin sesión puedes visualizar el fixture, tablas, clasificados, jugadores y rondas. Para registrar resultados o actualizar datos debes iniciar sesión.</p>
+    <label for="loginUser">Usuario</label>
+    <input id="loginUser" autocomplete="username" placeholder="Usuario">
+    <label for="loginPass">Contraseña</label>
+    <input id="loginPass" type="password" autocomplete="current-password" placeholder="Contraseña">
+    <div class="loginError" id="loginError"></div>
+    <div class="loginActions"><button type="button" class="btn white" id="loginCancelBtn">Cancelar</button><button type="submit" class="btn">Entrar</button></div>
+  </form>
+</div>
 <script>
 (function(){
 var GROUPS={
@@ -1339,7 +1370,7 @@ function fifaTeamSearchText(item){item=item||{};var meta=item.meta||{};var stats
 var STORAGE='fixture_mundial_2026_persistente_v9';var UI_TAB_STORAGE='fixture_mundial_2026_ui_tab_v1';var UI_GROUP_STORAGE='fixture_mundial_2026_ui_group_v1';var persistStatusClosed=false;
 var OLD_STORAGES=['fixture_mundial_2026_persistente_v8','fixture_mundial_2026_desktop_v110','fixture_mundial_2026_desktop_v109','fixture_mundial_2026_v108','fixture_mundial_2026_v7','fixture_mundial_2026_v6','fixture_mundial_2026_v5','fixture_mundial_2026_v4','fixture_mundial_2026'];
 var UI_PLAYER_STORAGE='fixture_mundial_2026_selected_player_v1';
-var selected='A';var active='fixture';var query='';var matches=[];var playerSectionTab='summary';var fifaSelectedTeamCode='GER';var selectedPlayerId='';var analysisLoading=false;var playerStatsLoading=false;var playerImageDownloading=false;var playerManualDownloadStatus=null;var playerManualLiveLogs=[];var fifaTeamStats={teams:[],catalog:{},sources:[],notes:[]};var fifaPlayerStats={players:[],teamAggregates:{},sources:[],notes:[]};var playerCountryFilters=[];var knockoutRounds=null;var externalAnalysis=null;var unifiedAnalysis=null;var lastEventSearch=null;var lastPlayerImageStatus=null;var internetSync=null;var teamDiscipline={yellow:[],red:[],sources:[],notes:[]};var playerEvents={goals:[],assists:[],yellow:[],red:[]};var backendReady=false;var saveTimer=null;var lastSaveText='Pendiente de guardar';var backendLoadedOnce=false;
+var selected='A';var active='fixture';var query='';var authState=window.__AUTH__||{authenticated:false,user:null};var matches=[];var playerSectionTab='summary';var fifaSelectedTeamCode='GER';var selectedPlayerId='';var analysisLoading=false;var playerStatsLoading=false;var playerImageDownloading=false;var playerManualDownloadStatus=null;var playerManualLiveLogs=[];var fifaTeamStats={teams:[],catalog:{},sources:[],notes:[]};var fifaPlayerStats={players:[],teamAggregates:{},sources:[],notes:[]};var playerCountryFilters=[];var knockoutRounds=null;var externalAnalysis=null;var unifiedAnalysis=null;var lastEventSearch=null;var lastPlayerImageStatus=null;var internetSync=null;var teamDiscipline={yellow:[],red:[],sources:[],notes:[]};var playerEvents={goals:[],assists:[],yellow:[],red:[]};var backendReady=false;var saveTimer=null;var lastSaveText='Pendiente de guardar';var backendLoadedOnce=false;
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 
 function linkifySource(src){
@@ -1377,7 +1408,7 @@ function baseMatches(){
  Object.keys(GROUPS).forEach(function(g){for(var i=0;i<FIFA_GROUP_MATCH_PATTERN.length;i++){var p=FIFA_GROUP_MATCH_PATTERN[i];add(g,p[0],p[1],(dates[g]||[])[i]||'')}});
  return all;
 }
-function statePayload(){ensureKnockoutRounds();return {version:'v102-web',matches:matches,knockoutRounds:knockoutRounds,externalAnalysis:externalAnalysis,unifiedAnalysis:unifiedAnalysis,lastEventSearch:lastEventSearch,internetSync:internetSync,playerEvents:playerEvents,teamDiscipline:teamDiscipline,fifaTeamStats:fifaTeamStats,fifaPlayerStats:fifaPlayerStats,savedAt:new Date().toISOString()}}
+function statePayload(){ensureKnockoutRounds();return {version:'v105-web-login',matches:matches,knockoutRounds:knockoutRounds,externalAnalysis:externalAnalysis,unifiedAnalysis:unifiedAnalysis,lastEventSearch:lastEventSearch,internetSync:internetSync,playerEvents:playerEvents,teamDiscipline:teamDiscipline,fifaTeamStats:fifaTeamStats,fifaPlayerStats:fifaPlayerStats,savedAt:new Date().toISOString()}}
 function doneCount(list){var c=0;(list||[]).forEach(function(m){if(m&&m.hg!==null&&m.ag!==null&&!isNaN(m.hg)&&!isNaN(m.ag))c++});return c}
 function applyPayload(data){if(!data)return;if(Array.isArray(data)){matches=data;return}if(data.matches&&Array.isArray(data.matches))matches=data.matches;if(data.knockoutRounds)knockoutRounds=normalizeKnockoutRounds(data.knockoutRounds);if(data.externalAnalysis)externalAnalysis=data.externalAnalysis;if(data.unifiedAnalysis)unifiedAnalysis=data.unifiedAnalysis;if(data.lastEventSearch)lastEventSearch=data.lastEventSearch;if(data.internetSync)internetSync=data.internetSync;if(data.playerEvents){playerEvents=Object.assign({goals:[],assists:[],yellow:[],red:[]},data.playerEvents)}if(data.teamDiscipline){teamDiscipline=Object.assign({yellow:[],red:[],sources:[],notes:[]},data.teamDiscipline)}if(data.fifaTeamStats){fifaTeamStats=Object.assign({teams:[],catalog:{},sources:[],notes:[]},data.fifaTeamStats)}if(data.fifaPlayerStats){fifaPlayerStats=Object.assign({players:[],teamAggregates:{},sources:[],notes:[]},data.fifaPlayerStats)}}
 function setPersistStatus(msg,good){lastSaveText=msg||'';var el=document.getElementById('persistBar');if(el){if(!msg||persistStatusClosed){el.style.display='none';el.innerHTML='';return}el.style.display='flex';el.innerHTML='<span class="persistText">'+(good?'✅ ':'ℹ️ ')+esc(msg)+'</span><button class="persistClose" title="Cerrar aviso" onclick="window.closePersistStatus(event)">×</button>'}}
@@ -1385,19 +1416,22 @@ window.closePersistStatus=function(ev){if(ev){ev.preventDefault();ev.stopPropaga
 function clearPersistStatusSoon(ms){setTimeout(function(){if(active==='jugadores')setPersistStatus('',true)},ms||3000)}
 function load(){var loaded=false;try{if(window.__INITIAL_STATE__&&window.__INITIAL_STATE__.matches){applyPayload(window.__INITIAL_STATE__);loaded=true;setPersistStatus('Datos cargados desde archivo persistente',true)}}catch(e){}if(!loaded){try{var keys=[STORAGE].concat(OLD_STORAGES);for(var i=0;i<keys.length;i++){var raw=localStorage.getItem(keys[i]);if(raw){applyPayload(JSON.parse(raw));loaded=true;break}}}catch(e){}}if(!loaded){matches=baseMatches()}if(!matches||!matches.length)matches=baseMatches();knockoutRounds=normalizeKnockoutRounds(knockoutRounds);try{var rememberedGroup=localStorage.getItem(UI_GROUP_STORAGE);if(rememberedGroup&&GROUPS[rememberedGroup])selected=rememberedGroup;var rememberedTab=localStorage.getItem(UI_TAB_STORAGE);if(rememberedTab&&document.getElementById(rememberedTab))active=rememberedTab;selectedPlayerId=localStorage.getItem(UI_PLAYER_STORAGE)||''}catch(e){}try{localStorage.setItem(STORAGE,JSON.stringify(statePayload()))}catch(e){}}
 async function apiCall(name,payload){
-  var routes={load_results:['GET','/api/load'],save_results:['POST','/api/save'],analyze_internet:['POST','/api/analyze'],analyze_full:['POST','/api/analyze_full'],search_match_events:['POST','/api/search_events'],cache_flags:['POST','/api/cache_flags'],cache_player_images:['POST','/api/cache_player_images'],player_image_save:['POST','/api/player_image_save'],player_image_attempt_log:['POST','/api/player_image_attempt_log'],player_image_status:['POST','/api/player_image_status'],player_image_log:['POST','/api/player_image_log'],player_image_sources_manual:['GET','/api/player_image_sources_manual'],player_image_manual_download_start:['POST','/api/player_image_manual_download_start'],player_image_manual_download_status:['GET','/api/player_image_manual_download_status'],sync_from_internet:['POST','/api/sync'],load_player_stats:['POST','/api/player_stats'],load_fifa_team_stats:['POST','/api/fifa_team_stats'],load_fifa_player_stats:['POST','/api/fifa_player_stats'],close_app:['POST','/api/close']};
+  var routes={session:['GET','/api/session'],login:['POST','/api/login'],logout:['POST','/api/logout'],load_results:['GET','/api/load'],save_results:['POST','/api/save'],analyze_internet:['POST','/api/analyze'],analyze_full:['POST','/api/analyze_full'],search_match_events:['POST','/api/search_events'],cache_flags:['POST','/api/cache_flags'],cache_player_images:['POST','/api/cache_player_images'],player_image_save:['POST','/api/player_image_save'],player_image_attempt_log:['POST','/api/player_image_attempt_log'],player_image_status:['POST','/api/player_image_status'],player_image_log:['POST','/api/player_image_log'],player_image_sources_manual:['GET','/api/player_image_sources_manual'],player_image_manual_download_start:['POST','/api/player_image_manual_download_start'],player_image_manual_download_status:['GET','/api/player_image_manual_download_status'],sync_from_internet:['POST','/api/sync'],load_player_stats:['POST','/api/player_stats'],load_fifa_team_stats:['POST','/api/fifa_team_stats'],load_fifa_player_stats:['POST','/api/fifa_player_stats'],close_app:['POST','/api/close']};
   var r=routes[name];
   // v77: para la descarga TXT se usa primero el puente pywebview,
   // igual que el backend web ejecutado directamente. Si no existe, recién cae a HTTP web.
   if(window.pywebview&&window.pywebview.api&&window.pywebview.api[name]){return await window.pywebview.api[name](payload||{})}
   if(!r)throw new Error('API no disponible: '+name);
-  var opts={method:r[0],headers:{'Content-Type':'application/json'}}; if(r[0]==='POST')opts.body=JSON.stringify(payload||{});
-  var res=await fetch(r[1],opts); if(!res.ok)throw new Error('Backend HTTP no disponible ('+res.status+')'); return await res.json();
+  var opts={method:r[0],headers:{'Content-Type':'application/json'},credentials:'same-origin'}; if(r[0]==='POST')opts.body=JSON.stringify(payload||{});
+  var res=await fetch(r[1],opts);
+  if(res.status===401){authState={authenticated:false,user:null};updateEditModeUI();var data=null;try{data=await res.json()}catch(_e){}throw new Error((data&&data.error)||'Debes iniciar sesión para registrar o actualizar datos.')}
+  if(!res.ok)throw new Error('Backend HTTP no disponible ('+res.status+')'); return await res.json();
 }
-async function save(silent){try{localStorage.setItem(STORAGE,JSON.stringify(statePayload()))}catch(e){}try{var r=await apiCall('save_results',statePayload());backendReady=!!(r&&r.ok);if(r&&r.ok){setPersistStatus('Guardado en archivo persistente: '+(r.path||'servidor web/resultados_fixture_2026.json'),true);if(!silent)toast('Guardado en archivo JSON')}else{setPersistStatus('Guardado solo en navegador: '+(r&&r.error?r.error:'sin backend'),false)}}catch(e){backendReady=false;setPersistStatus('Guardado solo en navegador. Verifica que el backend web esté activo',false)}}
+async function save(silent){if(!canEdit()){setPersistStatus('Modo visualización: inicia sesión para guardar cambios.',false);if(!silent)showLoginModal();return}try{localStorage.setItem(STORAGE,JSON.stringify(statePayload()))}catch(e){}try{var r=await apiCall('save_results',statePayload());backendReady=!!(r&&r.ok);if(r&&r.ok){setPersistStatus('Guardado en archivo persistente: '+(r.path||'servidor web/resultados_fixture_2026.json'),true);if(!silent)toast('Guardado en archivo JSON')}else{setPersistStatus('Guardado solo en navegador: '+(r&&r.error?r.error:'sin backend'),false)}}catch(e){backendReady=false;setPersistStatus('Guardado solo en navegador. Verifica que el backend web esté activo',false)}}
 function saveDebounced(){clearTimeout(saveTimer);saveTimer=setTimeout(function(){save(true)},450)}
 
 async function cacheFlagsLocal(auto){
+  if(!requireAuth('actualizar banderas'))return;
   try{
     var r=await apiCall('cache_flags',{});
     if(r&&r.ok){
@@ -1415,6 +1449,21 @@ window.cacheFlagsLocal=cacheFlagsLocal;
 async function loadFromPython(){if(backendLoadedOnce)return;backendLoadedOnce=true;try{var r=await apiCall('load_results',{});backendReady=!!(r&&r.ok);if(r&&r.ok&&r.data&&r.data.matches){applyPayload(r.data);try{localStorage.setItem(STORAGE,JSON.stringify(statePayload()))}catch(e){}render();setPersistStatus('Datos cargados desde '+(r.path||'archivo JSON'),true);toast('Datos cargados desde archivo')}else{await save(true)}}catch(e){setPersistStatus('Modo sin backend: se guarda en navegador. Internet no disponible.',false)}}
 function isDone(m){return m.hg!==null&&m.ag!==null&&!isNaN(m.hg)&&!isNaN(m.ag)}
 function toast(msg){var t=document.getElementById('toast');t.innerHTML=esc(msg);t.className='toast show';setTimeout(function(){t.className='toast'},1700)}
+function canEdit(){return !!(authState&&authState.authenticated)}
+function lockedAttr(){return canEdit()?'':' disabled title="Inicia sesión para registrar o actualizar datos"'}
+function requireAuth(action){if(canEdit())return true;toast('Inicia sesión para '+(action||'registrar cambios'));showLoginModal();return false}
+function readonlyNoticeHTML(){return canEdit()?'':'<div class="readOnlyNotice"><span>👁️ Modo visualización: puedes revisar datos, pero no registrar ni actualizar información.</span><button onclick="showLoginModal()">Iniciar sesión</button></div>'}
+function updateEditModeUI(){
+  document.body.classList.toggle('readOnlyMode',!canEdit());
+  var st=document.getElementById('authStatus');if(st){st.className='authStatus '+(canEdit()?'editor':'viewer');st.textContent=canEdit()?('✅ Sesión activa: '+(authState.user||'editor')):'👁️ Solo visualización'}
+  var btn=document.getElementById('loginBtn');if(btn){btn.className='authBtn '+(canEdit()?'out':'viewer');btn.textContent=canEdit()?'🚪 Cerrar sesión':'🔐 Iniciar sesión';btn.title=canEdit()?'Cerrar sesión':'Iniciar sesión para registrar datos'}
+  ['saveNowBtn','fullAnalysisBtn'].forEach(function(id){var el=document.getElementById(id);if(el)el.disabled=!canEdit()});
+}
+function showLoginModal(){var ov=document.getElementById('loginOverlay');if(ov){ov.classList.add('show');ov.setAttribute('aria-hidden','false');setTimeout(function(){var u=document.getElementById('loginUser');if(u)u.focus()},60)}}
+function hideLoginModal(){var ov=document.getElementById('loginOverlay');if(ov){ov.classList.remove('show');ov.setAttribute('aria-hidden','true')}var er=document.getElementById('loginError');if(er){er.className='loginError';er.textContent=''}}
+async function refreshAuthState(){try{var res=await fetch('/api/session',{cache:'no-store'});var data=await res.json();authState={authenticated:!!data.authenticated,user:data.user||null}}catch(e){authState={authenticated:false,user:null}}updateEditModeUI();render()}
+async function doLogin(ev){if(ev){ev.preventDefault()}var er=document.getElementById('loginError');if(er){er.className='loginError';er.textContent=''}try{var res=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:(document.getElementById('loginUser')||{}).value||'',password:(document.getElementById('loginPass')||{}).value||''})});var data=await res.json();if(res.ok&&data&&data.ok){authState={authenticated:true,user:data.user||''};hideLoginModal();updateEditModeUI();render();toast('Sesión iniciada');return}throw new Error((data&&data.error)||'Credenciales incorrectas')}catch(e){if(er){er.textContent=e.message||String(e);er.className='loginError show'}else toast('No se pudo iniciar sesión')}}
+async function doLogout(){try{await fetch('/api/logout',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})}catch(e){}authState={authenticated:false,user:null};updateEditModeUI();render();toast('Sesión cerrada')}
 function teamFifaStats(team){var c=(code(team)||'').toUpperCase();var map=fifaStatsByCode();return map[c]||{}}
 function fifaRankInfo(team){var c=(code(team)||'').toUpperCase();var st=teamFifaStats(team)||{};var fallback=FIFA_RANKING[c]||{};var rank=Number(st.fifaRank||st.rank||fallback.rank||999);var points=Number(st.fifaRankingPoints||st.rankingPoints||fallback.points||0);return {rank:rank,points:points}}
 function teamCards(team){var st=teamFifaStats(team)||{};var ta=Number(st.yellow||st.yellowCards||0)||0;var direct=Number(st.directRed||st.directRedCards||0)||0;var indirect=Number(st.indirectRed||st.indirectRedCards||0)||0;var red=Number(st.red||st.redCards||0)||0;if(!red)red=direct+indirect;return {ta:ta,tr:red,directRed:direct,indirectRed:indirect}}
@@ -1510,13 +1559,13 @@ function renderSideNavigation(){
 }
 window.pickGroup=function(g){selected=g;try{localStorage.setItem(UI_GROUP_STORAGE,g)}catch(e){}query='';document.getElementById('search').value='';render();refreshUXContext();toast('Grupo '+g+' seleccionado')};
 function updateMatchFromInputs(id){var m=null;for(var i=0;i<matches.length;i++){if(matches[i].id===id){m=matches[i];break}}if(!m)return null;var h=document.getElementById('hg_'+id);var a=document.getElementById('ag_'+id);if(!h||!a)return m;var hg=h.value;var ag=a.value;m.hg=hg===''?null:Math.max(0,parseInt(hg,10));m.ag=ag===''?null:Math.max(0,parseInt(ag,10));return m}
-window.autoSaveMatch=function(id){updateMatchFromInputs(id);try{localStorage.setItem(STORAGE,JSON.stringify(statePayload()))}catch(e){}saveDebounced();updateKpis()};
-window.saveMatch=function(id){var m=updateMatchFromInputs(id);save(false);render();toast(m&&isDone(m)?'Resultado guardado':'Marcador pendiente')};
-window.clearMatch=function(id){for(var i=0;i<matches.length;i++){if(matches[i].id===id){matches[i].hg=null;matches[i].ag=null;break}}save();render();toast('Resultado eliminado')};
+window.autoSaveMatch=function(id){if(!requireAuth('registrar resultados')){render();return}updateMatchFromInputs(id);try{localStorage.setItem(STORAGE,JSON.stringify(statePayload()))}catch(e){}saveDebounced();updateKpis()};
+window.saveMatch=function(id){if(!requireAuth('guardar resultados'))return;var m=updateMatchFromInputs(id);save(false);render();toast(m&&isDone(m)?'Resultado guardado':'Marcador pendiente')};
+window.clearMatch=function(id){if(!requireAuth('limpiar resultados'))return;for(var i=0;i<matches.length;i++){if(matches[i].id===id){matches[i].hg=null;matches[i].ag=null;break}}save();render();toast('Resultado eliminado')};
 function renderSummary(rows){var html='<div class="groupResume">';for(var i=0;i<GROUPS[selected].length;i++){var t=GROUPS[selected][i];var lead=rows.length&&rows[0].team===t?' leader':'';html+='<div class="teamTile'+lead+'"><span class="flag">'+flag(t)+'</span><b>'+teamSeedHTML(t)+esc(name(t))+'</b><small>'+code(t)+' · '+teamSlot(t)+'</small></div>'}return html+'</div>'}
-function matchHTML(m){var hval=m.hg===null?'':m.hg;var aval=m.ag===null?'':m.ag;var hs=m.hSlot||teamSlot(m.h);var as=m.aSlot||teamSlot(m.a);return '<div class="match"><div class="matchTop"><span class="date">'+esc(m.d)+' · Grupo '+m.g+' · '+esc(hs)+' vs '+esc(as)+'</span><span class="state '+(isDone(m)?'done':'')+'">'+(isDone(m)?'Finalizado':'Pendiente')+'</span></div><div class="teams"><div class="team"><span class="flag">'+flag(m.h)+'</span><span class="seedBadge">'+esc(hs)+'</span>'+esc(name(m.h))+'<span class="code">'+code(m.h)+'</span></div><input class="score" id="hg_'+m.id+'" type="number" min="0" value="'+hval+'" oninput="window.autoSaveMatch(\''+m.id+'\')"><div class="vs">vs</div><input class="score" id="ag_'+m.id+'" type="number" min="0" value="'+aval+'" oninput="window.autoSaveMatch(\''+m.id+'\')"><div class="team"><span class="flag">'+flag(m.a)+'</span><span class="seedBadge">'+esc(as)+'</span>'+esc(name(m.a))+'<span class="code">'+code(m.a)+'</span></div></div><div class="actions"><button class="btn" onclick="window.saveMatch(\''+m.id+'\')">Guardar marcador</button><button class="btn white" onclick="window.clearMatch(\''+m.id+'\')">Limpiar</button></div></div>'}
+function matchHTML(m){var hval=m.hg===null?'':m.hg;var aval=m.ag===null?'':m.ag;var hs=m.hSlot||teamSlot(m.h);var as=m.aSlot||teamSlot(m.a);var lock=lockedAttr();return '<div class="match"><div class="matchTop"><span class="date">'+esc(m.d)+' · Grupo '+m.g+' · '+esc(hs)+' vs '+esc(as)+'</span><span class="state '+(isDone(m)?'done':'')+'">'+(isDone(m)?'Finalizado':'Pendiente')+'</span></div><div class="teams"><div class="team"><span class="flag">'+flag(m.h)+'</span><span class="seedBadge">'+esc(hs)+'</span>'+esc(name(m.h))+'<span class="code">'+code(m.h)+'</span></div><input class="score" id="hg_'+m.id+'" type="number" min="0" value="'+hval+'" '+lock+' oninput="window.autoSaveMatch(\''+m.id+'\')"><div class="vs">vs</div><input class="score" id="ag_'+m.id+'" type="number" min="0" value="'+aval+'" '+lock+' oninput="window.autoSaveMatch(\''+m.id+'\')"><div class="team"><span class="flag">'+flag(m.a)+'</span><span class="seedBadge">'+esc(as)+'</span>'+esc(name(m.a))+'<span class="code">'+code(m.a)+'</span></div></div><div class="actions"><button class="btn" '+lock+' onclick="window.saveMatch(\''+m.id+'\')">Guardar marcador</button><button class="btn white" '+lock+' onclick="window.clearMatch(\''+m.id+'\')">Limpiar</button></div></div>'}
 function filteredMatches(){var q=query.toLowerCase().trim();var out=[];for(var i=0;i<matches.length;i++){var m=matches[i];if(m.g!==selected)continue;if(q){var hay=(name(m.h)+' '+name(m.a)+' '+code(m.h)+' '+code(m.a)+' '+(m.hSlot||'')+' '+(m.aSlot||'')+' '+m.g).toLowerCase();if(hay.indexOf(q)<0)continue}out.push(m)}return out}
-function renderFixture(){var rows=table(selected);var html='<div class="sectionHead"><div><h2>Grupo '+selected+' · Fixture</h2><p>Orden oficial FIFA por posiciones: '+selected+'1 vs '+selected+'2, '+selected+'3 vs '+selected+'4, '+selected+'1 vs '+selected+'3, '+selected+'4 vs '+selected+'2, '+selected+'4 vs '+selected+'1 y '+selected+'2 vs '+selected+'3.</p></div><span class="tag green">2 directos + posible 3.º</span></div><div class="fieldPanel"><div class="fieldInner">'+renderSummary(rows);var ms=filteredMatches();if(!ms.length){html+='<div class="empty">No hay partidos para la búsqueda actual.</div>'}for(var i=0;i<ms.length;i++){html+=matchHTML(ms[i])}html+='</div></div>';document.getElementById('fixture').innerHTML=html}
+function renderFixture(){var rows=table(selected);var html=readonlyNoticeHTML()+'<div class="sectionHead"><div><h2>Grupo '+selected+' · Fixture</h2><p>Orden oficial FIFA por posiciones: '+selected+'1 vs '+selected+'2, '+selected+'3 vs '+selected+'4, '+selected+'1 vs '+selected+'3, '+selected+'4 vs '+selected+'2, '+selected+'4 vs '+selected+'1 y '+selected+'2 vs '+selected+'3.</p></div><span class="tag green">2 directos + posible 3.º</span></div><div class="fieldPanel"><div class="fieldInner">'+renderSummary(rows);var ms=filteredMatches();if(!ms.length){html+='<div class="empty">No hay partidos para la búsqueda actual.</div>'}for(var i=0;i<ms.length;i++){html+=matchHTML(ms[i])}html+='</div></div>';document.getElementById('fixture').innerHTML=html}
 function renderTabla(){var rows=table(selected);var complete=groupComplete(selected);var orden=complete?'Orden final FIFA aplicado: puntos y, si hay empate, enfrentamiento directo entre equipos empatados; luego DG/GF generales, conducta y Ranking FIFA.':'Orden provisional con validación FIFA: si dos o más equipos empatan en puntos y ya jugaron entre sí, se aplica enfrentamiento directo; si todavía falta el cruce, se usa DG/GF como referencia provisional.';var html='<div class="sectionHead"><div><h2>Tabla del Grupo '+selected+'</h2><p>'+orden+'</p></div><span class="tag">Actualizable</span></div><div class="card">'+tableHTML(rows,false)+'<div class="legendRow"><span class="legend qual">1.º y 2.º clasifican</span><span class="legend third">3.º compite entre mejores terceros</span></div><div class="rulesMini">Regla FIFA v97: en igualdad de puntos dentro del grupo se prioriza el enfrentamiento directo entre los equipos empatados. Para mejores terceros no existe enfrentamiento directo entre grupos: se usa PTS · DG · GF · conducta · Ranking FIFA.</div></div>';document.getElementById('tabla').innerHTML=html}
 function allThirds(){var gs=Object.keys(GROUPS);var arr=[];for(var i=0;i<gs.length;i++){var t=table(gs[i]);if(t[2])arr.push(t[2])}arr.sort(thirdComparator);return arr}
 function thirdRouteCell(r,idx){if(idx>=8)return '<span class="thirdRoute pending">No clasifica</span>';var route=currentThirdRoute();if(!route.ready)return '<span class="thirdRoute pending">MEJORES TERCEROS</span>';var dest=thirdDestinationForGroup(r.g,route);if(!dest)return '<span class="thirdRoute pending">MEJORES TERCEROS</span>';return '<div class="thirdRoute">'+esc(dest.matchNo)+'<br><small>vs '+esc(dest.vs)+'</small></div>'}
@@ -1677,6 +1726,7 @@ function unifiedInternetBlock(){
 }
 window.runInternetAnalysis=async function(){return window.runUnifiedAnalysis(true)}
 window.runUnifiedAnalysis=async function(withInternet){
+  if(!requireAuth(withInternet?'actualizar análisis':'recalcular análisis'))return;
   if(analysisLoading){toast('Ya hay una actualización en curso');return}
   analysisLoading=true;
   showTab('analisis');
@@ -1712,6 +1762,7 @@ function eventSearchBlock(){if(!lastEventSearch)return '<p class="muted">Todaví
 window.searchEventsInternet=async function(scope,id){showTab('eventos');var box=document.getElementById('eventSearchStatus');if(box)box.innerHTML='<p class="muted">Buscando reportes, goleadores y tarjetas en internet...</p>';try{var payload=statePayload();payload.group=selected;payload.scope=scope||'group';payload.match_id=id||'';var res=await apiCall('search_match_events',payload);lastEventSearch=res;if(res&&res.ok&&res.matches){matches=res.matches;save(true);render();toast('Búsqueda de eventos actualizada')}else{renderEventos()}}catch(e){lastEventSearch={ok:false,error:'No se pudo conectar al backend web. Detalle: '+(e.message||String(e))};renderEventos()}}
 
 window.loadPlayerStatsFromInternet=async function(){
+  if(!requireAuth('cargar jugadores FIFA'))return;
   if(playerStatsLoading){toast('Ya se están cargando jugadores FIFA');return}
   playerStatsLoading=true;
   showTab('jugadores');
@@ -1834,6 +1885,7 @@ async function downloadOnePlayerImageFromBrowser(p){
 }
 
 window.cachePlayerImagesLocal=async function(force){
+  if(!requireAuth('descargar fotos faltantes'))return;
   if(playerStatsLoading||playerImageDownloading){toast('Ya hay una carga de jugadores/fotos en curso');return}
   playerStatsLoading=true;playerImageDownloading=true;
   showTab('jugadores');
@@ -1916,6 +1968,7 @@ async function downloadManualImageBySource(pid,src){
 }
 
 window.downloadAllManualPlayerImages=async function(force){
+  if(!requireAuth('descargar imágenes desde TXT'))return;
   if(playerImageDownloading){toast('La descarga ya está en proceso');return}
   playerImageDownloading=true;playerStatsLoading=true;playerManualLiveLogs=[];playerManualDownloadStatus=null;
   showTab('jugadores');
@@ -1987,6 +2040,7 @@ window.verifyPlayerImagesLocal=async function(){
 
 
 window.refreshFifaTeamsFromInternet=async function(){
+  if(!requireAuth('actualizar equipos FIFA'))return;
   if(playerStatsLoading){toast('Ya se están actualizando datos FIFA');return}
   playerStatsLoading=true;
   active='equiposFifa';
@@ -2018,6 +2072,7 @@ window.refreshFifaTeamsFromInternet=async function(){
 }
 
 window.recalculateFifaTeamsLocal=async function(){
+  if(!requireAuth('recalcular equipos FIFA'))return;
   if(analysisLoading){toast('Ya hay un recálculo en curso');return}
   analysisLoading=true;
   active='equiposFifa';
@@ -2047,6 +2102,7 @@ window.recalculateFifaTeamsLocal=async function(){
 }
 
 window.refreshRoundGroupResults=async function(){
+  if(!requireAuth('actualizar grupos'))return;
   setPersistStatus('Actualizando resultados de grupos sin salir de Rondas...',false);
   try{
     var res=await apiCall('sync_from_internet',statePayload());
@@ -2301,15 +2357,15 @@ async function refreshManualDownloadLiveLog(){
 }
 
 function jugadoresActionsPanel(){
-  return '<div class="card actionDock playerTopActions"><div class="unifiedToolbar"><button class="btn gold" onclick="window.downloadAllManualPlayerImages(false)">📥 Iniciar descarga TXT</button><button class="btn white" onclick="window.loadPlayerStatsFromInternet()">🌐 Cargar jugadores<small>Último FIFA</small></button><button class="btn white" onclick="window.cachePlayerImagesLocal(false)">🖼️ Fotos faltantes</button><button class="btn white" onclick="window.verifyPlayerImagesLocal()">✅ Verificar</button><button class="btn white" onclick="window.showPlayerImageLog()">📄 Log</button><button class="btn white" onclick="showTab(\'equiposFifa\')">📈 Equipos</button><button class="btn white" onclick="window.clearPlayerCountries()">🧹 Todos</button></div></div>';
+  return '<div class="card actionDock playerTopActions"><div class="unifiedToolbar"><button class="btn gold" '+lockedAttr()+' onclick="window.downloadAllManualPlayerImages(false)">📥 Iniciar descarga TXT</button><button class="btn white" '+lockedAttr()+' onclick="window.loadPlayerStatsFromInternet()">🌐 Cargar jugadores<small>Último FIFA</small></button><button class="btn white" '+lockedAttr()+' onclick="window.cachePlayerImagesLocal(false)">🖼️ Fotos faltantes</button><button class="btn white" onclick="window.verifyPlayerImagesLocal()">✅ Verificar</button><button class="btn white" onclick="window.showPlayerImageLog()">📄 Log</button><button class="btn white" onclick="showTab(\'equiposFifa\')">📈 Equipos</button><button class="btn white" onclick="window.clearPlayerCountries()">🧹 Todos</button></div></div>';
 }
 
 
 function analisisActionsPanel(){
-  return '<div class="card actionDock"><div class="sectionHead"><div><h2>Acciones</h2><p>El botón inferior Análisis solo abre la vista. Para consultar FIFA nuevamente, usa Actualizar FIFA + análisis.</p></div></div><div class="unifiedToolbar"><button class="btn gold" onclick="window.runUnifiedAnalysis(true)">🌐 Actualizar FIFA + análisis<small>Equipos y jugadores</small></button><button class="btn white" onclick="window.runUnifiedAnalysis(false)">📴 Recalcular local</button><button class="btn white" onclick="showTab(\'equiposFifa\')">📈 Equipos FIFA</button><button class="btn white" onclick="showTab(\'jugadores\')">👤 Jugadores</button><button class="btn" onclick="showTab(\'rondas\')">🏆 Rondas</button></div></div>';
+  return '<div class="card actionDock"><div class="sectionHead"><div><h2>Acciones</h2><p>El botón inferior Análisis solo abre la vista. Para consultar FIFA nuevamente, usa Actualizar FIFA + análisis.</p></div></div><div class="unifiedToolbar"><button class="btn gold" '+lockedAttr()+' onclick="window.runUnifiedAnalysis(true)">🌐 Actualizar FIFA + análisis<small>Equipos y jugadores</small></button><button class="btn white" '+lockedAttr()+' onclick="window.runUnifiedAnalysis(false)">📴 Recalcular local</button><button class="btn white" onclick="showTab(\'equiposFifa\')">📈 Equipos FIFA</button><button class="btn white" onclick="showTab(\'jugadores\')">👤 Jugadores</button><button class="btn" onclick="showTab(\'rondas\')">🏆 Rondas</button></div></div>';
 }
 function equiposFifaActionsPanel(){
-  return '<div class="card actionDock"><div class="sectionHead"><div><h2>Acciones</h2></div></div><div class="unifiedToolbar"><button class="btn gold" onclick="window.refreshFifaTeamsFromInternet()">🌐 Actualizar FIFA<small>Solo equipos</small></button><button class="btn white" onclick="window.cacheFlagsLocal(false)">🏳️ Banderas</button><button class="btn white" onclick="window.recalculateFifaTeamsLocal()">📴 Local</button><button class="btn" onclick="window.runUnifiedAnalysis(true)">🧠 Análisis</button></div></div>';
+  return '<div class="card actionDock"><div class="sectionHead"><div><h2>Acciones</h2></div></div><div class="unifiedToolbar"><button class="btn gold" '+lockedAttr()+' onclick="window.refreshFifaTeamsFromInternet()">🌐 Actualizar FIFA<small>Solo equipos</small></button><button class="btn white" '+lockedAttr()+' onclick="window.cacheFlagsLocal(false)">🏳️ Banderas</button><button class="btn white" '+lockedAttr()+' onclick="window.recalculateFifaTeamsLocal()">📴 Local</button><button class="btn" onclick="window.runUnifiedAnalysis(true)">🧠 Análisis</button></div></div>';
 }
 
 function playerFreshnessBlock(){
@@ -2423,14 +2479,15 @@ function teamVisualFromText(txt){txt=String(txt||'');var k=findTeamKey(txt);if(k
 function winnerFromKo(m){if(!m||!m.home||!m.away||m.hg===null||m.ag===null)return '';var hg=Number(m.hg),ag=Number(m.ag);if(hg>ag)return m.home;if(ag>hg)return m.away;if(m.ph!==null&&m.pa!==null){if(Number(m.ph)>Number(m.pa))return m.home;if(Number(m.pa)>Number(m.ph))return m.away}return ''}
 function loserFromKo(m){if(!m||!m.home||!m.away||m.hg===null||m.ag===null)return '';var w=winnerFromKo(m);if(!w)return '';return findTeamKey(w)===findTeamKey(m.home)?m.away:m.home}
 function updateKnockoutFromInputs(roundKey,idx){ensureKnockoutRounds();var m=knockoutRounds[roundKey][idx];var h=document.getElementById('ko_'+roundKey+'_'+idx+'_h');var a=document.getElementById('ko_'+roundKey+'_'+idx+'_a');var hg=document.getElementById('ko_'+roundKey+'_'+idx+'_hg');var ag=document.getElementById('ko_'+roundKey+'_'+idx+'_ag');var ph=document.getElementById('ko_'+roundKey+'_'+idx+'_ph');var pa=document.getElementById('ko_'+roundKey+'_'+idx+'_pa');if(h)m.home=normalizeKoTeamText(h.value);if(a)m.away=normalizeKoTeamText(a.value);if(hg)m.hg=normalizeKoValue(hg.value);if(ag)m.ag=normalizeKoValue(ag.value);if(ph)m.ph=normalizeKoValue(ph.value);if(pa)m.pa=normalizeKoValue(pa.value);return m}
-window.autoSaveKnockout=function(roundKey,idx){updateKnockoutFromInputs(roundKey,idx);try{localStorage.setItem(STORAGE,JSON.stringify(statePayload()))}catch(e){}saveDebounced()}
-window.saveKnockout=function(roundKey,idx){updateKnockoutFromInputs(roundKey,idx);save(false);render();toast('Partido de ronda guardado')}
-window.clearKnockoutMatch=function(roundKey,idx){ensureKnockoutRounds();knockoutRounds[roundKey][idx]=blankKoMatch(roundKey,idx);save(false);render();toast('Partido de ronda limpiado')}
-window.clearAllKnockout=function(){if(confirm('¿Quieres limpiar todas las rondas eliminatorias?')){knockoutRounds=baseKnockoutRounds();save(false);render();toast('Rondas eliminatorias reiniciadas')}}
+window.autoSaveKnockout=function(roundKey,idx){if(!requireAuth('registrar rondas')){render();return}updateKnockoutFromInputs(roundKey,idx);try{localStorage.setItem(STORAGE,JSON.stringify(statePayload()))}catch(e){}saveDebounced()}
+window.saveKnockout=function(roundKey,idx){if(!requireAuth('guardar rondas'))return;updateKnockoutFromInputs(roundKey,idx);save(false);render();toast('Partido de ronda guardado')}
+window.clearKnockoutMatch=function(roundKey,idx){if(!requireAuth('limpiar rondas'))return;ensureKnockoutRounds();knockoutRounds[roundKey][idx]=blankKoMatch(roundKey,idx);save(false);render();toast('Partido de ronda limpiado')}
+window.clearAllKnockout=function(){if(!requireAuth('reiniciar rondas'))return;if(confirm('¿Quieres limpiar todas las rondas eliminatorias?')){knockoutRounds=baseKnockoutRounds();save(false);render();toast('Rondas eliminatorias reiniciadas')}}
 function buildR32Matches(useTeams){var arr=[];for(var i=0;i<R32_BLUEPRINT.length;i++)arr.push(blueprintMatch(R32_BLUEPRINT[i],'r32',i,!!useTeams));return arr}
-window.loadQualifiedToR32=function(){ensureKnockoutRounds();var before=knownR32Count();knockoutRounds.r32=buildR32Matches(true);['r16','r8','r4','r3','r2'].forEach(function(k){knockoutRounds[k]=(baseKnockoutRounds()[k]||[])});var after=knownR32Count();save(false);render();toast(after?'Cruces FIFA actualizados con '+after+' llaves que ya tienen clasificados detectados':'Cruces FIFA cargados con posiciones pendientes')}
+window.loadQualifiedToR32=function(){if(!requireAuth('cargar cruces FIFA'))return;ensureKnockoutRounds();var before=knownR32Count();knockoutRounds.r32=buildR32Matches(true);['r16','r8','r4','r3','r2'].forEach(function(k){knockoutRounds[k]=(baseKnockoutRounds()[k]||[])});var after=knownR32Count();save(false);render();toast(after?'Cruces FIFA actualizados con '+after+' llaves que ya tienen clasificados detectados':'Cruces FIFA cargados con posiciones pendientes')}
 function mapWinnersByMatch(roundKey){var out={};(knockoutRounds[roundKey]||[]).forEach(function(m){if(m.matchNo)out[m.matchNo]=winnerFromKo(m)});return out}
 window.advanceRound=function(roundKey){
+  if(!requireAuth('pasar ganadores de ronda'))return;
   ensureKnockoutRounds();
   var cfg=ROUND_CONFIG.filter(function(r){return r.key===roundKey})[0];
   if(!cfg||!cfg.next)return;
@@ -2474,10 +2531,10 @@ function koMatchHTML(roundKey,m,idx){
   html+='<div class="koLine"><input class="koTeamInput" id="ko_'+roundKey+'_'+idx+'_h" value="'+esc(teamNameUpperES(m.home||''))+'" placeholder="'+esc(teamNameUpperES(m.homeSeed||'Equipo 1'))+'" oninput="window.autoSaveKnockout(\''+roundKey+'\','+idx+')"><input class="koScore" id="ko_'+roundKey+'_'+idx+'_hg" type="number" min="0" value="'+koValue(m.hg)+'" placeholder="0" oninput="window.autoSaveKnockout(\''+roundKey+'\','+idx+')"><input class="koScore" id="ko_'+roundKey+'_'+idx+'_ph" type="number" min="0" value="'+koValue(m.ph)+'" placeholder="0" oninput="window.autoSaveKnockout(\''+roundKey+'\','+idx+')"></div>';
   html+='<div class="koLine"><input class="koTeamInput" id="ko_'+roundKey+'_'+idx+'_a" value="'+esc(teamNameUpperES(m.away||''))+'" placeholder="'+esc(teamNameUpperES(m.awaySeed||'Equipo 2'))+'" oninput="window.autoSaveKnockout(\''+roundKey+'\','+idx+')"><input class="koScore" id="ko_'+roundKey+'_'+idx+'_ag" type="number" min="0" value="'+koValue(m.ag)+'" placeholder="0" oninput="window.autoSaveKnockout(\''+roundKey+'\','+idx+')"><input class="koScore" id="ko_'+roundKey+'_'+idx+'_pa" type="number" min="0" value="'+koValue(m.pa)+'" placeholder="0" oninput="window.autoSaveKnockout(\''+roundKey+'\','+idx+')"></div>';
   if(w){html+='<div class="koWinner">Avanza: '+teamVisualFromText(w)+'</div>'}
-  html+='<div class="actions"><button class="btn" onclick="window.saveKnockout(\''+roundKey+'\','+idx+')">Guardar</button><button class="btn white" onclick="window.clearKnockoutMatch(\''+roundKey+'\','+idx+')">Limpiar</button></div></div>';
+  html+='<div class="actions"><button class="btn" '+lock+' onclick="window.saveKnockout(\''+roundKey+'\','+idx+')">Guardar</button><button class="btn white" '+lock+' onclick="window.clearKnockoutMatch(\''+roundKey+'\','+idx+')">Limpiar</button></div></div>';
   return html;
 }
-function renderRound(title,roundKey){ensureKnockoutRounds();var cfg=ROUND_CONFIG.filter(function(r){return r.key===roundKey})[0];var matchesList=knockoutRounds[roundKey]||[];var html='<div class="roundCol"><div class="roundHead"><h3>'+title+'</h3><span class="roundCount">'+matchesList.length+'</span></div>';matchesList.forEach(function(m,i){html+=koMatchHTML(roundKey,m,i)});if(cfg&&cfg.next){var label=roundKey==='r4'?'Pasar finalistas y 3er puesto':'Pasar ganadores';html+='<button class="btn gold roundAdvance" onclick="window.advanceRound(\''+roundKey+'\')">'+label+'</button>'}return html+'</div>'}
+function renderRound(title,roundKey){ensureKnockoutRounds();var cfg=ROUND_CONFIG.filter(function(r){return r.key===roundKey})[0];var matchesList=knockoutRounds[roundKey]||[];var html='<div class="roundCol"><div class="roundHead"><h3>'+title+'</h3><span class="roundCount">'+matchesList.length+'</span></div>';matchesList.forEach(function(m,i){html+=koMatchHTML(roundKey,m,i)});if(cfg&&cfg.next){var label=roundKey==='r4'?'Pasar finalistas y 3er puesto':'Pasar ganadores';html+='<button class="btn gold roundAdvance" '+lockedAttr()+' onclick="window.advanceRound(\''+roundKey+'\')">'+label+'</button>'}return html+'</div>'}
 function finalWinner(){ensureKnockoutRounds();return winnerFromKo((knockoutRounds.r2||[])[0]||null)}
 function finalLoser(){ensureKnockoutRounds();return loserFromKo((knockoutRounds.r2||[])[0]||null)}
 function thirdPlaceWinner(){ensureKnockoutRounds();return winnerFromKo((knockoutRounds.r3||[])[0]||null)}
@@ -2505,7 +2562,7 @@ function renderRondas(){
   var decided=0,total=0;Object.keys(knockoutRounds||{}).forEach(function(k){(knockoutRounds[k]||[]).forEach(function(m){total++;if(winnerFromKo(m))decided++;})});
   var champLabel=champ?esc(name(findTeamKey(champ))||champ):'—';var route=safeCurrentThirdRoute();var qs=qualifiedSummaryForRondas();
   var html='<div class="rondasIntro"><h2>Fixture eliminatorio FIFA</h2><div class="rondasStatus"><div class="rondasChip">'+filledR32+'/16<small>R32 con equipos</small></div><div class="rondasChip">'+qs.total+'<small>clasificados detectados</small></div><div class="rondasChip">'+champLabel+'<small>Campeón</small></div></div></div>';
-  html+='<div class="koActions"><button class="btn" onclick="window.loadQualifiedToR32()">Cargar cruces FIFA</button><button class="btn gold" onclick="window.refreshRoundGroupResults()">Actualizar grupos</button><button class="btn red" onclick="window.clearAllKnockout()">Reiniciar</button></div>';
+  html+='<div class="koActions"><button class="btn" '+lockedAttr()+' onclick="window.loadQualifiedToR32()">Cargar cruces FIFA</button><button class="btn gold" '+lockedAttr()+' onclick="window.refreshRoundGroupResults()">Actualizar grupos</button><button class="btn red" '+lockedAttr()+' onclick="window.clearAllKnockout()">Reiniciar</button></div>';
   html+='<div class="rulesMini"><b>v104:</b> Rondas ya puede cargar parcialmente los equipos clasificados matemáticamente. Si un 1.º de grupo está asegurado por regla FIFA/desempate directo, se coloca en su llave. Si el 2.º o los mejores terceros aún no están definidos, quedan como posición pendiente. Combinación de terceros: '+(route.ready?esc(route.key):'pendiente')+'.</div>';
   if(qs.total){html+='<div class="card"><b>Clasificados detectados para cruces:</b><div class="mathMetaRow"><span class="mathMeta">1.º asegurados: '+qs.top1.length+'</span><span class="mathMeta">Top 2 asegurados: '+qs.top2.length+'</span><span class="mathMeta">Mejores terceros asegurados: '+qs.terceros.length+'</span></div></div>'}
   html+='<div class="bracketViewport"><div class="bracketGrid">'+renderRound('Ronda de 32','r32')+renderRound('Ronda de 16','r16')+renderRound('Cuartos','r8')+renderRound('Semifinal','r4')+renderRound('3er puesto','r3')+renderRound('Final','r2')+'</div></div>';
@@ -2707,8 +2764,8 @@ function render(){
 
 function updateSearchPlaceholder(){var el=document.getElementById('search');if(!el)return;if(active==='jugadores')el.placeholder='Buscar jugador, país, código o slug FIFA: Balogun, IRN, ir-iran...';else if(active==='equiposFifa')el.placeholder='Buscar selección, código o slug FIFA: ARG, BEL, IRN, ir-iran...';else if(active==='clasificados')el.placeholder='Buscar clasificados, eliminados o motivo: MEX, 1.º asegurado, eliminado...';else el.placeholder='Buscar selección, código o slug FIFA: ARG, BEL, IRN, ir-iran...'}
 function showTab(tab){if(tab!=='jugadores'){document.body.classList.remove('players-detail-open')}if(tab==='eventos')tab='jugadores';active=tab;try{localStorage.setItem(UI_TAB_STORAGE,active)}catch(e){}updateSearchPlaceholder();var secs=document.querySelectorAll('.section');for(var j=0;j<secs.length;j++)secs[j].className=secs[j].className.replace(' active','');var sec=document.getElementById(active);if(sec)sec.className+=' active';var tabs=document.querySelectorAll('.tab');for(var k=0;k<tabs.length;k++)tabs[k].className=tabs[k].className.replace(' active','');var t=document.querySelector('[data-tab="'+active+'"]');if(t)t.className+=' active';render();try{window.scrollTo({top:0,behavior:'smooth'})}catch(e){window.scrollTo(0,0)}}
-function bind(){var ts=document.querySelectorAll('.tab');for(var i=0;i<ts.length;i++){ts[i].onclick=function(){if(this.getAttribute('data-action')==='closeApp'){window.closeApplication();return}var target=this.getAttribute('data-tab');if(target==='analisis'){showTab('analisis');return}if(target)showTab(target)}}var searchEl=document.getElementById('search');searchEl.oninput=function(){query=this.value||'';if(active==='jugadores'){renderSideNavigation();renderJugadores();refreshUXContext()}else if(active==='equiposFifa'){renderSideNavigation();renderEquiposFifa();refreshUXContext()}else if(active==='clasificados'){renderClasificados();refreshUXContext()}else showTab('fixture')};searchEl.onfocus=function(){document.body.classList.add('search-focus')};searchEl.onblur=function(){document.body.classList.remove('search-focus')};document.getElementById('clearBtn').onclick=function(){query='';document.getElementById('search').value='';render();toast('Búsqueda limpia')};document.getElementById('saveNowBtn').onclick=function(){save(false)};var fa=document.getElementById('fullAnalysisBtn');if(fa)fa.onclick=function(){window.runUnifiedAnalysis(true)};document.addEventListener('keydown',function(e){var tag=(document.activeElement&&document.activeElement.tagName||'').toLowerCase();if(e.key==='/'&&tag!=='input'&&tag!=='textarea'){e.preventDefault();searchEl.focus();searchEl.select()}if(e.key==='Escape'){if(tag==='input'&&document.activeElement===searchEl){searchEl.blur()}query='';searchEl.value='';render()}})}
-try{load();bind();render();setPersistStatus('Cargando persistencia...',false);setTimeout(loadFromPython,150);window.addEventListener('beforeunload',function(){try{var payload=JSON.stringify(statePayload());localStorage.setItem(STORAGE,payload);if(navigator.sendBeacon){navigator.sendBeacon('/api/save',new Blob([payload],{type:'application/json'}));}else{fetch('/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body:payload,keepalive:true});}}catch(e){}})}catch(e){document.getElementById('fixture').innerHTML='<div class="errorBox">Error al iniciar: '+esc(e.message)+'</div>'}
+function bind(){var ts=document.querySelectorAll('.tab');for(var i=0;i<ts.length;i++){ts[i].onclick=function(){if(this.getAttribute('data-action')==='closeApp'){window.closeApplication();return}var target=this.getAttribute('data-tab');if(target==='analisis'){showTab('analisis');return}if(target)showTab(target)}}var searchEl=document.getElementById('search');searchEl.oninput=function(){query=this.value||'';if(active==='jugadores'){renderSideNavigation();renderJugadores();refreshUXContext()}else if(active==='equiposFifa'){renderSideNavigation();renderEquiposFifa();refreshUXContext()}else if(active==='clasificados'){renderClasificados();refreshUXContext()}else showTab('fixture')};searchEl.onfocus=function(){document.body.classList.add('search-focus')};searchEl.onblur=function(){document.body.classList.remove('search-focus')};document.getElementById('clearBtn').onclick=function(){query='';document.getElementById('search').value='';render();toast('Búsqueda limpia')};document.getElementById('saveNowBtn').onclick=function(){if(requireAuth('guardar datos'))save(false)};var loginBtn=document.getElementById('loginBtn');if(loginBtn)loginBtn.onclick=function(){canEdit()?doLogout():showLoginModal()};var lf=document.getElementById('loginForm');if(lf)lf.onsubmit=doLogin;var lc=document.getElementById('loginCancelBtn');if(lc)lc.onclick=hideLoginModal;var lo=document.getElementById('loginOverlay');if(lo)lo.onclick=function(ev){if(ev.target===lo)hideLoginModal()};var fa=document.getElementById('fullAnalysisBtn');if(fa)fa.onclick=function(){window.runUnifiedAnalysis(true)};updateEditModeUI();document.addEventListener('keydown',function(e){var tag=(document.activeElement&&document.activeElement.tagName||'').toLowerCase();if(e.key==='/'&&tag!=='input'&&tag!=='textarea'){e.preventDefault();searchEl.focus();searchEl.select()}if(e.key==='Escape'){if(tag==='input'&&document.activeElement===searchEl){searchEl.blur()}query='';searchEl.value='';render()}})}
+try{load();bind();render();setPersistStatus('Cargando persistencia...',false);setTimeout(refreshAuthState,80);setTimeout(loadFromPython,150);window.addEventListener('beforeunload',function(){try{var payload=JSON.stringify(statePayload());localStorage.setItem(STORAGE,payload);if(canEdit()){if(navigator.sendBeacon){navigator.sendBeacon('/api/save',new Blob([payload],{type:'application/json'}));}else{fetch('/api/save',{method:'POST',headers:{'Content-Type':'application/json'},body:payload,keepalive:true,credentials:'same-origin'});}}}catch(e){}})}catch(e){document.getElementById('fixture').innerHTML='<div class="errorBox">Error al iniciar: '+esc(e.message)+'</div>'}
 })();
 </script>
 </body>

@@ -70,3 +70,16 @@ Para persistencia real en producción, usar un disco persistente o base de datos
 - Los equipos en la sección Rondas se muestran en español y en mayúsculas.
 - Si el valor interno viene en inglés, por ejemplo `Germany`, se visualiza como `ALEMANIA`.
 - Al guardar una ronda, el equipo se normaliza internamente para mantener la lógica de ganadores y avance.
+
+
+## Versión v105 - sesión de edición
+
+La web queda en modo visualización para cualquier visitante. Solo al iniciar sesión se habilitan acciones de registro o actualización: guardar marcadores, actualizar FIFA/análisis, cargar cruces, editar rondas, reiniciar rondas y guardar datos.
+
+Para mayor seguridad en Render, puedes definir variables de entorno:
+
+- `APP_LOGIN_USER`
+- `APP_LOGIN_PASSWORD`
+- `SECRET_KEY`
+
+Si no se definen, la app usa las credenciales configuradas por defecto para esta entrega.

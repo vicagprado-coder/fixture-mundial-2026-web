@@ -15,7 +15,7 @@ import os
 from pathlib import Path
 from typing import Any, Callable, Dict
 
-from flask import Flask, Response, jsonify, make_response, request, send_from_directory
+from flask import Flask, Response, jsonify, make_response, request, send_from_directory, session
 
 # Importa toda la lógica existente sin usar archivos BAT ni consola local.
 import backend as fixture_backend
@@ -26,12 +26,30 @@ api = fixture_backend.AppApi()
 
 app = Flask(__name__, static_folder=None)
 app.config["JSON_AS_ASCII"] = False
+# Sesión de edición: solo usuarios autenticados pueden guardar o actualizar datos.
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "fixture-mundial-2026-web-session-v105")
+APP_LOGIN_USER = os.environ.get("APP_LOGIN_USER", "vglasinovich")
+APP_LOGIN_PASSWORD = os.environ.get("APP_LOGIN_PASSWORD", "vicglasi061290")
 
 
 def _json(payload: Dict[str, Any], status: int = 200) -> Response:
     response = make_response(jsonify(payload), status)
     response.headers["Cache-Control"] = "no-store"
     return response
+
+
+def _is_authenticated() -> bool:
+    return bool(session.get("authenticated"))
+
+
+def _auth_payload() -> Dict[str, Any]:
+    return {"ok": True, "authenticated": _is_authenticated(), "user": session.get("user") if _is_authenticated() else None}
+
+
+def _auth_required() -> Response | None:
+    if _is_authenticated():
+        return None
+    return _json({"ok": False, "auth_required": True, "error": "Debes iniciar sesión para registrar o actualizar datos."}, 401)
 
 
 @app.after_request
@@ -53,6 +71,7 @@ def _serve_html() -> Response:
         "<script>"
         "window.__APP_MODE__='web';"
         "window.__INITIAL_STATE__ = " + json.dumps(state, ensure_ascii=False) + ";"
+        "window.__AUTH__ = " + json.dumps(_auth_payload(), ensure_ascii=False) + ";"
         "</script>"
     )
     if "</head>" in html:
@@ -124,6 +143,8 @@ GET_MAP: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "player_image_manual_download_status": lambda p: api.player_image_manual_download_status(p),
 }
 
+PUBLIC_POST_ACTIONS = {"player_image_status", "player_image_log", "player_image_manual_download_status"}
+
 POST_MAP: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
     "save": api.save_results,
     "analyze_full": api.analyze_full,
@@ -145,12 +166,42 @@ POST_MAP: Dict[str, Callable[[Dict[str, Any]], Dict[str, Any]]] = {
 }
 
 
+@app.route("/api/session", methods=["GET"])
+def api_session() -> Response:
+    return _json(_auth_payload())
+
+
+@app.route("/api/login", methods=["POST", "OPTIONS"])
+def api_login() -> Response:
+    if request.method == "OPTIONS":
+        return _json({"ok": True})
+    data = _payload()
+    user = str(data.get("username") or data.get("user") or "").strip()
+    password = str(data.get("password") or "")
+    if user == APP_LOGIN_USER and password == APP_LOGIN_PASSWORD:
+        session["authenticated"] = True
+        session["user"] = APP_LOGIN_USER
+        return _json({"ok": True, "authenticated": True, "user": APP_LOGIN_USER})
+    session.clear()
+    return _json({"ok": False, "authenticated": False, "error": "Usuario o contraseña incorrectos."}, 401)
+
+
+@app.route("/api/logout", methods=["POST", "OPTIONS"])
+def api_logout() -> Response:
+    if request.method == "OPTIONS":
+        return _json({"ok": True})
+    session.clear()
+    return _json({"ok": True, "authenticated": False})
+
+
 @app.route("/api/status", methods=["GET"])
 def api_status() -> Response:
     return _json({
         "ok": True,
         "mode": "web",
         "backend": "flask",
+        "authenticated": _is_authenticated(),
+        "user": session.get("user") if _is_authenticated() else None,
         "data_file": str(fixture_backend.DATA_FILE),
         "backup_file": str(fixture_backend.LOCAL_DATA_FILE),
         "flags_dir": str(fixture_backend.FLAGS_DIR),
@@ -180,6 +231,10 @@ def api_routes(name: str) -> Response:
         elif request.method == "POST":
             fn = POST_MAP.get(key)
             if fn:
+                if key not in PUBLIC_POST_ACTIONS:
+                    blocked = _auth_required()
+                    if blocked is not None:
+                        return blocked
                 return _json(fn(_payload()))
         return _json({"ok": False, "error": f"Ruta API no encontrada: {key}"}, 404)
     except Exception as exc:
