@@ -699,6 +699,14 @@ class AppApi:
             USER_DATA_DIR.mkdir(parents=True, exist_ok=True)
             LOCAL_DATA_DIR.mkdir(parents=True, exist_ok=True)
             payload = payload or {}
+            # v106: proteger el archivo persistente contra guardados parciales.
+            # Si el navegador/API trae menos equipos o jugadores que el último JSON bueno,
+            # se conserva la información previa en lugar de reducirla.
+            existing = self._read_existing_payload_for_merge()
+            if isinstance(payload.get("fifaTeamStats"), dict) and isinstance(existing.get("fifaTeamStats"), dict):
+                payload["fifaTeamStats"] = self._merge_fifa_team_stats(payload.get("fifaTeamStats") or {}, existing.get("fifaTeamStats") or {})
+            if isinstance(payload.get("fifaPlayerStats"), dict) and isinstance(existing.get("fifaPlayerStats"), dict):
+                payload["fifaPlayerStats"] = self._merge_fifa_player_stats_payload(payload.get("fifaPlayerStats") or {}, existing.get("fifaPlayerStats") or {})
             payload["saved_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
             text = json.dumps(payload, ensure_ascii=False, indent=2)
             USER_DATA_FILE.write_text(text, encoding="utf-8")
@@ -710,6 +718,148 @@ class AppApi:
 
     def get_save_path(self, payload: Dict[str, Any] | None = None) -> Dict[str, Any]:
         return {"ok": True, "path": str(USER_DATA_FILE), "backup_path": str(LOCAL_DATA_FILE)}
+
+    def _read_existing_payload_for_merge(self) -> Dict[str, Any]:
+        for path in (USER_DATA_FILE, LOCAL_DATA_FILE):
+            try:
+                if path.exists():
+                    data = json.loads(path.read_text(encoding="utf-8"))
+                    if isinstance(data, dict):
+                        return data
+            except Exception:
+                continue
+        return {}
+
+    def _merge_fifa_team_stats(self, incoming: Dict[str, Any], existing: Dict[str, Any] | None = None) -> Dict[str, Any]:
+        """Evita que una actualización parcial borre equipos ya cargados.
+
+        FIFA puede devolver temporalmente menos equipos o fallar en la resolución de
+        un slug/IdTeam. En ese caso se conserva el último dato bueno por código.
+        """
+        if not isinstance(incoming, dict):
+            return existing if isinstance(existing, dict) else incoming
+        if not isinstance(existing, dict):
+            return incoming
+        in_rows = incoming.get("teams") if isinstance(incoming.get("teams"), list) else []
+        old_rows = existing.get("teams") if isinstance(existing.get("teams"), list) else []
+        if not old_rows:
+            return incoming
+
+        def row_code(row: Dict[str, Any]) -> str:
+            c = str((row or {}).get("code") or "").upper().strip()
+            if c:
+                return c
+            team = str((row or {}).get("team") or "")
+            return str(TEAM_CODES.get(team, "")).upper().strip()
+
+        in_by_code = {row_code(r): dict(r) for r in in_rows if isinstance(r, dict) and row_code(r)}
+        old_by_code = {row_code(r): dict(r) for r in old_rows if isinstance(r, dict) and row_code(r)}
+        preserved = []
+        completed = []
+        for code, old in old_by_code.items():
+            cur = in_by_code.get(code)
+            if not cur:
+                in_by_code[code] = old
+                preserved.append(code)
+                continue
+            # Si la fila nueva viene sin metadatos clave o con todo en cero, conserva los metadatos previos.
+            for key in ("idTeam", "slug", "pageUrl", "nameEs", "source"):
+                if old.get(key) and not cur.get(key):
+                    cur[key] = old.get(key)
+                    completed.append(code)
+            # Si el refresh trae una fila sin partidos ni stats pero el anterior sí tenía datos, conserva la fila anterior.
+            new_score = sum(float(cur.get(k) or 0) for k in ("matches", "goals", "assists", "yellow", "red", "shots", "xg"))
+            old_score = sum(float(old.get(k) or 0) for k in ("matches", "goals", "assists", "yellow", "red", "shots", "xg"))
+            if old_score > 0 and new_score == 0:
+                in_by_code[code] = old
+                preserved.append(code)
+            else:
+                in_by_code[code] = cur
+
+        ordered = []
+        for team, code_raw in TEAM_CODES.items():
+            code = str(code_raw).upper()
+            if code in in_by_code:
+                row = dict(in_by_code[code])
+                row.setdefault("team", team)
+                row.setdefault("code", code)
+                ordered.append(row)
+        known = {str(c).upper() for c in TEAM_CODES.values()}
+        for code, row in in_by_code.items():
+            if code not in known:
+                ordered.append(row)
+        incoming = dict(incoming)
+        incoming["teams"] = ordered
+        catalog = {}
+        if isinstance(existing.get("catalog"), dict):
+            catalog.update(existing.get("catalog") or {})
+        if isinstance(incoming.get("catalog"), dict):
+            catalog.update(incoming.get("catalog") or {})
+        incoming["catalog"] = catalog
+        notes = list(incoming.get("notes") or []) if isinstance(incoming.get("notes"), list) else []
+        if preserved:
+            notes.insert(0, "v106: se conservaron datos FIFA previos para no reducir la información por respuesta parcial: " + ", ".join(sorted(set(preserved))[:20]))
+        if completed:
+            notes.append("v106: se completaron metadatos FIFA desde caché para: " + ", ".join(sorted(set(completed))[:20]))
+        incoming["notes"] = list(dict.fromkeys([str(x) for x in notes if x]))[:18]
+        incoming["ok"] = bool(incoming.get("teams"))
+        incoming["preservedTeamCodes"] = sorted(set(preserved))
+        return incoming
+
+    def _merge_fifa_player_stats_payload(self, incoming: Dict[str, Any], existing: Dict[str, Any] | None = None) -> Dict[str, Any]:
+        """Evita que un guardado/refresh parcial reduzca el plantel cargado."""
+        if not isinstance(incoming, dict):
+            return existing if isinstance(existing, dict) else incoming
+        if not isinstance(existing, dict):
+            return incoming
+        in_players = incoming.get("players") if isinstance(incoming.get("players"), list) else []
+        old_players = existing.get("players") if isinstance(existing.get("players"), list) else []
+        if not old_players or len(in_players) >= len(old_players):
+            return incoming
+
+        def by_code(players):
+            out: Dict[str, List[Dict[str, Any]]] = {}
+            for p in players:
+                if isinstance(p, dict):
+                    c = str(p.get("code") or "").upper().strip()
+                    if c:
+                        out.setdefault(c, []).append(p)
+            return out
+
+        nb, ob = by_code(in_players), by_code(old_players)
+        old_aggs = existing.get("teamAggregates") if isinstance(existing.get("teamAggregates"), dict) else {}
+        new_aggs = incoming.get("teamAggregates") if isinstance(incoming.get("teamAggregates"), dict) else {}
+        merged = []
+        aggs = {}
+        preserved = []
+        for _team, code_raw in TEAM_CODES.items():
+            code = str(code_raw).upper()
+            np = nb.get(code, [])
+            op = ob.get(code, [])
+            use_old = bool(op) and (not np or len(np) < min(len(op), FIFA_EXPECTED_PLAYERS_PER_TEAM))
+            chosen = op if use_old else np
+            if use_old:
+                preserved.append(f"{code} ({len(op)} jugadores cacheados; nuevo {len(np)})")
+            merged.extend(chosen)
+            if use_old and code in old_aggs:
+                aggs[code] = old_aggs[code]
+            elif code in new_aggs:
+                aggs[code] = new_aggs[code]
+            elif code in old_aggs:
+                aggs[code] = old_aggs[code]
+        incoming = dict(incoming)
+        incoming["players"] = merged or old_players
+        incoming["teamAggregates"] = aggs or old_aggs
+        notes = list(incoming.get("notes") or []) if isinstance(incoming.get("notes"), list) else []
+        if preserved:
+            notes.insert(0, "v106: se conservaron planteles previos para evitar reducción por respuesta parcial FIFA: " + "; ".join(preserved[:20]))
+        incoming["notes"] = list(dict.fromkeys([str(x) for x in notes if x]))[:18]
+        incoming["preservedFromCache"] = list(dict.fromkeys((incoming.get("preservedFromCache") or []) + preserved))[:60]
+        try:
+            incoming = self._finalize_player_freshness(incoming, raw_stats_count=int(incoming.get("rawStatsPlayers") or 0))
+        except Exception:
+            pass
+        return incoming
 
 
     def analyze_full(self, payload: Dict[str, Any]) -> Dict[str, Any]:
@@ -766,6 +916,7 @@ class AppApi:
                 try:
                     fifa_stats = self._fetch_fifa_team_stats(force=True)
                     if isinstance(fifa_stats, dict) and fifa_stats.get("teams"):
+                        fifa_stats = self._merge_fifa_team_stats(fifa_stats, base_payload.get("fifaTeamStats") or self._read_fifa_stats_cache(max_age_seconds=None))
                         base_payload["fifaTeamStats"] = fifa_stats
                         base_payload["teamDiscipline"] = self._team_discipline_from_fifa(fifa_stats)
                         sources.extend(fifa_stats.get("sources", []) or [])
@@ -783,6 +934,7 @@ class AppApi:
                         catalog = base_payload.get("fifaTeamStats", {}).get("catalog") or {}
                     fifa_player_stats = self._fetch_fifa_player_stats(force=True, catalog=catalog, cache_images=False)
                     if isinstance(fifa_player_stats, dict) and fifa_player_stats.get("players"):
+                        fifa_player_stats = self._merge_fifa_player_stats_payload(fifa_player_stats, base_payload.get("fifaPlayerStats") or self._read_fifa_player_stats_cache(max_age_seconds=None))
                         base_payload["fifaPlayerStats"] = fifa_player_stats
                         sources.extend(fifa_player_stats.get("sources", []) or [])
                         notes.extend(fifa_player_stats.get("notes", []) or [])
@@ -1927,10 +2079,15 @@ class AppApi:
     def _fifa_slug_candidates(self, code: str, team: str) -> List[str]:
         code = (code or "").upper().strip()
         configured = FIFA_TEAM_SLUGS.get(code) or []
-        # UX/performance v50: no generar búsquedas extra. Si existe un slug
-        # configurado, se usa solo ese listado único y no se prueba otra variante.
-        # Irán queda únicamente como ir-iran.
-        candidates = [configured[0]] if configured else [self._slugify_team(team or self._team_from_code(code))]
+        # v106: probar todas las variantes configuradas.
+        # Antes solo se probaba la primera variante y equipos como BIH, CIV, COD
+        # podían quedar con "slug no resuelto" aunque existiera otro slug válido.
+        candidates = list(configured)
+        generated = self._slugify_team(team or self._team_from_code(code))
+        if generated:
+            candidates.append(generated)
+        if code:
+            candidates.append(code.lower())
         seen = set()
         out = []
         for x in candidates:
@@ -2667,6 +2824,9 @@ class AppApi:
             if item.get("pageUrl"):
                 result["sources"].append(item["pageUrl"])
 
+        # v106: si FIFA devuelve una respuesta parcial, no reducir lo que ya existía en caché.
+        if cached_any.get("teams"):
+            result = self._merge_fifa_team_stats(result, cached_any)
         result["teams"].sort(key=lambda x: (str(x.get("team") or "")))
         if not result["teams"]:
             result["ok"] = False
@@ -3204,6 +3364,8 @@ class AppApi:
             force = bool(payload.get("force", False))
             fifa_stats = self._fetch_fifa_team_stats(force=force)
             base_payload = dict(payload)
+            if isinstance(fifa_stats, dict):
+                fifa_stats = self._merge_fifa_team_stats(fifa_stats, payload.get("fifaTeamStats") or self._read_fifa_stats_cache(max_age_seconds=None))
             if fifa_stats.get("ok"):
                 base_payload["fifaTeamStats"] = fifa_stats
                 base_payload["teamDiscipline"] = self._team_discipline_from_fifa(fifa_stats)
@@ -3829,6 +3991,7 @@ class AppApi:
             if not catalog:
                 catalog = self._load_fifa_team_catalog(discover=True)
             fifa_player_stats = self._fetch_fifa_player_stats(force=force, catalog=catalog or {})
+            fifa_player_stats = self._merge_fifa_player_stats_payload(fifa_player_stats, payload.get("fifaPlayerStats") or self._read_fifa_player_stats_cache(max_age_seconds=None))
             base_payload = dict(payload)
             base_payload["fifaPlayerStats"] = fifa_player_stats
             # Conserva fifaTeamStats existente si lo había, pero no lo modifica.

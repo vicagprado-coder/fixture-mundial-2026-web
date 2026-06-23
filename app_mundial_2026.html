@@ -1408,9 +1408,42 @@ function baseMatches(){
  Object.keys(GROUPS).forEach(function(g){for(var i=0;i<FIFA_GROUP_MATCH_PATTERN.length;i++){var p=FIFA_GROUP_MATCH_PATTERN[i];add(g,p[0],p[1],(dates[g]||[])[i]||'')}});
  return all;
 }
-function statePayload(){ensureKnockoutRounds();return {version:'v105-web-login',matches:matches,knockoutRounds:knockoutRounds,externalAnalysis:externalAnalysis,unifiedAnalysis:unifiedAnalysis,lastEventSearch:lastEventSearch,internetSync:internetSync,playerEvents:playerEvents,teamDiscipline:teamDiscipline,fifaTeamStats:fifaTeamStats,fifaPlayerStats:fifaPlayerStats,savedAt:new Date().toISOString()}}
+function statePayload(){ensureKnockoutRounds();return {version:'v106-web-preserva-fifa',matches:matches,knockoutRounds:knockoutRounds,externalAnalysis:externalAnalysis,unifiedAnalysis:unifiedAnalysis,lastEventSearch:lastEventSearch,internetSync:internetSync,playerEvents:playerEvents,teamDiscipline:teamDiscipline,fifaTeamStats:fifaTeamStats,fifaPlayerStats:fifaPlayerStats,savedAt:new Date().toISOString()}}
 function doneCount(list){var c=0;(list||[]).forEach(function(m){if(m&&m.hg!==null&&m.ag!==null&&!isNaN(m.hg)&&!isNaN(m.ag))c++});return c}
-function applyPayload(data){if(!data)return;if(Array.isArray(data)){matches=data;return}if(data.matches&&Array.isArray(data.matches))matches=data.matches;if(data.knockoutRounds)knockoutRounds=normalizeKnockoutRounds(data.knockoutRounds);if(data.externalAnalysis)externalAnalysis=data.externalAnalysis;if(data.unifiedAnalysis)unifiedAnalysis=data.unifiedAnalysis;if(data.lastEventSearch)lastEventSearch=data.lastEventSearch;if(data.internetSync)internetSync=data.internetSync;if(data.playerEvents){playerEvents=Object.assign({goals:[],assists:[],yellow:[],red:[]},data.playerEvents)}if(data.teamDiscipline){teamDiscipline=Object.assign({yellow:[],red:[],sources:[],notes:[]},data.teamDiscipline)}if(data.fifaTeamStats){fifaTeamStats=Object.assign({teams:[],catalog:{},sources:[],notes:[]},data.fifaTeamStats)}if(data.fifaPlayerStats){fifaPlayerStats=Object.assign({players:[],teamAggregates:{},sources:[],notes:[]},data.fifaPlayerStats)}}
+function mergeFifaTeamStatsSafe(incoming,current){
+  if(!incoming||typeof incoming!=='object')return current||incoming;
+  if(!current||typeof current!=='object')return incoming;
+  var inRows=Array.isArray(incoming.teams)?incoming.teams:[];
+  var oldRows=Array.isArray(current.teams)?current.teams:[];
+  if(!oldRows.length)return incoming;
+  function rowCode(r){return String((r&&r.code)||code((r&&r.team)||'')||'').toUpperCase().trim()}
+  var map={};inRows.forEach(function(r){var c=rowCode(r);if(c)map[c]=Object.assign({},r)});
+  var preserved=[];
+  oldRows.forEach(function(old){var c=rowCode(old);if(!c)return;var cur=map[c];if(!cur){map[c]=Object.assign({},old);preserved.push(c);return}
+    ['idTeam','slug','pageUrl','nameEs','source'].forEach(function(k){if(old[k]&&!cur[k])cur[k]=old[k]});
+    var ns=['matches','goals','assists','yellow','red','shots','xg'].reduce(function(s,k){return s+Number(cur[k]||0)},0);
+    var os=['matches','goals','assists','yellow','red','shots','xg'].reduce(function(s,k){return s+Number(old[k]||0)},0);
+    if(os>0&&ns===0){map[c]=Object.assign({},old);preserved.push(c)}else map[c]=cur;
+  });
+  var out=Object.assign({},incoming);out.teams=[];
+  Object.keys(TEAM_CODES).forEach(function(t){var c=String(TEAM_CODES[t]||'').toUpperCase();if(map[c])out.teams.push(map[c])});
+  Object.keys(map).forEach(function(c){var known=false;Object.keys(TEAM_CODES).forEach(function(t){if(String(TEAM_CODES[t]).toUpperCase()===c)known=true});if(!known)out.teams.push(map[c])});
+  out.catalog=Object.assign({},current.catalog||{},incoming.catalog||{});
+  if(preserved.length){out.notes=(Array.isArray(out.notes)?out.notes:[]);out.notes.unshift('v106: se preservaron equipos desde caché por respuesta parcial: '+preserved.join(', '));out.preservedTeamCodes=preserved}
+  return out;
+}
+function mergeFifaPlayerStatsSafe(incoming,current){
+  if(!incoming||typeof incoming!=='object')return current||incoming;
+  if(!current||typeof current!=='object')return incoming;
+  var np=Array.isArray(incoming.players)?incoming.players:[];
+  var op=Array.isArray(current.players)?current.players:[];
+  if(!op.length||np.length>=op.length)return incoming;
+  var out=Object.assign({},incoming);out.players=op;out.teamAggregates=current.teamAggregates||incoming.teamAggregates||{};
+  out.notes=Array.isArray(out.notes)?out.notes:[];out.notes.unshift('v106: se preservó plantel anterior porque la actualización devolvió menos jugadores.');
+  out.preservedFromCache=out.preservedFromCache||['plantel anterior completo'];
+  return out;
+}
+function applyPayload(data){if(!data)return;if(Array.isArray(data)){matches=data;return}if(data.matches&&Array.isArray(data.matches))matches=data.matches;if(data.knockoutRounds)knockoutRounds=normalizeKnockoutRounds(data.knockoutRounds);if(data.externalAnalysis)externalAnalysis=data.externalAnalysis;if(data.unifiedAnalysis)unifiedAnalysis=data.unifiedAnalysis;if(data.lastEventSearch)lastEventSearch=data.lastEventSearch;if(data.internetSync)internetSync=data.internetSync;if(data.playerEvents){playerEvents=Object.assign({goals:[],assists:[],yellow:[],red:[]},data.playerEvents)}if(data.teamDiscipline){teamDiscipline=Object.assign({yellow:[],red:[],sources:[],notes:[]},data.teamDiscipline)}if(data.fifaTeamStats){fifaTeamStats=Object.assign({teams:[],catalog:{},sources:[],notes:[]},mergeFifaTeamStatsSafe(data.fifaTeamStats,fifaTeamStats))}if(data.fifaPlayerStats){fifaPlayerStats=Object.assign({players:[],teamAggregates:{},sources:[],notes:[]},mergeFifaPlayerStatsSafe(data.fifaPlayerStats,fifaPlayerStats))}}
 function setPersistStatus(msg,good){lastSaveText=msg||'';var el=document.getElementById('persistBar');if(el){if(!msg||persistStatusClosed){el.style.display='none';el.innerHTML='';return}el.style.display='flex';el.innerHTML='<span class="persistText">'+(good?'✅ ':'ℹ️ ')+esc(msg)+'</span><button class="persistClose" title="Cerrar aviso" onclick="window.closePersistStatus(event)">×</button>'}}
 window.closePersistStatus=function(ev){if(ev){ev.preventDefault();ev.stopPropagation()}persistStatusClosed=true;var el=document.getElementById('persistBar');if(el){el.style.display='none';el.innerHTML=''}}
 function clearPersistStatusSoon(ms){setTimeout(function(){if(active==='jugadores')setPersistStatus('',true)},ms||3000)}
@@ -1740,8 +1773,8 @@ window.runUnifiedAnalysis=async function(withInternet){
       if(res.matches)matches=res.matches;
       if(res.playerEvents)playerEvents=Object.assign({goals:[],assists:[],yellow:[],red:[]},res.playerEvents);
       if(res.teamDiscipline)teamDiscipline=Object.assign({yellow:[],red:[],sources:[],notes:[]},res.teamDiscipline);
-      if(res.fifaTeamStats)fifaTeamStats=Object.assign({teams:[],catalog:{},sources:[],notes:[]},res.fifaTeamStats);
-      if(res.fifaPlayerStats)fifaPlayerStats=Object.assign({players:[],teamAggregates:{},sources:[],notes:[]},res.fifaPlayerStats);
+      if(res.fifaTeamStats)fifaTeamStats=Object.assign({teams:[],catalog:{},sources:[],notes:[]},mergeFifaTeamStatsSafe(res.fifaTeamStats,fifaTeamStats));
+      if(res.fifaPlayerStats)fifaPlayerStats=Object.assign({players:[],teamAggregates:{},sources:[],notes:[]},mergeFifaPlayerStatsSafe(res.fifaPlayerStats,fifaPlayerStats));
       if(res.externalAnalysis)externalAnalysis=res.externalAnalysis;
       if(res.unifiedAnalysis)unifiedAnalysis=res.unifiedAnalysis;
       await save(true);renderAnalisis();updateKpis();
@@ -1772,7 +1805,7 @@ window.loadPlayerStatsFromInternet=async function(){
     payload.force=true;
     var res=await apiCall('load_fifa_player_stats',payload);
     if(res&&res.ok){
-      if(res.fifaPlayerStats)fifaPlayerStats=Object.assign({players:[],teamAggregates:{},sources:[],notes:[]},res.fifaPlayerStats);
+      if(res.fifaPlayerStats)fifaPlayerStats=Object.assign({players:[],teamAggregates:{},sources:[],notes:[]},mergeFifaPlayerStatsSafe(res.fifaPlayerStats,fifaPlayerStats));
       await save(true);render();toast('Jugadores FIFA actualizados');
       setPersistStatus('Jugadores FIFA actualizado. Equipos FIFA se mantiene con sus datos oficiales.',true);
     }else{
@@ -2051,7 +2084,7 @@ window.refreshFifaTeamsFromInternet=async function(){
     payload.force=true;
     var res=await apiCall('load_fifa_team_stats',payload);
     if(res&&res.ok){
-      if(res.fifaTeamStats)fifaTeamStats=Object.assign({teams:[],catalog:{},sources:[],notes:[]},res.fifaTeamStats);
+      if(res.fifaTeamStats)fifaTeamStats=Object.assign({teams:[],catalog:{},sources:[],notes:[]},mergeFifaTeamStatsSafe(res.fifaTeamStats,fifaTeamStats));
       if(res.teamDiscipline)teamDiscipline=Object.assign({yellow:[],red:[],sources:[],notes:[]},res.teamDiscipline);
       await save(true);
       showTab('equiposFifa');
@@ -2083,7 +2116,7 @@ window.recalculateFifaTeamsLocal=async function(){
     payload.force=false;
     var res=await apiCall('load_fifa_team_stats',payload);
     if(res&&res.ok){
-      if(res.fifaTeamStats)fifaTeamStats=Object.assign({teams:[],catalog:{},sources:[],notes:[]},res.fifaTeamStats);
+      if(res.fifaTeamStats)fifaTeamStats=Object.assign({teams:[],catalog:{},sources:[],notes:[]},mergeFifaTeamStatsSafe(res.fifaTeamStats,fifaTeamStats));
       if(res.teamDiscipline)teamDiscipline=Object.assign({yellow:[],red:[],sources:[],notes:[]},res.teamDiscipline);
       await save(true);
       showTab('equiposFifa');

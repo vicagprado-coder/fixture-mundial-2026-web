@@ -83,3 +83,10 @@ Para mayor seguridad en Render, puedes definir variables de entorno:
 - `SECRET_KEY`
 
 Si no se definen, la app usa las credenciales configuradas por defecto para esta entrega.
+
+
+## v106 - Protección de estadísticas FIFA
+
+- La actualización ya no reduce equipos ni jugadores si FIFA devuelve una respuesta parcial.
+- Se prueban todas las variantes de slug configuradas para resolver IdTeam.
+- El guardado del backend conserva el último dato bueno de FIFA cuando el navegador/API trae menos datos.
