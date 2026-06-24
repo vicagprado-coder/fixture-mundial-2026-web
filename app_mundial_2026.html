@@ -1543,7 +1543,7 @@ function baseMatches(){
  Object.keys(GROUPS).forEach(function(g){for(var i=0;i<FIFA_GROUP_MATCH_PATTERN.length;i++){var p=FIFA_GROUP_MATCH_PATTERN[i];add(g,p[0],p[1],(dates[g]||[])[i]||'')}});
  return all;
 }
-function statePayload(){ensureKnockoutRounds();return {version:'v111-web-fechas-rondas',matches:matches,knockoutRounds:knockoutRounds,externalAnalysis:externalAnalysis,unifiedAnalysis:unifiedAnalysis,lastEventSearch:lastEventSearch,internetSync:internetSync,playerEvents:playerEvents,teamDiscipline:teamDiscipline,fifaTeamStats:fifaTeamStats,fifaPlayerStats:fifaPlayerStats,savedAt:new Date().toISOString()}}
+function statePayload(){ensureKnockoutRounds();return {version:'v113-web-protege-resultados',matches:matches,knockoutRounds:knockoutRounds,externalAnalysis:externalAnalysis,unifiedAnalysis:unifiedAnalysis,lastEventSearch:lastEventSearch,internetSync:internetSync,playerEvents:playerEvents,teamDiscipline:teamDiscipline,fifaTeamStats:fifaTeamStats,fifaPlayerStats:fifaPlayerStats,savedAt:new Date().toISOString()}}
 function doneCount(list){var c=0;(list||[]).forEach(function(m){if(m&&m.hg!==null&&m.ag!==null&&!isNaN(m.hg)&&!isNaN(m.ag))c++});return c}
 function mergeFifaTeamStatsSafe(incoming,current){
   if(!incoming||typeof incoming!=='object')return current||incoming;
@@ -1779,7 +1779,25 @@ function buildGroupMathCache(g){
   var profiles={};
   teams.forEach(function(team){var cur=currentMap[team]||{};profiles[team]={team:team,g:g,row:cur.row||null,currentPts:cur.row?cur.row.pts:0,currentRank:cur.rank||0,maxPts:0,possibleTop1:false,guaranteedTop1:false,possibleTop2:false,guaranteedTop2:false,possibleTop3:false,guaranteedTop3:false,bestPossibleRank:99,worstPossibleRank:0}});
   var thirdMin=999,thirdMax=-1,states=simulateGroupStates(g);
-  states.forEach(function(state){var rows=state.rows||[];if(rows[2]){thirdMin=Math.min(thirdMin,Number(rows[2].pts||0));thirdMax=Math.max(thirdMax,Number(rows[2].pts||0))}rows.forEach(function(r,idx){var p=profiles[r.team];if(!p)return;var rank=idx+1;p.maxPts=Math.max(p.maxPts,Number(r.pts||0));p.bestPossibleRank=Math.min(p.bestPossibleRank,rank);p.worstPossibleRank=Math.max(p.worstPossibleRank,rank);if(rank<=1)p.possibleTop1=true;if(rank<=2)p.possibleTop2=true;if(rank<=3)p.possibleTop3=true})});
+  states.forEach(function(state){
+    var rows=state.rows||[];
+    if(rows[2]){thirdMin=Math.min(thirdMin,Number(rows[2].pts||0));thirdMax=Math.max(thirdMax,Number(rows[2].pts||0))}
+    rows.forEach(function(r,idx){
+      var p=profiles[r.team];if(!p)return;
+      var rank=idx+1;
+      var pts=Number(r.pts||0);
+      var pointWorstRank=1;
+      for(var z=0;z<rows.length;z++){
+        if(rows[z].team!==r.team && Number(rows[z].pts||0)>=pts)pointWorstRank++;
+      }
+      p.maxPts=Math.max(p.maxPts,pts);
+      p.bestPossibleRank=Math.min(p.bestPossibleRank,rank);
+      p.worstPossibleRank=Math.max(p.worstPossibleRank,pointWorstRank);
+      if(rank<=1)p.possibleTop1=true;
+      if(rank<=2)p.possibleTop2=true;
+      if(rank<=3)p.possibleTop3=true;
+    })
+  });
   teams.forEach(function(team){var p=profiles[team];if(p.bestPossibleRank===99)p.bestPossibleRank=4;if(!p.worstPossibleRank)p.worstPossibleRank=p.bestPossibleRank;p.guaranteedTop1=p.worstPossibleRank<=1;p.guaranteedTop2=p.worstPossibleRank<=2;p.guaranteedTop3=p.worstPossibleRank<=3;if(groupComplete(g)&&p.row){p.possibleTop1=p.guaranteedTop1=p.currentRank<=1;p.possibleTop2=p.guaranteedTop2=p.currentRank<=2;p.possibleTop3=p.guaranteedTop3=p.currentRank<=3;p.bestPossibleRank=p.worstPossibleRank=p.currentRank;p.maxPts=p.currentPts}});
   GROUP_MATH_CACHE.groups[g]=GROUP_MATH_CACHE.groups[g]||{};
   GROUP_MATH_CACHE.groups[g].profiles=profiles;
@@ -1795,7 +1813,7 @@ function mathStatusForTeam(team){
   if(groupComplete(g)&&rank===1){return {status:'qualified',route:'1.º lugar Grupo '+g,reason:'Grupo '+g+' completo: terminó 1.º con '+prof.currentPts+' pts. El orden final ya considera primero el desempate directo / victoria olímpica y luego DG, GF, conducta y Ranking FIFA.',profile:prof}}
   if(prof.guaranteedTop1){return {status:'qualified',route:'1.º lugar asegurado',reason:'Asegura el 1.º lugar del Grupo '+g+': al simular todos los partidos pendientes y aplicar primero el desempate directo / victoria olímpica, no existe escenario donde otro equipo lo supere. Tiene '+prof.currentPts+' pts y su peor rango posible es 1.º.',profile:prof}}
   if(groupComplete(g)&&rank<=2){return {status:'qualified',route:'Top 2 Grupo '+g,reason:'Grupo '+g+' completo: terminó '+rank+'.º con '+prof.currentPts+' pts, por eso ya está clasificado directo a ronda de 32.',profile:prof}}
-  if(prof.guaranteedTop2){return {status:'qualified',route:'Top 2 asegurado',reason:'Asegura Top 2 del Grupo '+g+': aun con los partidos pendientes no existe escenario por puntos donde caiga al 3.º o 4.º. Si termina igualado, la tabla final usará el desempate FIFA de enfrentamiento directo y luego DG/GF, conducta y Ranking FIFA. Tiene '+prof.currentPts+' pts y máximo rango desfavorable '+prof.worstPossibleRank+'.º tras evaluar primero el desempate directo del grupo.',profile:prof}}
+  if(prof.guaranteedTop2){return {status:'qualified',route:'Top 2 asegurado',reason:'Asegura Top 2 del Grupo '+g+': aun con los partidos pendientes no existe escenario por puntos ni empate desfavorable donde pueda caer al 3.º o 4.º. Si termina igualado, la tabla final usará el desempate FIFA de enfrentamiento directo y luego DG/GF, conducta y Ranking FIFA. Tiene '+prof.currentPts+' pts y máximo rango desfavorable '+prof.worstPossibleRank+'.º tras evaluar primero el desempate directo del grupo.',profile:prof}}
   if(groupComplete(g)&&rank===3&&allDone){var idx=thirdRankIndex(team);if(idx>=0&&idx<8){return {status:'qualified',route:'Mejor tercero',reason:'Todos los grupos están completos y quedó '+(idx+1)+'.º en el ranking de mejores terceros, dentro del Top 8 que avanza.',profile:prof}}}
   if(!allDone&&prof.guaranteedTop3){
     var safeGroups=Object.keys(GROUPS).filter(function(x){return x!==g&&thirdRanges[x].max<prof.currentPts}).length;
