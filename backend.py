@@ -1913,11 +1913,12 @@ class AppApi:
             for item in contenders:
                 item["injury_news_risk"] = 0
                 item["injury_headlines"] = []
-                # Ajuste final: rendimiento 65%, ranking 25%, disciplina/FIFA 10%.
+                # Ajuste final v123: rendimiento 50%, Ranking FIFA 38%, disciplina 12%.
+                # Evita que una goleada temprana sobrepese demasiado al ranking FIFA real.
                 item["mixed_score"] = round(
-                    item["result_score"] * 0.65
-                    + item["ranking_score"] * 0.25
-                    + item["discipline_score"] * 0.10,
+                    item["result_score"] * 0.50
+                    + item["ranking_score"] * 0.38
+                    + item["discipline_score"] * 0.12,
                     2,
                 )
             contenders.sort(key=lambda x: x["mixed_score"], reverse=True)
@@ -4279,7 +4280,7 @@ class AppApi:
             code = s["code"]
             rank_info = ranking.get(code, {"rank": 120, "points": 1200})
             rank = int(rank_info.get("rank", 120))
-            rank_score = max(10, 100 - min(rank, 120) * 0.75)
+            rank_score = max(10, min(100, 100 - (math.log(max(rank, 1)) / math.log(120)) * 70))
             pj = max(1, int(s["pj"]))
             ppg = s["pts"] / pj
             gfpg = s["gf"] / pj
