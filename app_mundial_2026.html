@@ -318,6 +318,27 @@ url('assets/logo_mundial_2026.webp');background-repeat:no-repeat;background-posi
   color:#0a8d46;
   border-color:#c9ecd9;
 }
+.koDatePill{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:2px;
+  margin:2px 0 7px;
+  padding:7px 9px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#fffbea,#eef6ff);
+  border:1px solid #dbe8f7;
+  color:var(--navy);
+  font-size:11px;
+  font-weight:1000;
+}
+.koDatePill small{
+  color:var(--muted);
+  font-size:9px;
+  font-weight:1000;
+  text-transform:uppercase;
+  letter-spacing:.3px;
+}
 .koCols{
   display:grid;
   grid-template-columns:minmax(0,1fr) 46px 46px;
@@ -1274,6 +1295,118 @@ button:disabled,input:disabled{opacity:.58!important;cursor:not-allowed!importan
 .loginActions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}.loginError{display:none;margin-top:10px;border-radius:14px;padding:10px;background:#fff0f1;color:var(--red);font-weight:900}.loginError.show{display:block}
 @media(max-width:780px){.authStatus{display:none}.toolbar{gap:7px}.authBtn{padding:10px 11px;font-size:12px}}
 
+
+
+/* =======================
+   V112 - Rondas por secciones verticales
+   Vista superior a inferior, más legible en PC y celular.
+   ======================= */
+.verticalRounds{
+  padding:14px!important;
+  border-radius:32px!important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.90),rgba(242,247,255,.82)),
+    radial-gradient(circle at 12% 0%,rgba(0,87,216,.12),transparent 34%),
+    radial-gradient(circle at 88% 12%,rgba(0,176,80,.10),transparent 32%)!important;
+}
+.verticalRounds:after{display:none!important}
+.roundSectionStack{
+  position:relative;
+  z-index:1;
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:18px!important;
+  overflow:visible!important;
+  padding:0!important;
+}
+.roundSectionStack .roundCol,
+.roundSectionStack .roundCol:nth-child(n){
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  flex:none!important;
+  padding:14px!important;
+  margin:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(285px,1fr))!important;
+  gap:13px!important;
+  border-radius:28px!important;
+  border:1px solid rgba(214,225,242,.95)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(247,251,255,.94))!important;
+  box-shadow:0 16px 38px rgba(15,36,84,.12)!important;
+  overflow:hidden!important;
+  position:relative!important;
+}
+.roundSectionStack .roundCol:before{
+  content:"";
+  position:absolute;
+  left:0;right:0;top:0;height:7px;
+  background:linear-gradient(90deg,var(--red),var(--orange),var(--green),var(--blue));
+}
+.roundSectionStack .roundCol:after{display:none!important}
+.roundSectionStack .roundHead{
+  grid-column:1/-1!important;
+  margin:0 0 2px!important;
+  padding:3px 0 8px!important;
+  border-bottom:1px solid rgba(214,225,242,.78);
+}
+.roundSectionStack .roundHead h3{
+  min-height:46px!important;
+  padding:0 18px!important;
+  border-radius:18px!important;
+  background:linear-gradient(135deg,#ffffff,#eef6ff)!important;
+  border:1px solid #dbe7f6!important;
+  box-shadow:0 10px 20px rgba(15,36,84,.08)!important;
+  font-size:18px!important;
+}
+.roundSectionStack .roundCount{
+  min-width:50px!important;
+  height:40px!important;
+  border-radius:16px!important;
+  background:linear-gradient(135deg,var(--navy),var(--blue))!important;
+}
+.roundSectionStack .bracketMatch{
+  margin:0!important;
+  min-height:0;
+  border-radius:22px!important;
+  border:1px solid #dce7f5!important;
+}
+.roundSectionStack .bracketMatch .actions{margin-top:11px!important}
+.roundSectionStack .roundAdvance{
+  grid-column:1/-1!important;
+  width:100%!important;
+  margin:4px 0 0!important;
+}
+.roundStageGuide{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  gap:8px;
+  margin:12px 0 14px;
+}
+.roundStageGuide a{
+  text-decoration:none;
+  text-align:center;
+  border-radius:18px;
+  padding:10px 8px;
+  background:rgba(255,255,255,.92);
+  color:var(--navy);
+  border:1px solid rgba(214,225,242,.95);
+  box-shadow:0 8px 18px rgba(15,36,84,.08);
+  font-size:11px;
+  font-weight:1000;
+}
+.roundStageGuide a span{display:block;font-size:17px;line-height:1.1;margin-bottom:3px}
+.roundStageGuide a:hover{background:#eef6ff;color:var(--blue)}
+@media(max-width:980px){.roundStageGuide{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:780px){
+  .verticalRounds{padding:10px!important;border-radius:24px!important}
+  .roundSectionStack{gap:14px!important}
+  .roundSectionStack .roundCol,.roundSectionStack .roundCol:nth-child(n){grid-template-columns:1fr!important;padding:12px!important;border-radius:24px!important}
+  .roundSectionStack .roundHead{display:flex!important;align-items:center!important}
+  .roundStageGuide{grid-template-columns:repeat(2,1fr);gap:7px}
+  .roundStageGuide a{padding:9px 6px;font-size:10px}
+}
+
 </style>
 </head>
 <body>
@@ -1356,6 +1489,8 @@ var GROUPS={
 'L':['England','Croatia','Ghana','Panama']
 };
 var CODES={'Mexico':'MEX','South Africa':'RSA','Korea Republic':'KOR','Czechia':'CZE','Canada':'CAN','Bosnia and Herzegovina':'BIH','Qatar':'QAT','Switzerland':'SUI','Brazil':'BRA','Morocco':'MAR','Haiti':'HAI','Scotland':'SCO','United States':'USA','Paraguay':'PAR','Australia':'AUS','Türkiye':'TUR','Germany':'GER','Curaçao':'CUW','Ivory Coast':'CIV','Ecuador':'ECU','Netherlands':'NED','Japan':'JPN','Sweden':'SWE','Tunisia':'TUN','Belgium':'BEL','Egypt':'EGY','Iran':'IRN','New Zealand':'NZL','Spain':'ESP','Cape Verde':'CPV','Saudi Arabia':'KSA','Uruguay':'URU','France':'FRA','Senegal':'SEN','Iraq':'IRQ','Norway':'NOR','Argentina':'ARG','Algeria':'ALG','Austria':'AUT','Jordan':'JOR','Portugal':'POR','DR Congo':'COD','Uzbekistan':'UZB','Colombia':'COL','England':'ENG','Croatia':'CRO','Ghana':'GHA','Panama':'PAN'};
+// v110: compatibilidad para funciones de preservación FIFA que ordenan por códigos de selección.
+var TEAM_CODES=CODES;
 var ISO={'Mexico':'mx','South Africa':'za','Korea Republic':'kr','Czechia':'cz','Canada':'ca','Bosnia and Herzegovina':'ba','Qatar':'qa','Switzerland':'ch','Brazil':'br','Morocco':'ma','Haiti':'ht','Scotland':'gb-sct','United States':'us','Paraguay':'py','Australia':'au','Türkiye':'tr','Germany':'de','Curaçao':'cw','Ivory Coast':'ci','Ecuador':'ec','Netherlands':'nl','Japan':'jp','Sweden':'se','Tunisia':'tn','Belgium':'be','Egypt':'eg','Iran':'ir','New Zealand':'nz','Spain':'es','Cape Verde':'cv','Saudi Arabia':'sa','Uruguay':'uy','France':'fr','Senegal':'sn','Iraq':'iq','Norway':'no','Argentina':'ar','Algeria':'dz','Austria':'at','Jordan':'jo','Portugal':'pt','DR Congo':'cd','Uzbekistan':'uz','Colombia':'co','England':'gb-eng','Croatia':'hr','Ghana':'gh','Panama':'pa'};
 var EMOJIS={"Mexico": "🇲🇽", "South Africa": "🇿🇦", "Korea Republic": "🇰🇷", "Czechia": "🇨🇿", "Canada": "🇨🇦", "Bosnia and Herzegovina": "🇧🇦", "Qatar": "🇶🇦", "Switzerland": "🇨🇭", "Brazil": "🇧🇷", "Morocco": "🇲🇦", "Haiti": "🇭🇹", "Scotland": "🏴", "United States": "🇺🇸", "Paraguay": "🇵🇾", "Australia": "🇦🇺", "Türkiye": "🇹🇷", "Germany": "🇩🇪", "Curaçao": "🇨🇼", "Ivory Coast": "🇨🇮", "Ecuador": "🇪🇨", "Netherlands": "🇳🇱", "Japan": "🇯🇵", "Sweden": "🇸🇪", "Tunisia": "🇹🇳", "Belgium": "🇧🇪", "Egypt": "🇪🇬", "Iran": "🇮🇷", "New Zealand": "🇳🇿", "Spain": "🇪🇸", "Cape Verde": "🇨🇻", "Saudi Arabia": "🇸🇦", "Uruguay": "🇺🇾", "France": "🇫🇷", "Senegal": "🇸🇳", "Iraq": "🇮🇶", "Norway": "🇳🇴", "Argentina": "🇦🇷", "Algeria": "🇩🇿", "Austria": "🇦🇹", "Jordan": "🇯🇴", "Portugal": "🇵🇹", "DR Congo": "🇨🇩", "Uzbekistan": "🇺🇿", "Colombia": "🇨🇴", "England": "🏴", "Croatia": "🇭🇷", "Ghana": "🇬🇭", "Panama": "🇵🇦"};
 var ES={'Mexico':'México','South Africa':'Sudáfrica','Korea Republic':'Corea del Sur','Czechia':'Chequia','Canada':'Canadá','Bosnia and Herzegovina':'Bosnia y Herzegovina','Qatar':'Qatar','Switzerland':'Suiza','Brazil':'Brasil','Morocco':'Marruecos','Haiti':'Haití','Scotland':'Escocia','United States':'Estados Unidos','Paraguay':'Paraguay','Australia':'Australia','Türkiye':'Turquía','Germany':'Alemania','Curaçao':'Curazao','Ivory Coast':'Costa de Marfil','Ecuador':'Ecuador','Netherlands':'Países Bajos','Japan':'Japón','Sweden':'Suecia','Tunisia':'Túnez','Belgium':'Bélgica','Egypt':'Egipto','Iran':'Irán','New Zealand':'Nueva Zelanda','Spain':'España','Cape Verde':'Cabo Verde','Saudi Arabia':'Arabia Saudita','Uruguay':'Uruguay','France':'Francia','Senegal':'Senegal','Iraq':'Irak','Norway':'Noruega','Argentina':'Argentina','Algeria':'Argelia','Austria':'Austria','Jordan':'Jordania','Portugal':'Portugal','DR Congo':'RD Congo','Uzbekistan':'Uzbekistán','Colombia':'Colombia','England':'Inglaterra','Croatia':'Croacia','Ghana':'Ghana','Panama':'Panamá'};
@@ -1408,7 +1543,7 @@ function baseMatches(){
  Object.keys(GROUPS).forEach(function(g){for(var i=0;i<FIFA_GROUP_MATCH_PATTERN.length;i++){var p=FIFA_GROUP_MATCH_PATTERN[i];add(g,p[0],p[1],(dates[g]||[])[i]||'')}});
  return all;
 }
-function statePayload(){ensureKnockoutRounds();return {version:'v109-web-parse-fifa-json',matches:matches,knockoutRounds:knockoutRounds,externalAnalysis:externalAnalysis,unifiedAnalysis:unifiedAnalysis,lastEventSearch:lastEventSearch,internetSync:internetSync,playerEvents:playerEvents,teamDiscipline:teamDiscipline,fifaTeamStats:fifaTeamStats,fifaPlayerStats:fifaPlayerStats,savedAt:new Date().toISOString()}}
+function statePayload(){ensureKnockoutRounds();return {version:'v111-web-fechas-rondas',matches:matches,knockoutRounds:knockoutRounds,externalAnalysis:externalAnalysis,unifiedAnalysis:unifiedAnalysis,lastEventSearch:lastEventSearch,internetSync:internetSync,playerEvents:playerEvents,teamDiscipline:teamDiscipline,fifaTeamStats:fifaTeamStats,fifaPlayerStats:fifaPlayerStats,savedAt:new Date().toISOString()}}
 function doneCount(list){var c=0;(list||[]).forEach(function(m){if(m&&m.hg!==null&&m.ag!==null&&!isNaN(m.hg)&&!isNaN(m.ag))c++});return c}
 function mergeFifaTeamStatsSafe(incoming,current){
   if(!incoming||typeof incoming!=='object')return current||incoming;
@@ -2486,6 +2621,42 @@ var NEXT_BLUEPRINTS={
  r3:[{matchNo:'M103',homeSeed:'L101',awaySeed:'L102',srcHome:'M101',srcAway:'M102',srcMode:'loser'}],
  r2:[{matchNo:'M104',homeSeed:'W101',awaySeed:'W102',srcHome:'M101',srcAway:'M102',srcMode:'winner'}]
 };
+var KO_SCHEDULE={
+ M73:{date:'Dom 28 Jun 2026',timePe:'14:00 Perú',timeEt:'15:00 ET'},
+ M74:{date:'Lun 29 Jun 2026',timePe:'15:30 Perú',timeEt:'16:30 ET'},
+ M75:{date:'Lun 29 Jun 2026',timePe:'20:00 Perú',timeEt:'21:00 ET'},
+ M76:{date:'Lun 29 Jun 2026',timePe:'12:00 Perú',timeEt:'13:00 ET'},
+ M77:{date:'Mar 30 Jun 2026',timePe:'16:00 Perú',timeEt:'17:00 ET'},
+ M78:{date:'Mar 30 Jun 2026',timePe:'12:00 Perú',timeEt:'13:00 ET'},
+ M79:{date:'Mar 30 Jun 2026',timePe:'20:00 Perú',timeEt:'21:00 ET'},
+ M80:{date:'Mié 1 Jul 2026',timePe:'11:00 Perú',timeEt:'12:00 ET'},
+ M81:{date:'Mié 1 Jul 2026',timePe:'19:00 Perú',timeEt:'20:00 ET'},
+ M82:{date:'Mié 1 Jul 2026',timePe:'15:00 Perú',timeEt:'16:00 ET'},
+ M83:{date:'Jue 2 Jul 2026',timePe:'18:00 Perú',timeEt:'19:00 ET'},
+ M84:{date:'Jue 2 Jul 2026',timePe:'14:00 Perú',timeEt:'15:00 ET'},
+ M85:{date:'Jue 2 Jul 2026',timePe:'22:00 Perú',timeEt:'23:00 ET'},
+ M86:{date:'Vie 3 Jul 2026',timePe:'17:00 Perú',timeEt:'18:00 ET'},
+ M87:{date:'Vie 3 Jul 2026',timePe:'20:30 Perú',timeEt:'21:30 ET'},
+ M88:{date:'Vie 3 Jul 2026',timePe:'13:00 Perú',timeEt:'14:00 ET'},
+ M89:{date:'Sáb 4 Jul 2026',timePe:'12:00 Perú',timeEt:'13:00 ET'},
+ M90:{date:'Sáb 4 Jul 2026',timePe:'16:00 Perú',timeEt:'17:00 ET'},
+ M91:{date:'Dom 5 Jul 2026',timePe:'15:00 Perú',timeEt:'16:00 ET'},
+ M92:{date:'Dom 5 Jul 2026',timePe:'19:00 Perú',timeEt:'20:00 ET'},
+ M93:{date:'Lun 6 Jul 2026',timePe:'14:00 Perú',timeEt:'15:00 ET'},
+ M94:{date:'Lun 6 Jul 2026',timePe:'19:00 Perú',timeEt:'20:00 ET'},
+ M95:{date:'Mar 7 Jul 2026',timePe:'11:00 Perú',timeEt:'12:00 ET'},
+ M96:{date:'Mar 7 Jul 2026',timePe:'15:00 Perú',timeEt:'16:00 ET'},
+ M97:{date:'Jue 9 Jul 2026',timePe:'15:00 Perú',timeEt:'16:00 ET'},
+ M98:{date:'Vie 10 Jul 2026',timePe:'14:00 Perú',timeEt:'15:00 ET'},
+ M99:{date:'Sáb 11 Jul 2026',timePe:'16:00 Perú',timeEt:'17:00 ET'},
+ M100:{date:'Sáb 11 Jul 2026',timePe:'20:00 Perú',timeEt:'21:00 ET'},
+ M101:{date:'Mar 14 Jul 2026',timePe:'14:00 Perú',timeEt:'15:00 ET'},
+ M102:{date:'Mié 15 Jul 2026',timePe:'14:00 Perú',timeEt:'15:00 ET'},
+ M103:{date:'Sáb 18 Jul 2026',timePe:'16:00 Perú',timeEt:'17:00 ET'},
+ M104:{date:'Dom 19 Jul 2026',timePe:'14:00 Perú',timeEt:'15:00 ET'}
+};
+function koSchedule(no){return KO_SCHEDULE[String(no||'').toUpperCase()]||null}
+function koScheduleHTML(no){var s=koSchedule(no);if(!s)return '';return '<div class="koDatePill">📅 '+esc(s.date)+' · '+esc(s.timePe)+'<small>Horario referencial del calendario FIFA · '+esc(s.timeEt)+'</small></div>'}
 function groupStageComplete(){return doneCount(matches)>=matches.length}
 function safeGroupMathProfile(team){try{return groupMathProfile(team)}catch(e){return null}}
 function guaranteedFirstTeam(g){var teams=GROUPS[g]||[],out=[];for(var i=0;i<teams.length;i++){var p=safeGroupMathProfile(teams[i]);if(p&&p.guaranteedTop1)out.push(teams[i])}return out.length===1?out[0]:''}
@@ -2559,6 +2730,7 @@ function koValue(v){return (v===null||v===undefined)?'':v}
 function koMatchHTML(roundKey,m,idx){
   var w=winnerFromKo(m);var no=m.matchNo||('P'+(idx+1));var lock=lockedAttr();
   var html='<div class="bracketMatch"><div class="koMatchHeader"><span class="roundBadge">'+esc(no)+'</span><span class="state '+(w?'done':'')+'">'+(w?'✓':'•')+'</span></div>';
+  html+=koScheduleHTML(no);
   if(m.homeSeed||m.awaySeed){html+='<div class="koSeedHint">'+esc(m.homeSeed||'')+' vs '+esc(m.awaySeed||'')+(m.thirdGroups?' · 3.º posibles: '+esc(m.thirdGroups):'')+'</div>'}
   html+='<div class="koCols"><span></span><span>G</span><span>P</span></div>';
   html+='<div class="koLine"><input class="koTeamInput" id="ko_'+roundKey+'_'+idx+'_h" value="'+esc(teamNameUpperES(m.home||''))+'" placeholder="'+esc(teamNameUpperES(m.homeSeed||'Equipo 1'))+'" '+lock+' oninput="window.autoSaveKnockout(\''+roundKey+'\','+idx+')"><input class="koScore" id="ko_'+roundKey+'_'+idx+'_hg" type="number" min="0" value="'+koValue(m.hg)+'" placeholder="0" '+lock+' oninput="window.autoSaveKnockout(\''+roundKey+'\','+idx+')"><input class="koScore" id="ko_'+roundKey+'_'+idx+'_ph" type="number" min="0" value="'+koValue(m.ph)+'" placeholder="0" '+lock+' oninput="window.autoSaveKnockout(\''+roundKey+'\','+idx+')"></div>';
@@ -2596,9 +2768,10 @@ function renderRondas(){
   var champLabel=champ?esc(name(findTeamKey(champ))||champ):'—';var route=safeCurrentThirdRoute();var qs=qualifiedSummaryForRondas();
   var html='<div class="rondasIntro"><h2>Fixture eliminatorio FIFA</h2><div class="rondasStatus"><div class="rondasChip">'+filledR32+'/16<small>R32 con equipos</small></div><div class="rondasChip">'+qs.total+'<small>clasificados detectados</small></div><div class="rondasChip">'+champLabel+'<small>Campeón</small></div></div></div>';
   html+='<div class="koActions"><button class="btn" '+lockedAttr()+' onclick="window.loadQualifiedToR32()">Cargar cruces FIFA</button><button class="btn gold" '+lockedAttr()+' onclick="window.refreshRoundGroupResults()">Actualizar grupos</button><button class="btn red" '+lockedAttr()+' onclick="window.clearAllKnockout()">Reiniciar</button></div>';
-  html+='<div class="rulesMini"><b>v104:</b> Rondas ya puede cargar parcialmente los equipos clasificados matemáticamente. Si un 1.º de grupo está asegurado por regla FIFA/desempate directo, se coloca en su llave. Si el 2.º o los mejores terceros aún no están definidos, quedan como posición pendiente. Combinación de terceros: '+(route.ready?esc(route.key):'pendiente')+'.</div>';
+  html+='<div class="rulesMini"><b>v112:</b> Rondas muestra los partidos por secciones verticales, de arriba hacia abajo, con fecha y hora referencial de cada llave. Puede cargar parcialmente equipos clasificados matemáticamente; las posiciones pendientes quedan marcadas hasta que se definan. Combinación de terceros: '+(route.ready?esc(route.key):'pendiente')+'.</div>';
   if(qs.total){html+='<div class="card"><b>Clasificados detectados para cruces:</b><div class="mathMetaRow"><span class="mathMeta">1.º asegurados: '+qs.top1.length+'</span><span class="mathMeta">Top 2 asegurados: '+qs.top2.length+'</span><span class="mathMeta">Mejores terceros asegurados: '+qs.terceros.length+'</span></div></div>'}
-  html+='<div class="bracketViewport"><div class="bracketGrid">'+renderRound('Ronda de 32','r32')+renderRound('Ronda de 16','r16')+renderRound('Cuartos','r8')+renderRound('Semifinal','r4')+renderRound('3er puesto','r3')+renderRound('Final','r2')+'</div></div>';
+  html+='<div class="roundStageGuide"><a href="#ronda_r32"><span>①</span>Ronda de 32</a><a href="#ronda_r16"><span>②</span>Ronda de 16</a><a href="#ronda_r8"><span>③</span>Cuartos</a><a href="#ronda_r4"><span>④</span>Semifinales</a><a href="#ronda_r3"><span>⑤</span>3er puesto</a><a href="#ronda_r2"><span>⑥</span>Final</a></div>';
+  html+='<div class="bracketViewport verticalRounds"><div class="roundSectionStack">'+renderRound('Ronda de 32','r32').replace('<div class="roundCol"','<div id="ronda_r32" class="roundCol"')+renderRound('Ronda de 16','r16').replace('<div class="roundCol"','<div id="ronda_r16" class="roundCol"')+renderRound('Cuartos','r8').replace('<div class="roundCol"','<div id="ronda_r8" class="roundCol"')+renderRound('Semifinal','r4').replace('<div class="roundCol"','<div id="ronda_r4" class="roundCol"')+renderRound('3er puesto','r3').replace('<div class="roundCol"','<div id="ronda_r3" class="roundCol"')+renderRound('Final','r2').replace('<div class="roundCol"','<div id="ronda_r2" class="roundCol"')+'</div></div>';
   html+=renderFinalPodium();
   html+='<div class="championCard '+(champ?'':'empty')+'"><div class="championMain"><div class="championFlag">'+(champ?teamVisualFromText(champ):'<span class="flagBlank"></span>')+'</div><div><p class="championSub">Campeón</p><h2 class="championTitle">'+(champ?esc(name(findTeamKey(champ))||champ):'Por definir')+'</h2><p class="championSub">'+(runner?'Segundo puesto: '+esc(name(findTeamKey(runner))||runner):'Segundo puesto por definir')+' · '+(third?'Tercer puesto: '+esc(name(findTeamKey(third))||third):'Tercer puesto por definir')+'</p></div></div></div>';
   document.getElementById('rondas').innerHTML=html;

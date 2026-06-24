@@ -110,3 +110,22 @@ Si no se definen, la app usa las credenciales configuradas por defecto para esta
 - El botón de actualización forzada agrega un parámetro temporal para evitar caché intermedio.
 - La posesión ahora acepta valores `0.435` y también `43.5` sin multiplicar dos veces.
 - Después de actualizar FIFA, inicia sesión y presiona **Guardar** para persistir los datos en Supabase.
+
+
+## v110 - Corrección TEAM_CODES
+
+- Se corrigió el error `TEAM_CODES is not defined` que bloqueaba la actualización de Equipos/Jugadores FIFA.
+- Se mantiene la persistencia en Supabase y la protección contra respuestas parciales de FIFA.
+- Después de desplegar, usar Ctrl+F5, iniciar sesión, ejecutar Actualizar FIFA + análisis y presionar Guardar.
+
+
+## v111 - Fechas en rondas eliminatorias
+- Se agregaron fecha y hora referencial en Perú para Ronda de 32, Ronda de 16, Cuartos, Semifinales, 3er puesto y Final.
+- Las fechas se muestran dentro de cada tarjeta M73-M104 en la sección Rondas.
+
+
+## v112 - Rondas por secciones
+
+- La sección Rondas ahora se muestra de arriba hacia abajo por secciones.
+- Cada etapa tiene su propio bloque: Ronda de 32, Ronda de 16, Cuartos, Semifinales, 3er puesto y Final.
+- Se mantiene fecha y hora referencial por partido, login, Supabase y bloqueo de edición.
