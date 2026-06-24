@@ -1549,7 +1549,7 @@ function baseMatches(){
  Object.keys(GROUPS).forEach(function(g){for(var i=0;i<FIFA_GROUP_MATCH_PATTERN.length;i++){var p=FIFA_GROUP_MATCH_PATTERN[i];add(g,p[0],p[1],(dates[g]||[])[i]||'')}});
  return all;
 }
-function statePayload(){ensureKnockoutRounds();return {version:'v120-web-clasif-top2-terceros',matches:matches,knockoutRounds:knockoutRounds,externalAnalysis:externalAnalysis,unifiedAnalysis:unifiedAnalysis,lastEventSearch:lastEventSearch,internetSync:internetSync,playerEvents:playerEvents,teamDiscipline:teamDiscipline,fifaTeamStats:fifaTeamStats,fifaPlayerStats:fifaPlayerStats,savedAt:new Date().toISOString()}}
+function statePayload(){ensureKnockoutRounds();return {version:'v121-web-sorpresas-decepciones',matches:matches,knockoutRounds:knockoutRounds,externalAnalysis:externalAnalysis,unifiedAnalysis:unifiedAnalysis,lastEventSearch:lastEventSearch,internetSync:internetSync,playerEvents:playerEvents,teamDiscipline:teamDiscipline,fifaTeamStats:fifaTeamStats,fifaPlayerStats:fifaPlayerStats,savedAt:new Date().toISOString()}}
 function doneCount(list){var c=0;(list||[]).forEach(function(m){if(m&&m.hg!==null&&m.ag!==null&&!isNaN(m.hg)&&!isNaN(m.ag))c++});return c}
 function mergeFifaTeamStatsSafe(incoming,current){
   if(!incoming||typeof incoming!=='object')return current||incoming;
@@ -2871,54 +2871,91 @@ function renderRondas(){
   document.getElementById('rondas').innerHTML=html;
 }
 
+function analysisExpectedProfile(x){
+  var team=x&&x.team, g=(x&&x.g)||groupOfTeam(team), group=GROUPS[g]||[];
+  var ranked=group.map(function(t,idx){var info=fifaRankInfo(t)||{};return {team:t,rank:Number(info.rank||999),slot:idx+1}}).sort(function(a,b){return a.rank-b.rank||a.slot-b.slot});
+  var expectedRank=4, fifaRank=Number((x&&x.fifaRank)||((fifaRankInfo(team)||{}).rank)||999);
+  for(var i=0;i<ranked.length;i++){if(ranked[i].team===team){expectedRank=i+1;break}}
+  var expectedLabel=expectedRank+'.º favorito del grupo';
+  if(fifaRank<=20)expectedLabel='favorito fuerte del grupo';
+  else if(fifaRank<=35)expectedLabel='candidato natural a clasificar';
+  else if(expectedRank>=3)expectedLabel='sorpresa/outsider del grupo';
+  return {expectedRank:expectedRank,fifaRank:fifaRank,isFavorite:(expectedRank<=2||fifaRank<=35),isUnderdog:(expectedRank>=3||fifaRank>35),label:expectedLabel};
+}
+function analysisActualRankText(x){
+  var r=Number(x&&x.rank||0);return r?String(r)+'.º del Grupo '+esc((x&&x.g)||''):'posición pendiente';
+}
+function surpriseScore(x){
+  var exp=analysisExpectedProfile(x),st=x.status||mathStatusSafe(x.team)||{},rank=Number(x.rank||4);
+  var over=Math.max(0,exp.expectedRank-rank);
+  var statusBonus=st.status==='qualified'?32:(rank<=2?22:(rank===3?10:0));
+  var underdogBonus=exp.isUnderdog?18:0;
+  var rankBonus=exp.fifaRank>45?18:(exp.fifaRank>35?10:0);
+  var perf=(Number(x.pts||0)*5)+(Number(x.dg||0)*4)+(x.pp===0&&x.pj?8:0);
+  return round1(over*28+statusBonus+underdogBonus+rankBonus+perf);
+}
+function deceptionScore(x){
+  var exp=analysisExpectedProfile(x),st=x.status||mathStatusSafe(x.team)||{},rank=Number(x.rank||4);
+  var drop=Math.max(0,rank-exp.expectedRank);
+  var expectation=exp.fifaRank<=20?28:(exp.fifaRank<=35?18:(exp.expectedRank<=2?12:0));
+  var eliminated=st.status==='eliminated'?38:0;
+  var danger=(rank>=3?24:0)+(st.status!=='qualified'&&x.pj>=2?10:0);
+  var lowForm=(x.pj&&Number(x.pts||0)<(x.pj*1.35)?16:0)+(Number(x.dg||0)<0?Math.abs(Number(x.dg||0))*8:0)+(x.pp?Number(x.pp)*7:0);
+  return round1(expectation+drop*28+eliminated+danger+lowForm);
+}
+function isSurpriseCandidate(x){
+  if(!x||!x.pj)return false;
+  var exp=analysisExpectedProfile(x),st=x.status||mathStatusSafe(x.team)||{},rank=Number(x.rank||4);
+  if(st.status==='eliminated')return false;
+  if(!exp.isUnderdog)return false;
+  return st.status==='qualified'||rank<=2||(rank===3&&Number(x.pts||0)>=4)||(rank<exp.expectedRank&&Number(x.pts||0)>0);
+}
+function isDeceptionCandidate(x){
+  if(!x||!x.pj)return false;
+  var exp=analysisExpectedProfile(x),st=x.status||mathStatusSafe(x.team)||{},rank=Number(x.rank||4);
+  if(!exp.isFavorite)return false;
+  if(st.status==='qualified'&&rank<=2)return false;
+  return st.status==='eliminated'||rank>=3||(x.pj>=2&&Number(x.pts||0)<(x.pj*1.35))||Number(x.dg||0)<0;
+}
 function analysisMiniTeamCard(x,type){
   if(!x)return '';
   var cls=type==='bad'?'out':'';
-  var label=type==='bad'?'Decepción':'Destacado';
+  var label=type==='bad'?'Decepción':'Sorpresa';
   var statusTxt=x.status?x.status.route:'En disputa';
   var reason=type==='bad'?disappointmentReason(x):highlightReason(x);
-  return '<div class="mathTeamCard '+cls+'"><div class="mathTeamTop"><div class="mathTeamName"><span class="flagMini">'+flag(x.team)+'</span><div>'+teamSeedHTML(x.team)+esc(name(x.team))+'<small>'+esc(code(x.team))+' · Grupo '+esc(x.g)+' · '+(x.pts||0)+' pts · DG '+((x.dg>0?'+':'')+(x.dg||0))+'</small></div></div><span class="mathRoute">'+label+'</span></div><p class="mathReason">'+esc(reason)+'</p><div class="mathMetaRow"><span class="mathMeta">Índice '+(x.score100||0)+'/100</span><span class="mathMeta">'+esc(statusTxt)+'</span><span class="mathMeta">Ranking '+(x.fifaRank?('#'+x.fifaRank):'-')+'</span></div></div>';
+  var exp=analysisExpectedProfile(x);
+  return '<div class="mathTeamCard '+cls+'"><div class="mathTeamTop"><div class="mathTeamName"><span class="flagMini">'+flag(x.team)+'</span><div>'+teamSeedHTML(x.team)+esc(name(x.team))+'<small>'+esc(code(x.team))+' · Grupo '+esc(x.g)+' · '+(x.pts||0)+' pts · DG '+((x.dg>0?'+':'')+(x.dg||0))+'</small></div></div><span class="mathRoute">'+label+'</span></div><p class="mathReason">'+esc(reason)+'</p><div class="mathMetaRow"><span class="mathMeta">Actual: '+analysisActualRankText(x)+'</span><span class="mathMeta">Esperado: '+esc(exp.expectedRank+'.º')+'</span><span class="mathMeta">Ranking '+(exp.fifaRank&&exp.fifaRank<999?('#'+exp.fifaRank):'-')+'</span><span class="mathMeta">'+esc(statusTxt)+'</span></div></div>';
 }
 function highlightReason(x){
-  var parts=[];
-  if(x.status&&x.status.status==='qualified')parts.push('clasificación asegurada');
-  if(x.pj&&x.pp===0)parts.push('invicto');
+  var exp=analysisExpectedProfile(x),st=x.status||mathStatusSafe(x.team)||{},parts=[];
+  parts.push('sorpresa del Mundial: por ranking/expectativa era '+exp.label+', pero está '+analysisActualRankText(x));
+  if(st.status==='qualified')parts.push('ya aparece clasificado');
+  else if(Number(x.rank||4)<=2)parts.push('está en zona de clasificación directa');
+  else if(Number(x.rank||4)===3)parts.push('pelea como mejor tercero');
+  if(x.pj)parts.push((x.pts||0)+' pts en '+x.pj+' PJ');
   if(x.dg>0)parts.push('DG '+(x.dg>0?'+':'')+x.dg);
-  if(x.components){
-    var best=[['forma',x.components.forma],['ataque',x.components.ataque],['defensa',x.components.defensa],['plantel',x.components.plantel]].sort(function(a,b){return b[1]-a[1]})[0];
-    if(best)parts.push('fortaleza en '+best[0]+' '+best[1]+'/100');
-  }
-  if(x.hasFifa)parts.push('estadísticas FIFA cargadas');
-  return parts.length?parts.join(' · '):'buen rendimiento con los datos actuales';
+  if(x.pp===0&&x.pj)parts.push('invicto');
+  return parts.join(' · ');
 }
 function disappointmentReason(x){
-  var parts=[];
-  if(x.status&&x.status.status==='eliminated')parts.push('eliminado matemáticamente');
+  var exp=analysisExpectedProfile(x),st=x.status||mathStatusSafe(x.team)||{},parts=[];
+  parts.push('decepción: por ranking/expectativa era '+exp.label+', pero está '+analysisActualRankText(x));
+  if(st.status==='eliminated')parts.push('eliminado matemáticamente');
+  else if(st.status!=='qualified')parts.push('aún no asegura clasificación');
+  if(Number(x.rank||0)>=3)parts.push('fuera del Top 2 actual');
   if(x.pj&&x.pp>0)parts.push(x.pp+' derrota(s)');
   if(x.dg<0)parts.push('DG '+x.dg);
-  if(x.fifaRank&&x.fifaRank<=30)parts.push('ranking FIFA alto, rendimiento por debajo');
-  if(x.components&&x.components.forma<45)parts.push('forma baja '+x.components.forma+'/100');
-  if(x.components&&x.components.defensa<45)parts.push('defensa baja '+x.components.defensa+'/100');
-  if(!parts.length&&x.status&&x.status.status==='alive')parts.push('sigue en disputa pese a expectativas');
-  return parts.length?parts.join(' · '):'rendimiento menor al esperado con los datos actuales';
+  if(x.pj&&Number(x.pts||0)<(x.pj*1.35))parts.push('puntaje bajo para su expectativa');
+  return parts.join(' · ');
 }
 function analysisHighlightsPanel(combined){
   var played=(combined||[]).filter(function(x){return x.pj>0});
-  var destacados=played.slice().filter(function(x){return !(x.status&&x.status.status==='eliminated')}).sort(function(a,b){return b.score100-a.score100||b.pts-a.pts||b.dg-a.dg||name(a.team).localeCompare(name(b.team))}).slice(0,5);
-  var decepciones=played.slice().map(function(x){
-    var expectation=(x.fifaRank&&x.fifaRank>0)?Math.max(0,100-x.fifaRank):50;
-    var badForm=100-(x.components&&x.components.forma?x.components.forma:50);
-    var badDefense=100-(x.components&&x.components.defensa?x.components.defensa:50);
-    var negDg=x.dg<0?Math.abs(x.dg)*8:0;
-    var eliminated=(x.status&&x.status.status==='eliminated')?35:0;
-    var noWin=(x.pj&&!x.pg)?18:0;
-    x.decepcionScore=round1((expectation*0.22)+(badForm*0.30)+(badDefense*0.18)+negDg+eliminated+noWin);
-    return x;
-  }).sort(function(a,b){return b.decepcionScore-a.decepcionScore||a.score100-b.score100||name(a.team).localeCompare(name(b.team))}).slice(0,5);
-  var html='<div class="card" style="margin-top:14px"><div class="sectionHead"><div><h2>Equipos destacados y equipos decepción</h2><p>Lectura rápida según resultados registrados, estado matemático, Ranking FIFA, disciplina y estadísticas FIFA disponibles.</p></div><span class="tag gold">Nuevo v119</span></div><div class="mathColumns"><div class="mathColumn"><div class="mathColumnHead"><div><h3>⭐ Equipos destacados</h3><p>Mejor rendimiento actual y señales positivas.</p></div><span class="tag green">'+destacados.length+'</span></div>';
-  if(destacados.length){destacados.forEach(function(x){html+=analysisMiniTeamCard(x,'good')})}else{html+='<div class="mathEmpty">Aún no hay equipos destacados con datos suficientes.</div>'}
-  html+='</div><div class="mathColumn"><div class="mathColumnHead"><div><h3>⚠️ Equipos decepción</h3><p>Rendimiento bajo frente a expectativa o métricas débiles.</p></div><span class="tag red">'+decepciones.length+'</span></div>';
-  if(decepciones.length){decepciones.forEach(function(x){html+=analysisMiniTeamCard(x,'bad')})}else{html+='<div class="mathEmpty">Aún no hay equipos decepción con datos suficientes.</div>'}
+  var destacados=played.slice().filter(isSurpriseCandidate).map(function(x){x.sorpresaScore=surpriseScore(x);return x}).sort(function(a,b){return b.sorpresaScore-a.sorpresaScore||b.pts-a.pts||b.dg-a.dg||name(a.team).localeCompare(name(b.team))}).slice(0,5);
+  var decepciones=played.slice().filter(isDeceptionCandidate).map(function(x){x.decepcionScore=deceptionScore(x);return x}).sort(function(a,b){return b.decepcionScore-a.decepcionScore||a.score100-b.score100||name(a.team).localeCompare(name(b.team))}).slice(0,5);
+  var html='<div class="card" style="margin-top:14px"><div class="sectionHead"><div><h2>Equipos destacados y equipos decepción</h2><p>Los destacados son las sorpresas: equipos con baja expectativa previa que están clasificando o peleando arriba. Las decepciones son favoritos que deberían clasificar con facilidad, pero están complicados o eliminados.</p></div><span class="tag gold">Nuevo v121</span></div><div class="mathColumns"><div class="mathColumn"><div class="mathColumnHead"><div><h3>⭐ Equipos destacados / sorpresas</h3><p>Outsiders que superan su expectativa por resultados.</p></div><span class="tag green">'+destacados.length+'</span></div>';
+  if(destacados.length){destacados.forEach(function(x){html+=analysisMiniTeamCard(x,'good')})}else{html+='<div class="mathEmpty">Aún no hay sorpresas claras con los resultados registrados.</div>'}
+  html+='</div><div class="mathColumn"><div class="mathColumnHead"><div><h3>⚠️ Equipos decepción</h3><p>Favoritos o candidatos fuertes que no están cumpliendo.</p></div><span class="tag red">'+decepciones.length+'</span></div>';
+  if(decepciones.length){decepciones.forEach(function(x){html+=analysisMiniTeamCard(x,'bad')})}else{html+='<div class="mathEmpty">Aún no hay decepciones claras con los resultados registrados.</div>'}
   html+='</div></div></div>';
   return html;
 }
