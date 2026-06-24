@@ -2690,18 +2690,113 @@ class AppApi:
 
     @staticmethod
     def _fifa_stat_value(rows: Any, key: str, default: float = 0) -> float:
-        if not isinstance(rows, list):
+        """Extrae valores desde el JSON FDH de FIFA aunque cambie el formato.
+
+        FIFA ha devuelto el endpoint de Team Stats en varios formatos:
+        - lista de listas: ["Goals", 2]
+        - lista de diccionarios: {"name": "Goals", "value": 2}
+        - objeto con data/items/statistics anidados
+        - objeto con claves directas: {"Goals": 2}
+
+        Las versiones antiguas solo leían lista de listas; por eso el botón JSON podía
+        mostrar datos nuevos, pero la tarjeta seguía sin actualizar algunos campos.
+        """
+        wanted = str(key or "").strip().lower()
+        if not wanted:
             return default
-        for row in rows:
+
+        def to_number(value: Any) -> float | None:
             try:
-                if isinstance(row, list) and len(row) >= 2 and str(row[0]) == key:
-                    value = row[1]
-                    if isinstance(value, (int, float)):
-                        return value
+                if value is None or value == "":
+                    return None
+                if isinstance(value, bool):
+                    return float(int(value))
+                if isinstance(value, (int, float)):
                     return float(value)
+                txt = str(value).strip().replace(",", "")
+                # Acepta "43.5%" y valores con texto alrededor.
+                m = re.search(r"-?\d+(?:\.\d+)?", txt)
+                if not m:
+                    return None
+                return float(m.group(0))
             except Exception:
-                continue
-        return default
+                return None
+
+        def normalize_name(value: Any) -> str:
+            return re.sub(r"[^a-z0-9]+", "", str(value or "").lower())
+
+        wanted_norm = normalize_name(wanted)
+        name_keys = ("key", "name", "stat", "stats", "statname", "statkey", "statistic", "statisticname", "type", "id", "code", "label", "displayname")
+        value_keys = ("value", "val", "total", "count", "amount", "statvalue", "numericvalue", "number", "data")
+
+        def scan(obj: Any, depth: int = 0) -> float | None:
+            if depth > 8:
+                return None
+            if isinstance(obj, dict):
+                # Clave directa: {"Goals": 2}
+                for k, v in obj.items():
+                    if normalize_name(k) == wanted_norm:
+                        n = to_number(v)
+                        if n is not None:
+                            return n
+                # Objeto tipo {name/key/stat: "Goals", value/total: 2}
+                row_name = None
+                for nk in name_keys:
+                    if nk in obj:
+                        row_name = obj.get(nk)
+                        break
+                    # tolerante a mayúsculas
+                    for actual in obj.keys():
+                        if normalize_name(actual) == normalize_name(nk):
+                            row_name = obj.get(actual)
+                            break
+                    if row_name is not None:
+                        break
+                if row_name is not None and normalize_name(row_name) == wanted_norm:
+                    for vk in value_keys:
+                        if vk in obj:
+                            n = to_number(obj.get(vk))
+                            if n is not None:
+                                return n
+                        for actual in obj.keys():
+                            if normalize_name(actual) == normalize_name(vk):
+                                n = to_number(obj.get(actual))
+                                if n is not None:
+                                    return n
+                # Formatos anidados frecuentes
+                for container_key in ("data", "items", "rows", "stats", "statistics", "teamStats", "values", "result"):
+                    if container_key in obj:
+                        n = scan(obj.get(container_key), depth + 1)
+                        if n is not None:
+                            return n
+                    for actual in obj.keys():
+                        if normalize_name(actual) == normalize_name(container_key):
+                            n = scan(obj.get(actual), depth + 1)
+                            if n is not None:
+                                return n
+                return None
+            if isinstance(obj, list):
+                for row in obj:
+                    # Lista clásica: ["Goals", 2] o ["Goals", "Goles", 2]
+                    if isinstance(row, list) and row:
+                        if normalize_name(row[0]) == wanted_norm:
+                            for value in row[1:]:
+                                n = to_number(value)
+                                if n is not None:
+                                    return n
+                        # Algunas respuestas traen pares internos o listas anidadas.
+                        n = scan(row, depth + 1)
+                        if n is not None:
+                            return n
+                    else:
+                        n = scan(row, depth + 1)
+                        if n is not None:
+                            return n
+                return None
+            return None
+
+        found = scan(rows)
+        return default if found is None else found
 
     def _fetch_fifa_team_stats(self, force: bool = False) -> Dict[str, Any]:
         """Lee estadísticas agregadas por equipo desde FIFA con caché y concurrencia.
@@ -2766,7 +2861,8 @@ class AppApi:
             team_name_default, code, meta_item = job
             team_id = str(meta_item.get("idTeam") or "").strip()
             stats_url = FIFA_TEAM_STATS_TEMPLATE.format(season=FIFA_STATS_SEASON_ID, team_id=team_id)
-            rows = json.loads(fetch_url(stats_url, timeout=8))
+            request_url = stats_url + (("?t=" + str(int(time.time()))) if force else "")
+            rows = json.loads(fetch_url(request_url, timeout=8))
             team_name = self._team_from_code(code)
             tr_direct = int(self._fifa_stat_value(rows, "DirectRedCards", 0) or 0)
             tr_indirect = int(self._fifa_stat_value(rows, "IndirectRedCards", 0) or 0)
@@ -2793,7 +2889,7 @@ class AppApi:
                 "shots": int(self._fifa_stat_value(rows, "AttemptAtGoal", 0) or 0),
                 "shotsOnTarget": int(self._fifa_stat_value(rows, "AttemptAtGoalOnTarget", 0) or 0),
                 "xg": round(float(self._fifa_stat_value(rows, "XG", 0) or 0), 3),
-                "possession": round(float(self._fifa_stat_value(rows, "Possession", 0) or 0) * 100, 2),
+                "possession": round((lambda v: v * 100 if v <= 1 else v)(float(self._fifa_stat_value(rows, "Possession", 0) or 0)), 2),
                 "passes": int(self._fifa_stat_value(rows, "Passes", 0) or 0),
                 "passesCompleted": int(self._fifa_stat_value(rows, "PassesCompleted", 0) or 0),
                 "corners": int(self._fifa_stat_value(rows, "Corners", 0) or 0),

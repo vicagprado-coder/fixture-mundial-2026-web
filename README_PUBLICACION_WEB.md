@@ -142,3 +142,11 @@ Abre:
 `/api/storage/status`
 
 Debe responder con `storage: supabase`, `supabase_configured: true` y `has_data: true` después del primer guardado.
+
+
+## v109 - Corrección actualización JSON FIFA
+
+- Se corrigió el parser del endpoint `fdh-api.fifa.com/v1/stats/season/.../team/...json` para aceptar lista de listas, lista de objetos, claves directas y estructuras anidadas.
+- El botón de actualización forzada agrega un parámetro temporal para evitar caché intermedio.
+- La posesión ahora acepta valores `0.435` y también `43.5` sin multiplicar dos veces.
+- Después de actualizar FIFA, inicia sesión y presiona **Guardar** para persistir los datos en Supabase.
