@@ -108,7 +108,7 @@ FALLBACK_RANKING = {
     "CAN": {"rank": 28, "points": 1550.00}, "QAT": {"rank": 30, "points": 1536.00},
     "EGY": {"rank": 31, "points": 1530.00}, "NOR": {"rank": 32, "points": 1525.00},
     "SCO": {"rank": 33, "points": 1518.00}, "PAR": {"rank": 35, "points": 1509.00},
-    "RSA": {"rank": 38, "points": 1491.00}, "CIV": {"rank": 40, "points": 1480.00},
+    "RSA": {"rank": 38, "points": 1491.00}, "SWE": {"rank": 38, "points": 1491.00}, "CIV": {"rank": 40, "points": 1480.00},
     "TUN": {"rank": 42, "points": 1472.00}, "ALG": {"rank": 43, "points": 1469.00},
     "CZE": {"rank": 44, "points": 1464.00}, "BIH": {"rank": 52, "points": 1420.00},
     "KSA": {"rank": 54, "points": 1410.00}, "NZL": {"rank": 57, "points": 1395.00},
