@@ -1534,14 +1534,9 @@ body.editMode .adminOnly.grid{display:grid!important}
 }
 
 
-/* v125: Sorpresas/decepciones a la izquierda + Fair Play fijo al costado */
+/* v126: Sorpresas/decepciones con scroll + Fair Play en métricas superiores */
 #analisis .analysisHighlightsCard{overflow:visible!important}
-#analisis .analysisHighlightsLayout{
-  display:grid!important;
-  grid-template-columns:minmax(0,2.05fr) minmax(300px,.82fr)!important;
-  gap:14px!important;
-  align-items:start!important;
-}
+#analisis .analysisHighlightsLayout{display:block!important}
 #analisis .analysisTeamsPair{
   display:grid!important;
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
@@ -1560,32 +1555,37 @@ body.editMode .adminOnly.grid{display:grid!important}
 #analisis .analysisScrollList::-webkit-scrollbar-track{background:#eef3f9;border-radius:999px}
 #analisis .analysisScrollList::-webkit-scrollbar-thumb{background:#b9c8dc;border-radius:999px}
 #analisis .analysisScrollList .mathTeamCard:first-child{margin-top:0}
-#analisis .fairPlayColumn{
-  min-width:0!important;
-  background:linear-gradient(180deg,#ffffff,#f8fbff)!important;
-  align-self:stretch!important;
-  position:relative!important;
+#analisis .fairPlayGrid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important;margin-top:14px!important}
+#analisis .fairPlayMetricCard{
+  position:relative;
+  overflow:hidden;
+  border:1px solid #e2ebf7;
+  background:linear-gradient(180deg,#ffffff,#f9fbff);
+  border-radius:22px;
+  padding:14px;
+  min-height:118px;
+  box-shadow:0 10px 22px rgba(15,36,84,.075);
 }
-#analisis .fairPlayGrid{display:grid!important;grid-template-columns:1fr!important;gap:9px!important}
-#analisis .fairPlayMetricCard{position:relative;overflow:hidden;border:1px solid #e2ebf7;background:#fff;border-radius:20px;padding:11px;box-shadow:0 8px 18px rgba(15,36,84,.065)}
+#analisis .scenarioGrid .fairPlayMetricCard{margin:0!important}
 #analisis .fairPlayMetricCard:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--green)}
 #analisis .fairPlayMetricCard.bad:before{background:var(--red)}
 #analisis .fairPlayMetricCard.empty:before{background:#98a2b3}
 #analisis .fairPlayMetricTop{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-#analisis .fairPlayMetricTop h4{margin:0;color:var(--navy);font-size:14px;line-height:1.15}
-#analisis .fairPlayMetricTop p{margin:3px 0 0;color:var(--muted);font-size:11px;font-weight:850;line-height:1.3}
+#analisis .fairPlayMetricTop h4{margin:0;color:var(--navy);font-size:15px;line-height:1.15}
+#analisis .fairPlayMetricTop p{margin:4px 0 0;color:var(--muted);font-size:11.5px;font-weight:850;line-height:1.3}
 #analisis .fairPlayMetricTop span{flex:0 0 auto;border-radius:999px;background:#e9f9f0;color:#067a3b;padding:6px 8px;font-size:12px;font-weight:1000;white-space:nowrap}
 #analisis .fairPlayMetricCard.bad .fairPlayMetricTop span{background:#fff0f1;color:var(--red)}
-#analisis .fairPlayTeam{display:flex;align-items:center;gap:8px;margin-top:9px;color:var(--navy);font-weight:1000}
+#analisis .fairPlayTeam{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--navy);font-weight:1000}
 #analisis .fairPlayTeam .flagImg{width:36px;height:24px;border-radius:5px}
 #analisis .fairPlayTeam small{display:block;color:var(--muted);font-size:10.5px;font-weight:950;margin-top:1px}
 #analisis .fairPlayMetricCard .mathMetaRow{gap:5px!important;margin-top:8px!important}
 #analisis .fairPlayMetricCard .mathMeta{font-size:10px!important;padding:5px 7px!important}
 #analisis .fairPlayMetricCard.empty p{margin:6px 0 0;color:var(--muted);font-weight:850;line-height:1.35}
-@media(max-width:980px){
-  #analisis .analysisHighlightsLayout{grid-template-columns:1fr!important}
-  #analisis .analysisTeamsPair{grid-template-columns:1fr!important}
+@media(max-width:1180px){
   #analisis .fairPlayGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:980px){
+  #analisis .analysisTeamsPair{grid-template-columns:1fr!important}
   #analisis .analysisScrollList{max-height:420px!important}
 }
 @media(max-width:620px){
@@ -3309,6 +3309,19 @@ function analysisFairPlayPanel(combined){
   html+='</div></div>';
   return html;
 }
+function analysisFairPlayScenarioCards(combined){
+  var rows=analysisFairPlayRows(combined);
+  var bestFouls=analysisFairPlayPick(rows,'bestFouls');
+  var bestCards=analysisFairPlayPick(rows,'bestCards');
+  var worstFouls=analysisFairPlayPick(rows,'worstFouls');
+  var worstCards=analysisFairPlayPick(rows,'worstCards');
+  var html='';
+  html+=analysisFairPlayCard(bestFouls,'Mejor fair play por faltas','Menos faltas realizadas.','good','fouls');
+  html+=analysisFairPlayCard(bestCards,'Mejor fair play por tarjetas','Menos tarjetas recibidas.','good','cards');
+  html+=analysisFairPlayCard(worstFouls,'Peor disciplina por faltas','Más faltas realizadas.','bad','fouls');
+  html+=analysisFairPlayCard(worstCards,'Peor disciplina por tarjetas','Más tarjetas recibidas.','bad','cards');
+  return html;
+}
 function analysisHighlightsPanel(combined){
   var played=(combined||[]).filter(function(x){return x.pj>0});
   var buckets={surprises:[],deceptions:[]};
@@ -3334,11 +3347,11 @@ function analysisHighlightsPanel(combined){
   var destacados=buckets.surprises.sort(function(a,b){return b.sorpresaScore-a.sorpresaScore||b.pts-a.pts||b.dg-a.dg||name(a.team).localeCompare(name(b.team))}).slice(0,10);
   var sorpresaMap={};destacados.forEach(function(x){sorpresaMap[x.team]=1});
   var decepciones=buckets.deceptions.filter(function(x){return !sorpresaMap[x.team]}).sort(function(a,b){return b.decepcionScore-a.decepcionScore||a.score100-b.score100||name(a.team).localeCompare(name(b.team))}).slice(0,10);
-  var html='<div class="card analysisHighlightsCard" style="margin-top:14px"><div class="sectionHead"><div><h2>Equipos destacados y equipos decepción</h2><p>Hasta 10 equipos por bloque solo cuando cumplen los criterios. Cada lista usa desplazamiento interno y ningún equipo puede aparecer como sorpresa y decepción a la vez.</p></div><span class="tag gold">Nuevo v125</span></div><div class="analysisHighlightsLayout"><div class="analysisTeamsPair"><div class="mathColumn analysisScrollColumn"><div class="mathColumnHead"><div><h3>⭐ Equipos destacados / sorpresas</h3><p>Outsiders que superan su expectativa por resultados.</p></div><span class="tag green">'+destacados.length+'</span></div><div class="analysisScrollList">';
+  var html='<div class="card analysisHighlightsCard" style="margin-top:14px"><div class="sectionHead"><div><h2>Equipos destacados y equipos decepción</h2><p>Hasta 10 equipos por bloque solo cuando cumplen los criterios. Cada lista usa desplazamiento interno y ningún equipo puede aparecer como sorpresa y decepción a la vez. Fair play queda arriba junto a Tendencia y Mayor goleada.</p></div><span class="tag gold">Nuevo v126</span></div><div class="analysisHighlightsLayout"><div class="analysisTeamsPair"><div class="mathColumn analysisScrollColumn"><div class="mathColumnHead"><div><h3>⭐ Equipos destacados / sorpresas</h3><p>Outsiders que superan su expectativa por resultados.</p></div><span class="tag green">'+destacados.length+'</span></div><div class="analysisScrollList">';
   if(destacados.length){destacados.forEach(function(x){html+=analysisMiniTeamCard(x,'good')})}else{html+='<div class="mathEmpty">Aún no hay sorpresas claras con los resultados registrados.</div>'}
   html+='</div></div><div class="mathColumn analysisScrollColumn"><div class="mathColumnHead"><div><h3>⚠️ Equipos decepción</h3><p>Favoritos o candidatos fuertes que no están cumpliendo.</p></div><span class="tag red">'+decepciones.length+'</span></div><div class="analysisScrollList">';
   if(decepciones.length){decepciones.forEach(function(x){html+=analysisMiniTeamCard(x,'bad')})}else{html+='<div class="mathEmpty">Aún no hay decepciones claras con los resultados registrados.</div>'}
-  html+='</div></div></div>'+analysisFairPlayPanel(combined)+'</div></div>';
+  html+='</div></div></div></div></div>';
   return html;
 }
 
@@ -3365,7 +3378,7 @@ function renderAnalisisCore(){
   html+='<div class="statGrid"><div class="statCard"><b>'+summary.done+'</b><span>Partidos analizados</span><small>De '+matches.length+' partidos de fase de grupos.</small></div><div class="statCard"><b>'+summary.goals+'</b><span>Goles por resultados</span><small>Promedio '+summary.avg.toFixed(2)+' por partido.</small></div><div class="statCard"><b>'+fifaRows.length+'</b><span>Equipos FIFA cargados</span><small>Estadísticas oficiales vinculadas por IdTeam.</small></div><div class="statCard"><b>'+fifaTeamTotal('goals')+'</b><span>Goles FIFA</span><small>Dato oficial agregado por selección.</small></div><div class="statCard"><b>'+fifaTeamTotal('assists')+'</b><span>Asistencias FIFA</span><small>Recalculadas desde jugadores cuando está disponible.</small></div><div class="statCard"><b>'+fifaTeamTotal('yellow')+' / '+fifaTeamTotal('red')+'</b><span>TA / TR FIFA</span><small>Disciplina oficial por equipo.</small></div></div>';
   html+='<div class="unifiedPanel" style="margin-top:14px"><div>';
   html+='<div class="championCard"><div class="championMain"><div class="championFlag">'+(cand?flag(cand.team):'<span class="flagBlank"></span>')+'</div><div><p class="championSub">Predicción de posible campeón</p><h2 class="championTitle">'+(cand?esc(name(cand.team)):'Sin candidato')+'</h2><p class="championSub">'+(cand?code(cand.team)+' · Grupo '+cand.g+' · Índice '+cand.score100+'/100 · Prob. calibrada '+cand.prob+'%':'Carga resultados o estadísticas FIFA')+'</p></div></div><div class="confidence"><span style="width:'+confidence+'%"></span></div><p class="muted" style="margin-top:8px">Confianza del modelo: '+confidence+'%. El índice usa forma en el grupo, ataque, defensa, posesión/pases, profundidad de jugadores, Ranking FIFA real, disciplina y estado matemático.</p>'+(cand?'<div class="mathMetaRow" style="margin-top:10px">'+componentPills(cand)+'</div><p class="muted" style="margin-top:8px"><b>Por qué:</b> '+esc(cand.reason)+'</p><p class="muted"><b>Riesgo:</b> '+esc(cand.risk)+'</p>':'')+'</div>';
-  html+='<div class="scenarioGrid"><div class="scenario"><h3>Tendencia de resultados</h3><p>Victorias local: '+summary.homeWins+' · Empates: '+summary.draws+' · Victorias visitante: '+summary.awayWins+'.</p></div><div class="scenario"><h3>Mayor goleada</h3><p>'+(biggest?esc(name(biggest.match.h))+' '+biggest.match.hg+' - '+biggest.match.ag+' '+esc(name(biggest.match.a))+' · Grupo '+biggest.match.g:'Sin datos suficientes')+'</p></div><div class="scenario"><h3>Mejor ataque local</h3><p>'+(bestAttack?esc(name(bestAttack.team))+' · '+bestAttack.gf+' goles registrados':'Sin datos')+'</p></div><div class="scenario"><h3>Mejor defensa local</h3><p>'+(bestDefense?esc(name(bestDefense.team))+' · '+bestDefense.gc+' goles recibidos':'Sin datos')+'</p></div></div>';
+  html+='<div class="scenarioGrid"><div class="scenario"><h3>Tendencia de resultados</h3><p>Victorias local: '+summary.homeWins+' · Empates: '+summary.draws+' · Victorias visitante: '+summary.awayWins+'.</p></div><div class="scenario"><h3>Mayor goleada</h3><p>'+(biggest?esc(name(biggest.match.h))+' '+biggest.match.hg+' - '+biggest.match.ag+' '+esc(name(biggest.match.a))+' · Grupo '+biggest.match.g:'Sin datos suficientes')+'</p></div><div class="scenario"><h3>Mejor ataque local</h3><p>'+(bestAttack?esc(name(bestAttack.team))+' · '+bestAttack.gf+' goles registrados':'Sin datos')+'</p></div><div class="scenario"><h3>Mejor defensa local</h3><p>'+(bestDefense?esc(name(bestDefense.team))+' · '+bestDefense.gc+' goles recibidos':'Sin datos')+'</p></div>'+analysisFairPlayScenarioCards(combined)+'</div>';
   html+='</div><div>';
   html+='<div class="scenario"><h3>Resumen FIFA destacado</h3><p><b>Goles:</b> '+(fifaTopGoals?esc(name(fifaTopGoals.team))+' ('+statValue(fifaTopGoals.goals)+')':'Pendiente')+'</p><p><b>Asistencias:</b> '+(fifaTopAssists?esc(name(fifaTopAssists.team))+' ('+statValue(fifaTopAssists.assists)+')':'Pendiente')+'</p><p><b>xG:</b> '+(fifaTopXg?esc(name(fifaTopXg.team))+' ('+statValue(fifaTopXg.xg)+')':'Pendiente')+'</p></div>';
   html+='<div class="scenario" style="margin-top:12px"><h3>Invictos por resultados</h3><p>'+(undefeated.length?undefeated.slice(0,6).map(function(x){return esc(name(x.team))}).join(' · '):'Sin invictos calculados todavía')+'</p></div>';
