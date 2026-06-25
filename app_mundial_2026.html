@@ -1534,28 +1534,39 @@ body.editMode .adminOnly.grid{display:grid!important}
 }
 
 
-/* v124: Sorpresas/decepciones con Top 10, scroll interno y fair play separado */
+/* v125: Sorpresas/decepciones a la izquierda + Fair Play fijo al costado */
 #analisis .analysisHighlightsCard{overflow:visible!important}
 #analisis .analysisHighlightsLayout{
   display:grid!important;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(290px,.72fr)!important;
-  gap:12px!important;
+  grid-template-columns:minmax(0,2.05fr) minmax(300px,.82fr)!important;
+  gap:14px!important;
   align-items:start!important;
+}
+#analisis .analysisTeamsPair{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;
+  min-width:0!important;
 }
 #analisis .analysisScrollColumn{min-width:0!important;min-height:0!important}
 #analisis .analysisScrollList{
-  max-height:440px;
-  overflow-y:auto;
-  overflow-x:hidden;
-  padding-right:7px;
-  scrollbar-gutter:stable;
+  max-height:430px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  padding-right:7px!important;
+  scrollbar-gutter:stable!important;
 }
 #analisis .analysisScrollList::-webkit-scrollbar{width:8px}
 #analisis .analysisScrollList::-webkit-scrollbar-track{background:#eef3f9;border-radius:999px}
 #analisis .analysisScrollList::-webkit-scrollbar-thumb{background:#b9c8dc;border-radius:999px}
 #analisis .analysisScrollList .mathTeamCard:first-child{margin-top:0}
-#analisis .fairPlayColumn{min-width:0!important;background:linear-gradient(180deg,#ffffff,#f8fbff)!important}
-#analisis .fairPlayGrid{display:grid;grid-template-columns:1fr;gap:9px}
+#analisis .fairPlayColumn{
+  min-width:0!important;
+  background:linear-gradient(180deg,#ffffff,#f8fbff)!important;
+  align-self:stretch!important;
+  position:relative!important;
+}
+#analisis .fairPlayGrid{display:grid!important;grid-template-columns:1fr!important;gap:9px!important}
 #analisis .fairPlayMetricCard{position:relative;overflow:hidden;border:1px solid #e2ebf7;background:#fff;border-radius:20px;padding:11px;box-shadow:0 8px 18px rgba(15,36,84,.065)}
 #analisis .fairPlayMetricCard:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--green)}
 #analisis .fairPlayMetricCard.bad:before{background:var(--red)}
@@ -1571,20 +1582,15 @@ body.editMode .adminOnly.grid{display:grid!important}
 #analisis .fairPlayMetricCard .mathMetaRow{gap:5px!important;margin-top:8px!important}
 #analisis .fairPlayMetricCard .mathMeta{font-size:10px!important;padding:5px 7px!important}
 #analisis .fairPlayMetricCard.empty p{margin:6px 0 0;color:var(--muted);font-weight:850;line-height:1.35}
-@media(max-width:1280px){
-  #analisis .analysisHighlightsLayout{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
-  #analisis .fairPlayColumn{grid-column:1 / -1!important}
-  #analisis .fairPlayGrid{grid-template-columns:repeat(4,minmax(0,1fr))}
-}
-@media(max-width:900px){
+@media(max-width:980px){
   #analisis .analysisHighlightsLayout{grid-template-columns:1fr!important}
-  #analisis .fairPlayColumn{grid-column:auto!important}
-  #analisis .fairPlayGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  #analisis .analysisScrollList{max-height:420px}
+  #analisis .analysisTeamsPair{grid-template-columns:1fr!important}
+  #analisis .fairPlayGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #analisis .analysisScrollList{max-height:420px!important}
 }
 @media(max-width:620px){
-  #analisis .fairPlayGrid{grid-template-columns:1fr}
-  #analisis .analysisScrollList{max-height:390px}
+  #analisis .fairPlayGrid{grid-template-columns:1fr!important}
+  #analisis .analysisScrollList{max-height:390px!important}
 }
 
 </style>
@@ -3305,13 +3311,34 @@ function analysisFairPlayPanel(combined){
 }
 function analysisHighlightsPanel(combined){
   var played=(combined||[]).filter(function(x){return x.pj>0});
-  var destacados=played.slice().filter(isSurpriseCandidate).map(function(x){x.sorpresaScore=surpriseScore(x);return x}).sort(function(a,b){return b.sorpresaScore-a.sorpresaScore||b.pts-a.pts||b.dg-a.dg||name(a.team).localeCompare(name(b.team))}).slice(0,10);
-  var decepciones=played.slice().filter(isDeceptionCandidate).map(function(x){x.decepcionScore=deceptionScore(x);return x}).sort(function(a,b){return b.decepcionScore-a.decepcionScore||a.score100-b.score100||name(a.team).localeCompare(name(b.team))}).slice(0,10);
-  var html='<div class="card analysisHighlightsCard" style="margin-top:14px"><div class="sectionHead"><div><h2>Equipos destacados y equipos decepción</h2><p>Ahora muestra hasta 10 sorpresas y 10 decepciones con desplazamiento interno, para mantener el mismo alto visual. A la derecha se resume fair play y peor disciplina por faltas y tarjetas.</p></div><span class="tag gold">Nuevo v124</span></div><div class="mathColumns analysisHighlightsLayout"><div class="mathColumn analysisScrollColumn"><div class="mathColumnHead"><div><h3>⭐ Equipos destacados / sorpresas</h3><p>Outsiders que superan su expectativa por resultados.</p></div><span class="tag green">'+destacados.length+'</span></div><div class="analysisScrollList">';
+  var buckets={surprises:[],deceptions:[]};
+  played.forEach(function(x){
+    var item=Object.assign({},x);
+    item.sorpresaScore=surpriseScore(item);
+    item.decepcionScore=deceptionScore(item);
+    var sOk=isSurpriseCandidate(item)&&item.sorpresaScore>=35;
+    var dOk=isDeceptionCandidate(item)&&item.decepcionScore>=40;
+    if(sOk&&dOk){
+      var st=item.status||mathStatusSafe(item.team)||{};
+      var rank=Number(item.rank||4);
+      /* Un equipo nunca puede figurar como sorpresa y decepción a la vez.
+         Si ya clasificó o está en Top 2, se prioriza como sorpresa; si está fuera del Top 2 o eliminado, se prioriza como decepción. */
+      if(st.status==='qualified'||rank<=2){buckets.surprises.push(item)}
+      else{buckets.deceptions.push(item)}
+    }else if(sOk){
+      buckets.surprises.push(item);
+    }else if(dOk){
+      buckets.deceptions.push(item);
+    }
+  });
+  var destacados=buckets.surprises.sort(function(a,b){return b.sorpresaScore-a.sorpresaScore||b.pts-a.pts||b.dg-a.dg||name(a.team).localeCompare(name(b.team))}).slice(0,10);
+  var sorpresaMap={};destacados.forEach(function(x){sorpresaMap[x.team]=1});
+  var decepciones=buckets.deceptions.filter(function(x){return !sorpresaMap[x.team]}).sort(function(a,b){return b.decepcionScore-a.decepcionScore||a.score100-b.score100||name(a.team).localeCompare(name(b.team))}).slice(0,10);
+  var html='<div class="card analysisHighlightsCard" style="margin-top:14px"><div class="sectionHead"><div><h2>Equipos destacados y equipos decepción</h2><p>Hasta 10 equipos por bloque solo cuando cumplen los criterios. Cada lista usa desplazamiento interno y ningún equipo puede aparecer como sorpresa y decepción a la vez.</p></div><span class="tag gold">Nuevo v125</span></div><div class="analysisHighlightsLayout"><div class="analysisTeamsPair"><div class="mathColumn analysisScrollColumn"><div class="mathColumnHead"><div><h3>⭐ Equipos destacados / sorpresas</h3><p>Outsiders que superan su expectativa por resultados.</p></div><span class="tag green">'+destacados.length+'</span></div><div class="analysisScrollList">';
   if(destacados.length){destacados.forEach(function(x){html+=analysisMiniTeamCard(x,'good')})}else{html+='<div class="mathEmpty">Aún no hay sorpresas claras con los resultados registrados.</div>'}
   html+='</div></div><div class="mathColumn analysisScrollColumn"><div class="mathColumnHead"><div><h3>⚠️ Equipos decepción</h3><p>Favoritos o candidatos fuertes que no están cumpliendo.</p></div><span class="tag red">'+decepciones.length+'</span></div><div class="analysisScrollList">';
   if(decepciones.length){decepciones.forEach(function(x){html+=analysisMiniTeamCard(x,'bad')})}else{html+='<div class="mathEmpty">Aún no hay decepciones claras con los resultados registrados.</div>'}
-  html+='</div></div>'+analysisFairPlayPanel(combined)+'</div></div>';
+  html+='</div></div></div>'+analysisFairPlayPanel(combined)+'</div></div>';
   return html;
 }
 
