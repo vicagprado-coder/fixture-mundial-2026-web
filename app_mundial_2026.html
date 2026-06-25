@@ -1502,20 +1502,21 @@ body.editMode .adminOnly.grid{display:grid!important}
   margin:4px 0!important;
   color:#5f6d82!important;
 }
-#analisis .unifiedPanel > div:last-child{
+#analisis .analysisSideColumn{
   display:grid!important;
   gap:14px!important;
+  align-self:start!important;
 }
-#analisis .unifiedPanel > div:last-child .scenario{
+#analisis .analysisSideColumn .scenario{
   margin-top:0!important;
 }
-#analisis .unifiedPanel > div:last-child .scenario:first-child{
+#analisis .analysisSideColumn .scenario:first-child{
   border-top:5px solid var(--blue)!important;
 }
-#analisis .unifiedPanel > div:last-child .scenario:nth-child(2){
+#analisis .analysisSideColumn .scenario:nth-child(2){
   border-top:5px solid var(--green)!important;
 }
-#analisis .unifiedPanel > div:last-child .btn{display:none!important}
+#analisis .analysisSideColumn .btn{display:none!important}
 #analisis .statGrid{
   gap:12px!important;
 }
@@ -1687,6 +1688,26 @@ body.editMode .adminOnly.grid{display:grid!important}
 }
 @media(max-width:620px){
   #analisis .scenarioGrid{grid-template-columns:1fr!important}
+}
+
+
+/* v128: usar el ancho completo inferior del panel de análisis */
+#analisis .unifiedPanelWide{
+  grid-template-columns:minmax(0,2fr) minmax(320px,1fr)!important;
+  align-items:start!important;
+}
+#analisis .analysisChampionColumn{min-width:0!important}
+#analisis .analysisSideColumn{min-width:0!important}
+#analisis .scenarioGridFull{
+  grid-column:1 / -1!important;
+  width:100%!important;
+}
+#analisis .scenarioGridFull.scenarioGrid{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+@media(max-width:1180px){
+  #analisis .unifiedPanelWide{grid-template-columns:1fr!important}
+  #analisis .scenarioGridFull{grid-column:auto!important}
 }
 
 </style>
@@ -3472,13 +3493,14 @@ function renderAnalisisCore(){
   html+='<div class="card"><div class="sectionHead"><div><h2>Lectura general</h2><p>Este panel reemplaza los análisis separados. Todo se interpreta en una sola vista: rendimiento en partidos, forma del grupo y métricas FIFA por equipo.</p></div><span class="tag">Análisis único</span></div>';
   if(!summary.done&&!fifaRows.length){html+='<div class="warningAnalysis">Aún no hay resultados ni estadísticas FIFA cargadas. Registra marcadores o presiona “Actualizar con internet”.</div>'}
   html+='<div class="statGrid"><div class="statCard"><b>'+summary.done+'</b><span>Partidos analizados</span><small>De '+matches.length+' partidos de fase de grupos.</small></div><div class="statCard"><b>'+summary.goals+'</b><span>Goles por resultados</span><small>Promedio '+summary.avg.toFixed(2)+' por partido.</small></div><div class="statCard"><b>'+fifaRows.length+'</b><span>Equipos FIFA cargados</span><small>Estadísticas oficiales vinculadas por IdTeam.</small></div><div class="statCard"><b>'+fifaTeamTotal('goals')+'</b><span>Goles FIFA</span><small>Dato oficial agregado por selección.</small></div><div class="statCard"><b>'+fifaTeamTotal('assists')+'</b><span>Asistencias FIFA</span><small>Recalculadas desde jugadores cuando está disponible.</small></div><div class="statCard"><b>'+fifaTeamTotal('yellow')+' / '+fifaTeamTotal('red')+'</b><span>TA / TR FIFA</span><small>Disciplina oficial por equipo.</small></div></div>';
-  html+='<div class="unifiedPanel" style="margin-top:14px"><div>';
+  html+='<div class="unifiedPanel unifiedPanelWide" style="margin-top:14px"><div class="analysisChampionColumn">';
   html+='<div class="championCard"><div class="championMain"><div class="championFlag">'+(cand?flag(cand.team):'<span class="flagBlank"></span>')+'</div><div><p class="championSub">Predicción de posible campeón</p><h2 class="championTitle">'+(cand?esc(name(cand.team)):'Sin candidato')+'</h2><p class="championSub">'+(cand?code(cand.team)+' · Grupo '+cand.g+' · Índice '+cand.score100+'/100 · Prob. calibrada '+cand.prob+'%':'Carga resultados o estadísticas FIFA')+'</p></div></div><div class="confidence"><span style="width:'+confidence+'%"></span></div><p class="muted" style="margin-top:8px">Confianza del modelo: '+confidence+'%. El índice usa forma en el grupo, ataque, defensa, posesión/pases, profundidad de jugadores, Ranking FIFA real, disciplina y estado matemático.</p>'+(cand?'<div class="mathMetaRow" style="margin-top:10px">'+componentPills(cand)+'</div><p class="muted" style="margin-top:8px"><b>Por qué:</b> '+esc(cand.reason)+'</p><p class="muted"><b>Riesgo:</b> '+esc(cand.risk)+'</p>':'')+'</div>';
-  html+='<div class="scenarioGrid"><div class="scenario"><h3>Tendencia de resultados</h3><p>Victorias local: '+summary.homeWins+' · Empates: '+summary.draws+' · Victorias visitante: '+summary.awayWins+'.</p></div><div class="scenario"><h3>Mayor goleada</h3><p>'+(biggest?esc(name(biggest.match.h))+' '+biggest.match.hg+' - '+biggest.match.ag+' '+esc(name(biggest.match.a))+' · Grupo '+biggest.match.g:'Sin datos suficientes')+'</p></div><div class="scenario"><h3>Mejor ataque local</h3><p>'+(bestAttack?esc(name(bestAttack.team))+' · '+bestAttack.gf+' goles registrados':'Sin datos')+'</p></div><div class="scenario"><h3>Mejor defensa local</h3><p>'+(bestDefense?esc(name(bestDefense.team))+' · '+bestDefense.gc+' goles recibidos':'Sin datos')+'</p></div>'+analysisFairPlayScenarioCards(combined)+'</div>';
-  html+='</div><div>';
+  html+='</div><div class="analysisSideColumn">';
   html+='<div class="scenario"><h3>Resumen FIFA destacado</h3><p><b>Goles:</b> '+(fifaTopGoals?esc(name(fifaTopGoals.team))+' ('+statValue(fifaTopGoals.goals)+')':'Pendiente')+'</p><p><b>Asistencias:</b> '+(fifaTopAssists?esc(name(fifaTopAssists.team))+' ('+statValue(fifaTopAssists.assists)+')':'Pendiente')+'</p><p><b>xG:</b> '+(fifaTopXg?esc(name(fifaTopXg.team))+' ('+statValue(fifaTopXg.xg)+')':'Pendiente')+'</p></div>';
-  html+='<div class="scenario" style="margin-top:12px"><h3>Invictos por resultados</h3><p>'+(undefeated.length?undefeated.slice(0,6).map(function(x){return esc(name(x.team))}).join(' · '):'Sin invictos calculados todavía')+'</p></div>';
-  html+='</div></div>';
+  html+='<div class="scenario"><h3>Invictos por resultados</h3><p>'+(undefeated.length?undefeated.slice(0,6).map(function(x){return esc(name(x.team))}).join(' · '):'Sin invictos calculados todavía')+'</p></div>';
+  html+='</div>';
+  html+='<div class="scenarioGrid scenarioGridFull"><div class="scenario"><h3>Tendencia de resultados</h3><p>Victorias local: '+summary.homeWins+' · Empates: '+summary.draws+' · Victorias visitante: '+summary.awayWins+'.</p></div><div class="scenario"><h3>Mayor goleada</h3><p>'+(biggest?esc(name(biggest.match.h))+' '+biggest.match.hg+' - '+biggest.match.ag+' '+esc(name(biggest.match.a))+' · Grupo '+biggest.match.g:'Sin datos suficientes')+'</p></div><div class="scenario"><h3>Mejor ataque local</h3><p>'+(bestAttack?esc(name(bestAttack.team))+' · '+bestAttack.gf+' goles registrados':'Sin datos')+'</p></div><div class="scenario"><h3>Mejor defensa local</h3><p>'+(bestDefense?esc(name(bestDefense.team))+' · '+bestDefense.gc+' goles recibidos':'Sin datos')+'</p></div>'+analysisFairPlayScenarioCards(combined)+'</div>';
+  html+='</div>';
   html+=analysisHighlightsPanel(combined);
   html+='<div class="card" style="margin-top:14px"><div class="sectionHead"><div><h2>Top candidatos a campeón</h2><p>Modelo 0-100 balanceado. Ahora usa el Ranking FIFA real como fuerza previa fuerte, para evitar que una goleada temprana coloque primero a un equipo que no parte como favorito #1.</p></div><span class="tag green">Modelo predictivo v123</span></div><div class="barList">';
   var top=combined.slice(0,10);if(top.length){top.forEach(function(x,i){var width=Math.max(4,Math.round(x.score100));var f=x.fifa||{};var statusTxt=x.status?x.status.route:'En disputa';html+='<div class="barItem"><div class="barTop"><span><b>'+(i+1)+'. '+esc(name(x.team))+'</b> <small>'+code(x.team)+' · Grupo '+x.g+' · '+esc(statusTxt)+'</small></span><b>'+x.score100+'/100 · '+x.prob+'%</b></div><div class="bar"><span style="width:'+width+'%"></span></div><div class="mathMetaRow" style="margin-top:8px">'+componentPills(x)+'</div><small class="muted"><b>Lectura:</b> '+esc(x.reason)+'<br><b>Riesgo:</b> '+esc(x.risk)+'<br>FIFA: Ranking '+(x.fifaRank?('#'+x.fifaRank):'-')+' · GF '+statValue(f.goals)+' · xG '+statValue(f.xg)+' · TA/TR '+statValue(x.yellow)+'/'+statValue(x.red)+' · Jugadores '+statValue((x.player&&x.player.players)||f.playersWithStats||f.players)+'</small></div>'})}else{html+='<p class="muted">Sin candidatos hasta cargar resultados o estadísticas FIFA.</p>'}html+='</div></div>';
