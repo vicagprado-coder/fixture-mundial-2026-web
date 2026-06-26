@@ -2880,6 +2880,80 @@ input:disabled:not(.score):not(.koScore):not(.koTeamInput){opacity:.72!important
   #rondas .koTag{font-size:8.5px!important;padding:4px 6px!important}
 }
 
+
+/* ===== v153 Fix modo visualización: texto legible en rondas ===== */
+#rondas .koSplitCard .koMiniTeamDisplay{
+  background:rgba(5,20,52,.76)!important;
+  border:1px solid rgba(148,211,255,.38)!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  text-shadow:0 1px 2px rgba(0,0,0,.38);
+}
+#rondas .koSplitCard .koMiniTeamDisplay span:not(.seedBadge){
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+#rondas .koSplitCard .koMiniTeamDisplay .seedBadge{
+  background:rgba(237,244,255,.96)!important;
+  color:#0057d8!important;
+  -webkit-text-fill-color:#0057d8!important;
+  border:1px solid rgba(255,255,255,.72)!important;
+  text-shadow:none!important;
+}
+#rondas .koSplitCard .koMiniTeamDisplay .seedBadge.thirdSeed{
+  min-width:auto!important;
+  height:auto!important;
+  padding:4px 8px!important;
+  background:#fff6d8!important;
+  color:#775900!important;
+  -webkit-text-fill-color:#775900!important;
+  border-color:#f2d36a!important;
+  white-space:nowrap!important;
+}
+#rondas .koSplitCard .koMiniTeamDisplay .flagImg{
+  background:#fff!important;
+  border:1px solid rgba(255,255,255,.55)!important;
+}
+
+
+/* ===== v154 Ajuste ancho uniforme + quitar horario ET ===== */
+#rondas .koLaneHeader,
+#rondas .laneRight .koLaneHeader{
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+}
+#rondas .koPathPair,
+#rondas .koPathPair.rtl{
+  grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr)!important;
+}
+#rondas .koPathSources,
+#rondas .koPathNext{
+  min-width:0!important;
+}
+#rondas .koPathSources .koSplitCard,
+#rondas .koPathNext .koSplitCard{
+  width:100%!important;
+}
+#rondas .koTag.et{
+  display:none!important;
+}
+#rondas .koFinalBlockGrid{
+  grid-template-columns:minmax(190px,.75fr) minmax(340px,1fr) minmax(340px,1fr) minmax(190px,.75fr)!important;
+}
+#rondas .koFinalLane .koFinalCard,
+#rondas .koFinalLane .koThirdCard{
+  width:100%!important;
+}
+@media(max-width:900px){
+  #rondas .koPathPair,
+  #rondas .koPathPair.rtl{
+    grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr)!important;
+  }
+  #rondas .koLaneHeader,
+  #rondas .laneRight .koLaneHeader{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -4508,7 +4582,7 @@ var KO_SCHEDULE={
  M104:{date:'Dom 19 Jul 2026',timePe:'14:00 Perú',timeEt:'15:00 ET'}
 };
 function koSchedule(no){return KO_SCHEDULE[String(no||'').toUpperCase()]||null}
-function koScheduleHTML(no){var s=koSchedule(no);if(!s)return '';return '<div class="koDatePill">📅 '+esc(s.date)+' · '+esc(s.timePe)+'<small>Horario referencial del calendario FIFA · '+esc(s.timeEt)+'</small></div>'}
+function koScheduleHTML(no){var s=koSchedule(no);if(!s)return '';return '<div class="koDatePill">📅 '+esc(s.date)+' · '+esc(s.timePe)+'<small>Horario referencial del calendario FIFA</small></div>'}
 function groupStageComplete(){return doneCount(matches)>=matches.length}
 function safeGroupMathProfile(team){try{return groupMathProfile(team)}catch(e){return null}}
 function guaranteedFirstTeam(g){var teams=GROUPS[g]||[],out=[];for(var i=0;i<teams.length;i++){var p=safeGroupMathProfile(teams[i]);if(p&&p.guaranteedTop1)out.push(teams[i])}return out.length===1?out[0]:''}
@@ -4685,7 +4759,7 @@ function koCompactDate(txt){return String(txt||'Fecha').replace(/^\S+\s+/,'').re
 function koSplitTags(no,m){
   var sch=koSchedule(no)||{};
   var st=koAutoStatus(m,no);
-  return '<div class="koSplitHead"><span class="koTag matchNo">🏟️ '+esc(no||'Partido')+'</span><span class="koTag date">📅 '+esc(koCompactDate(sch.date||'Fecha'))+'</span><span class="koTag pe">🕒 '+esc(sch.timePe||'Hora Perú')+'</span><span class="koTag et">'+esc(sch.timeEt||'ET')+'</span><span class="koTag state '+esc(st.className||'')+'">'+esc(st.label)+'</span></div>';
+  return '<div class="koSplitHead"><span class="koTag matchNo">🏟️ '+esc(no||'Partido')+'</span><span class="koTag date">📅 '+esc(koCompactDate(sch.date||'Fecha'))+'</span><span class="koTag pe">🕒 '+esc(sch.timePe||'Hora Perú')+'</span><span class="koTag state '+esc(st.className||'')+'">'+esc(st.label)+'</span></div>';
 }
 function koSplitMatchCardHTML(roundKey,m,idx,side,extraClass){
   m=m||{};
