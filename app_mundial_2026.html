@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fixture Mundial 2026 - Análisis</title>
+<!-- v148 QA UX/UI/CX: contraste, legibilidad de marcadores, limpieza de funciones duplicadas y búsqueda sin salto de pestaña -->
 <style>
 :root{
   --red:#e30613;--orange:#ff5b00;--green:#00b050;--lime:#8cff00;--blue:#0047ff;--sky:#58a6ff;--gold:#f6c542;
@@ -1744,609 +1745,145 @@ body.editMode .adminOnly.grid{display:grid!important}
 @media(max-width:780px){.app{padding-left:8px;padding-right:8px}.hero{min-height:150px}.analysisHeroChips{grid-template-columns:repeat(2,1fr)}.analysisMetricGrid{grid-template-columns:1fr}.analysisChampionV133{align-items:flex-start}.analysisChampionV133 .flagImg{width:76px;height:52px}.analysisChampionName{font-size:25px}.mathTeamCard{grid-template-columns:1fr}.toolbar{position:static;flex-wrap:wrap}.search{flex-basis:100%}.kpis{grid-template-columns:repeat(2,1fr)}}
 
 
-/* Ajuste visual v134: evita vista apretada y mantiene todas las ventanas visibles */
-.app{max-width:1440px!important;width:100%!important;padding:14px 18px 122px!important}
-.content,.section,.analysisV133{min-width:0!important;width:100%!important}
-.workspace{grid-template-columns:180px minmax(0,1fr)!important;gap:16px!important}
-.card,.fieldPanel,.match,.roundCol,.mathColumn,.scenario,.statCard,.barItem{min-width:0!important}
-.sectionHead{flex-wrap:wrap!important;align-items:flex-start!important}
-.sectionHead .tag{margin-top:2px!important}
-.toolbar{flex-wrap:wrap!important;align-items:stretch!important;gap:8px!important}
-.search{min-width:280px!important;flex:1 1 360px!important}.miniBtn,.authBtn,.authStatus{flex:0 0 auto!important}
-.tabs{display:flex!important;grid-template-columns:none!important;align-items:stretch!important;justify-content:flex-start!important;overflow-x:auto!important;overflow-y:hidden!important;max-width:min(1220px,calc(100vw - 20px))!important;width:calc(100vw - 20px)!important;margin:auto!important;scrollbar-width:thin!important;scroll-snap-type:x proximity!important}
-.tab{flex:0 0 112px!important;min-width:112px!important;scroll-snap-align:center!important;white-space:normal!important}
-.analysisTopGrid{grid-template-columns:minmax(0,1.55fr) minmax(300px,.75fr)!important;gap:14px!important}
-.analysisHeroChips{grid-template-columns:repeat(auto-fit,minmax(112px,1fr))!important}.heroChip{min-height:52px!important}
-.analysisMetricGrid{grid-template-columns:repeat(auto-fit,minmax(235px,1fr))!important;gap:12px!important}.fairplayV133{grid-template-columns:repeat(auto-fit,minmax(235px,1fr))!important}
-.analysisTeamsPair{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}.analysisScrollColumn{max-height:370px!important}.analysisScrollList{max-height:275px!important}
-.mathTeamCard{grid-template-columns:minmax(155px,.85fr) minmax(86px,auto) minmax(220px,1.45fr)!important}
-.groupResume{grid-template-columns:repeat(auto-fit,minmax(132px,1fr))!important}.fixtureMatchGrid,.gridTeams,.playerPhotoGrid,.fifaTeamGrid{min-width:0!important}.tableWrap{overflow:auto!important;max-width:100%!important}
-.bracketViewport{overflow-x:auto!important;max-width:100%!important}.roundSectionStack{min-width:0!important}
-@media(max-width:1280px){
-  .app{padding-left:14px!important;padding-right:14px!important}
-  .workspace{display:block!important}.side{position:relative!important;top:auto!important;margin:0 0 12px!important;width:100%!important}.sideTitle{display:none!important}
-  .groupRail{display:flex!important;grid-template-columns:none!important;gap:8px!important;overflow-x:auto!important;padding:2px 0 8px!important;scrollbar-width:thin!important}.gbtn{flex:0 0 76px!important;min-width:76px!important;min-height:48px!important}
-  .analysisTopGrid{grid-template-columns:1fr!important}.analysisTeamsPair{grid-template-columns:1fr!important}.mathTeamCard{grid-template-columns:minmax(150px,.9fr) minmax(82px,auto) minmax(210px,1.4fr)!important}
-}
-@media(max-width:820px){
-  .app{padding:10px 8px 116px!important}.hero{min-height:auto!important;border-radius:24px!important;padding:14px 12px!important}.brand{align-items:flex-start!important}.brand h1{font-size:23px!important}.brand p{font-size:12px!important}.logoCup{width:62px!important;height:62px!important;border-radius:18px!important}.themeStrip{display:none!important}
-  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}.toolbar{display:grid!important;grid-template-columns:1fr auto!important}.search{grid-column:1/-1!important;min-width:0!important}.miniBtn,.authBtn,.authStatus{min-width:0!important;font-size:11px!important;padding:10px 9px!important}.adminOnly.compactAdmin{display:inline-flex!important}
-  .analysisChampionV133{align-items:flex-start!important}.analysisChampionV133 .flagImg{width:72px!important;height:48px!important}.analysisChampionName{font-size:24px!important}.analysisHeroCard{padding:15px!important}.analysisHeroTitle h2{font-size:19px!important}.analysisHeroChips{grid-template-columns:repeat(2,minmax(0,1fr))!important}.analysisMetricGrid,.fairplayV133{grid-template-columns:1fr!important}.analysisMetricCard{min-height:94px!important}.sideInsight{min-height:auto!important}.mathTeamCard{grid-template-columns:1fr!important;gap:6px!important}.mathRoute{justify-self:start!important}.analysisScrollColumn{max-height:390px!important}.analysisScrollList{max-height:300px!important}
-  .tabs{bottom:6px!important;width:calc(100vw - 12px)!important;max-width:none!important;padding:5px!important;border-radius:20px!important;gap:5px!important}.tab{flex-basis:82px!important;min-width:82px!important;min-height:50px!important;font-size:8.8px!important;padding:5px 3px!important;border-radius:15px!important}.tab b{font-size:14px!important}
-}
-@media(max-width:520px){.kpis{grid-template-columns:1fr 1fr!important}.groupResume{grid-template-columns:1fr 1fr!important}.teamTile{min-height:88px!important}.score{width:46px!important}.teams{grid-template-columns:1fr 46px 16px 46px 1fr!important}.tab{flex-basis:76px!important;min-width:76px!important}.analysisHeroChips{grid-template-columns:1fr!important}}
 
-
-
+/* v147: se eliminaron capas CSS obsoletas v134-v145 para evitar conflictos de layout. */
 /* =========================================================
-   v135 - Corrección full-width + legibilidad real
-   - La app ocupa todo el ancho disponible.
-   - Las tarjetas del análisis tienen fondo propio y textos legibles.
-   - Las métricas de campeón muestran los componentes reales del modelo.
-   ========================================================= */
-html,body{width:100%!important;min-width:0!important;overflow-x:hidden!important}
-.app{
-  width:calc(100vw - 28px)!important;
-  max-width:none!important;
-  margin:0 auto!important;
-  padding-left:14px!important;
-  padding-right:14px!important;
-  box-sizing:border-box!important;
-}
-.workspace{
-  width:100%!important;
-  max-width:none!important;
-  grid-template-columns:clamp(132px,9vw,172px) minmax(0,1fr)!important;
-  gap:16px!important;
-}
-.content,.section{min-width:0!important;width:100%!important;max-width:none!important}
-.hero,.toolbar,.kpis,.card,.tableWrap,.fixtureSections,.fixtureMatchGrid,.analysisV133,.analysisTopGrid,.analysisMetricGrid,.analysisTeamsPair{
-  max-width:none!important;
-}
-.tabs{
-  width:calc(100vw - 28px)!important;
-  max-width:none!important;
-  left:14px!important;
-  right:14px!important;
-  margin:0!important;
-  box-sizing:border-box!important;
-}
-#analisis .analysisV133{gap:16px!important}
-#analisis .analysisTopGrid{
-  grid-template-columns:minmax(640px,2fr) minmax(360px,.9fr)!important;
-  gap:16px!important;
-  align-items:stretch!important;
-}
-#analisis .analysisHeroCard,
-#analisis .sideInsight,
-#analisis .analysisMetricCard,
-#analisis .fairPlayMetricCard,
-#analisis .analysisHighlightsCard{
-  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,251,255,.94))!important;
-  border:1px solid rgba(216,227,243,.95)!important;
-  box-shadow:0 14px 32px rgba(8,26,71,.13)!important;
-  color:var(--navy)!important;
-}
-#analisis .analysisMetricGrid{
-  grid-template-columns:repeat(4,minmax(230px,1fr))!important;
-  gap:14px!important;
-}
-#analisis .analysisMetricCard{
-  min-height:116px!important;
-  border-radius:22px!important;
-  padding:16px 18px!important;
-}
-#analisis .analysisMetricCard .metricText h3,
-#analisis .analysisMetricCard .metricText p{opacity:1!important;visibility:visible!important}
-#analisis .analysisHeroChips{
-  grid-template-columns:repeat(8,minmax(94px,1fr))!important;
-  gap:10px!important;
-}
-#analisis .heroChip{
-  min-height:64px!important;
-  padding:9px 8px!important;
-}
-#analisis .heroChip span{font-size:11.5px!important;line-height:1.15!important}
-#analisis .heroChip b{font-size:18px!important;line-height:1.1!important}
-#analisis .analysisReasonLine{font-size:13.2px!important;line-height:1.35!important}
-#analisis .fairplayV133{
-  grid-template-columns:repeat(4,minmax(220px,1fr))!important;
-}
-#analisis .analysisTeamsPair{
-  grid-template-columns:repeat(2,minmax(420px,1fr))!important;
-  gap:16px!important;
-}
-#analisis .analysisScrollColumn{
-  max-height:none!important;
-  min-height:360px!important;
-  border-radius:22px!important;
-}
-#analisis .analysisScrollList{
-  max-height:285px!important;
-}
-#analisis .mathTeamCard{
-  grid-template-columns:minmax(180px,.9fr) minmax(130px,.55fr) minmax(330px,1.6fr)!important;
-  gap:14px!important;
-  padding:12px 10px!important;
-}
-#analisis .mathTeamCard .mathReason{
-  font-size:12.4px!important;
-  line-height:1.35!important;
-  text-align:left!important;
-}
-.tableWrap{overflow-x:auto!important}
-table{min-width:980px}
-@media(max-width:1300px){
-  #analisis .analysisTopGrid{grid-template-columns:1fr!important}
-  #analisis .analysisMetricGrid,#analisis .fairplayV133{grid-template-columns:repeat(2,minmax(260px,1fr))!important}
-  #analisis .analysisTeamsPair{grid-template-columns:1fr!important}
-}
-@media(max-width:980px){
-  .app{width:100%!important;padding-left:10px!important;padding-right:10px!important}
-  .workspace{grid-template-columns:1fr!important}
-  .side{position:relative!important;top:auto!important;overflow-x:auto!important}
-  .groupRail{display:flex!important;grid-template-columns:none!important;gap:8px!important;padding-bottom:4px!important}
-  .gbtn{min-width:74px!important}
-  #analisis .analysisMetricGrid,#analisis .fairplayV133{grid-template-columns:1fr!important}
-  #analisis .analysisHeroChips{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-  #analisis .mathTeamCard{grid-template-columns:1fr!important}
-  .tabs{overflow-x:auto!important;grid-template-columns:none!important;display:flex!important;padding:6px!important}
-  .tab{min-width:96px!important;flex:0 0 auto!important}
-}
-
-
-/* =========================================================
-   v136 - Corrección fondo tarjetas de métricas del análisis
-   - Evita que Pulso/Mayor goleada/Equipo más goleador/Mejor defensa queden sobre fondo azul.
-   - Fuerza tarjeta blanca legible aunque herede estilos oscuros del contenedor.
-   ========================================================= */
-#analisis .analysisMetricGrid > .analysisMetricCard,
-#analisis .analysisMetricGrid:not(.fairplayV133) > .card.analysisMetricCard,
-.analysisMetricGrid > .analysisMetricCard{
-  background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%)!important;
-  border:1px solid rgba(216,227,243,.96)!important;
-  box-shadow:0 14px 30px rgba(8,26,71,.13)!important;
-  color:#0b1f4d!important;
-  opacity:1!important;
-  border-radius:22px!important;
-}
-#analisis .analysisMetricGrid:not(.fairplayV133) > .analysisMetricCard .metricText h3,
-#analisis .analysisMetricGrid:not(.fairplayV133) > .analysisMetricCard .metricText p,
-.analysisMetricGrid > .analysisMetricCard .metricText h3,
-.analysisMetricGrid > .analysisMetricCard .metricText p{
-  color:#0b1f4d!important;
-  opacity:1!important;
-  text-shadow:none!important;
-  visibility:visible!important;
-}
-#analisis .analysisMetricGrid:not(.fairplayV133) > .analysisMetricCard .metricText p,
-.analysisMetricGrid > .analysisMetricCard .metricText p{
-  color:#506078!important;
-  font-weight:900!important;
-}
-#analisis .analysisMetricGrid:not(.fairplayV133) > .analysisMetricCard .metricIcon,
-.analysisMetricGrid > .analysisMetricCard .metricIcon{
-  background:#eef6ff!important;
-  color:#0047ff!important;
-  box-shadow:inset 0 0 0 1px rgba(0,71,255,.08)!important;
-}
-#analisis .analysisMetricGrid:not(.fairplayV133) > .analysisMetricCard.good .metricIcon,
-.analysisMetricGrid > .analysisMetricCard.good .metricIcon{
-  background:#e9f9f0!important;
-  color:#078a48!important;
-}
-#analisis .analysisMetricGrid:not(.fairplayV133) > .analysisMetricCard.bad .metricIcon,
-.analysisMetricGrid > .analysisMetricCard.bad .metricIcon{
-  background:#fff0f1!important;
-  color:#e30613!important;
-}
-#analisis .analysisMetricGrid:not(.fairplayV133) > .analysisMetricCard:after{
-  color:#0b1f4d!important;
-  opacity:.045!important;
-}
-
-
-/* =========================================================
-   v137 - Corrección barra inferior visible y full-width
-   - Elimina el transform heredado que desplazaba las pestañas hacia la izquierda.
-   - La navegación inferior usa todo el ancho y muestra todos los botones.
-   ========================================================= */
-.tabs{
-  position:fixed!important;
-  left:16px!important;
-  right:16px!important;
-  bottom:10px!important;
-  width:auto!important;
-  max-width:none!important;
-  margin:0!important;
-  transform:none!important;
-  display:grid!important;
-  grid-template-columns:repeat(9,minmax(84px,1fr))!important;
-  align-items:stretch!important;
-  justify-content:stretch!important;
-  gap:8px!important;
-  padding:8px!important;
-  border-radius:24px!important;
-  background:rgba(255,255,255,.76)!important;
-  border:1px solid rgba(255,255,255,.55)!important;
-  box-shadow:0 18px 42px rgba(8,26,71,.24)!important;
-  backdrop-filter:blur(18px)!important;
-  overflow:visible!important;
-  z-index:9000!important;
-  box-sizing:border-box!important;
-}
-.tabs .tab{
-  width:100%!important;
-  min-width:0!important;
-  max-width:none!important;
-  flex:initial!important;
-  min-height:54px!important;
-  border-radius:17px!important;
-  padding:6px 5px!important;
-  font-size:10.5px!important;
-  line-height:1.05!important;
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:center!important;
-  justify-content:center!important;
-  white-space:normal!important;
-  text-align:center!important;
-  box-sizing:border-box!important;
-}
-.tabs .tab b{
-  font-size:16px!important;
-  line-height:1!important;
-  margin:0 0 3px!important;
-}
-.tabs .tabClose{
-  background:linear-gradient(135deg,#ff2a16,#ff5b1a)!important;
-  color:#fff!important;
-  border-color:transparent!important;
-}
-body{padding-bottom:86px!important;}
-.app{padding-bottom:86px!important;}
-@media(min-width:781px){
-  .app{height:calc(100vh - 72px)!important;}
-  .content,.workspace.no-side .content{padding-bottom:92px!important;}
-}
-@media(max-width:980px){
-  .tabs{
-    left:8px!important;
-    right:8px!important;
-    bottom:6px!important;
-    display:flex!important;
-    width:auto!important;
-    max-width:none!important;
-    overflow-x:auto!important;
-    overflow-y:hidden!important;
-    grid-template-columns:none!important;
-    gap:6px!important;
-    padding:6px!important;
-    border-radius:20px!important;
-    scroll-snap-type:x proximity!important;
-  }
-  .tabs .tab{
-    flex:0 0 86px!important;
-    min-width:86px!important;
-    min-height:50px!important;
-    font-size:9px!important;
-    scroll-snap-align:center!important;
-  }
-  .tabs .tab b{font-size:14px!important;}
-  body,.app{padding-bottom:78px!important;}
-}
-
-
-
-/* =========================================================
-   v138 - Jerarquía de espacios: cabecera compacta + centro amplio
-   Objetivo:
-   - Reducir banner, KPIs, toolbar, estado y navegación inferior.
-   - Dar más alto real a la zona central de contenido.
-   - Mantener ancho completo, colores e imágenes del Mundial.
+   v146 UX/UI DEFINITIVO - legibilidad, alto útil y resultados visibles
+   - Revisión global de contraste: títulos sobre azul en blanco, tarjetas en blanco.
+   - La zona central usa el espacio real hasta la barra inferior.
+   - Fixture, tabla, terceros, clasificados, análisis, equipos, jugadores y rondas
+     dejan de usar contenedores internos que cortaban información.
    ========================================================= */
 :root{
-  --v138-nav-h:62px;
-  --v138-gap:8px;
+  --ux-bg:#071747;
+  --ux-panel:#ffffff;
+  --ux-panel-soft:#f7faff;
+  --ux-ink:#0c2357;
+  --ux-muted:#5d6980;
+  --ux-line:#dbe6f5;
+  --ux-shadow:0 14px 32px rgba(4,18,61,.16);
+  --ux-nav-h:58px;
+  --ux-status-h:28px;
 }
-html,body{
-  width:100%!important;
-  height:100%!important;
-  margin:0!important;
-  overflow:hidden!important;
+body{background:var(--ux-bg)!important;color:var(--ux-ink)!important}
+body:before{opacity:.80!important}
+body:after{opacity:.18!important}
+.card,.fieldPanel,.match,.teamTile,.roster,.tableWrap,.mathColumn,.analysisHeroCard,.analysisHighlightsCard,.analysisMetricCard,.fairPlayMetricCard,.sideInsight,.fixtureSection,.fifaDetailCard,.playerRosterCard,.playerDetailSide,.roundCol,.scenario,.statCard,.barItem,.readOnlyNotice,.viewContext,.bottomPersistBar{
+  background:linear-gradient(180deg,var(--ux-panel),var(--ux-panel-soft))!important;
+  color:var(--ux-ink)!important;
+  border:1px solid var(--ux-line)!important;
+  box-shadow:var(--ux-shadow)!important;
+  text-shadow:none!important;
 }
-body{
-  padding-bottom:0!important;
-  background:#061744!important;
+.card h1,.card h2,.card h3,.card h4,.fieldPanel h1,.fieldPanel h2,.fieldPanel h3,.fieldPanel h4,.match h1,.match h2,.match h3,.match h4,.mathColumn h1,.mathColumn h2,.mathColumn h3,.mathColumn h4,.analysisHeroCard h1,.analysisHeroCard h2,.analysisHeroCard h3,.analysisMetricCard h3,.fairPlayMetricCard h4,.sideInsight h3,.fixtureSection h3,.roster b,.teamTile b,.team b,.barItem b{
+  color:var(--ux-ink)!important;
+  text-shadow:none!important;
 }
-.app{
-  width:calc(100vw - 24px)!important;
-  max-width:none!important;
-  height:calc(100vh - var(--v138-nav-h) - 10px)!important;
-  min-height:0!important;
-  margin:0 auto!important;
-  padding:7px 12px 0!important;
-  display:flex!important;
-  flex-direction:column!important;
-  gap:var(--v138-gap)!important;
-  overflow:hidden!important;
-  box-sizing:border-box!important;
+.card p,.fieldPanel p,.match p,.fixtureSection p,.analysisMetricCard p,.sideInsight p,.team .code,.roster small,.teamTile small,.mathReason,.metricText p,.muted,small.muted{
+  color:var(--ux-muted)!important;
+  text-shadow:none!important;
 }
-/* Cabecera mundialista más baja, sin perder imagen ni color */
-.hero{
-  flex:0 0 82px!important;
-  min-height:82px!important;
-  max-height:82px!important;
-  padding:8px 14px!important;
-  margin:0!important;
-  border-radius:18px!important;
-  display:flex!important;
-  align-items:center!important;
-  overflow:hidden!important;
+/* Títulos de secciones principales sobre fondo azul */
+#fixture > .sectionHead h2,#tabla > .sectionHead h2,#terceros > .sectionHead h2,#clasificados > .sectionHead h2,#analisis > .sectionHead h2,#equiposFifa > .sectionHead h2,#jugadores > .sectionHead h2,#rondas > .sectionHead h2,
+#fixture > .compactTitle h2,#tabla > .compactTitle h2,#terceros > .compactTitle h2,#clasificados > .compactTitle h2,#analisis > .compactTitle h2,#equiposFifa > .compactTitle h2,#jugadores > .compactTitle h2,#rondas > .compactTitle h2{
+  color:#ffffff!important;
+  text-shadow:0 2px 10px rgba(0,0,0,.35)!important;
 }
-.logoCup{
-  width:54px!important;
-  height:54px!important;
-  min-width:54px!important;
-  border-radius:15px!important;
+#fixture > .sectionHead p,#tabla > .sectionHead p,#terceros > .sectionHead p,#clasificados > .sectionHead p,#analisis > .sectionHead p,#equiposFifa > .sectionHead p,#jugadores > .sectionHead p,#rondas > .sectionHead p,
+#fixture > .compactTitle p,#tabla > .compactTitle p,#terceros > .compactTitle p,#clasificados > .compactTitle p,#analisis > .compactTitle p,#equiposFifa > .compactTitle p,#jugadores > .compactTitle p,#rondas > .compactTitle p{
+  color:#dbe8ff!important;
+  text-shadow:0 1px 8px rgba(0,0,0,.28)!important;
 }
-.brand{gap:10px!important;align-items:center!important;min-width:0!important;position:relative!important;z-index:2!important;}
-.brand h1{
-  font-size:21px!important;
-  line-height:1.05!important;
-  margin:0!important;
-  letter-spacing:-.35px!important;
+
+@media(min-width:901px){
+  html,body{height:100dvh!important;overflow:hidden!important;margin:0!important;padding:0!important}
+  .app{
+    width:100vw!important;max-width:none!important;height:100dvh!important;min-height:100dvh!important;
+    display:flex!important;flex-direction:column!important;gap:6px!important;
+    padding:6px 14px calc(var(--ux-nav-h) + 8px)!important;margin:0!important;overflow:hidden!important;
+  }
+  .hero{flex:0 0 78px!important;height:78px!important;min-height:78px!important;border-radius:20px!important;padding:7px 14px!important;overflow:hidden!important}
+  .brand{height:100%!important;align-items:center!important;gap:10px!important}.logoCup{width:54px!important;height:54px!important;border-radius:15px!important}.brand h1{font-size:22px!important;line-height:1!important}.brand p,.quickHint,.themeStrip{display:none!important}
+  .hosts{position:absolute!important;left:88px!important;bottom:7px!important;margin:0!important;gap:6px!important;max-width:calc(100% - 360px)!important;overflow:hidden!important;flex-wrap:nowrap!important}.host{padding:5px 8px!important;font-size:10px!important;line-height:1!important;white-space:nowrap!important}
+  .heroVisuals{right:16px!important;top:6px!important;transform:scale(.52)!important;transform-origin:right top!important;opacity:.75!important}.worldWatermark{opacity:.08!important;max-height:76px!important}
+
+  .kpis{flex:0 0 44px!important;height:44px!important;min-height:44px!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;margin:0!important}.kpi{height:44px!important;min-height:44px!important;border-radius:15px!important;padding:6px 10px!important}.kpi b{font-size:18px!important;line-height:1!important}.kpi span{font-size:8.8px!important;line-height:1.1!important;letter-spacing:.25px!important}
+
+  .toolbar{flex:0 0 44px!important;height:44px!important;min-height:44px!important;margin:0!important;padding:4px!important;border-radius:17px!important;display:flex!important;align-items:center!important;gap:7px!important;overflow:hidden!important}.toolbar .search{height:36px!important;min-height:36px!important;border-radius:14px!important;flex:1 1 auto!important;min-width:250px!important}.toolbar .search input{font-size:12.5px!important;height:100%!important}.miniBtn,.authBtn,.authStatus{height:36px!important;min-height:36px!important;border-radius:13px!important;padding:7px 10px!important;font-size:11px!important;white-space:nowrap!important;flex:0 0 auto!important}
+
+  .workspace,.workspace.group-side,.workspace.selection-side,.workspace.no-side{flex:1 1 auto!important;min-height:0!important;height:auto!important;margin:0!important;display:grid!important;align-items:stretch!important;gap:10px!important;overflow:hidden!important}.workspace.group-side{grid-template-columns:162px minmax(0,1fr)!important}.workspace.selection-side{grid-template-columns:252px minmax(0,1fr)!important}.workspace.no-side{grid-template-columns:minmax(0,1fr)!important}
+  .side{height:100%!important;min-height:0!important;overflow:auto!important;position:relative!important;top:auto!important;border-radius:19px!important;padding:9px!important}.sideTitle{font-size:10px!important;margin-bottom:6px!important}.gbtn{min-height:42px!important;padding:7px 8px!important;border-radius:13px!important;font-size:11.5px!important;line-height:1.12!important}.sideTeamBtn{min-height:46px!important;padding:7px 8px!important}
+  .content{height:100%!important;min-height:0!important;width:100%!important;overflow-y:auto!important;overflow-x:hidden!important;padding:0 6px 8px 0!important;scrollbar-width:thin!important}
+  .section.active{display:block!important;min-height:100%!important;height:auto!important;overflow:visible!important;padding:0!important}.sectionHead{margin:0 0 8px!important;padding:0 4px!important;align-items:center!important}.sectionHead h2{font-size:20px!important;line-height:1.1!important;margin:0!important}.sectionHead p{font-size:11px!important;line-height:1.25!important;margin-top:3px!important}.tag{font-size:10px!important;padding:6px 9px!important}
+
+  /* Fixture: se deja todo dentro del scroll principal para no cortar marcadores ni botones */
+  #fixture .fieldPanel{min-height:auto!important;height:auto!important;overflow:visible!important;padding:12px!important;border-radius:22px!important;display:block!important}
+  #fixture .fieldInner{display:block!important;overflow:visible!important;min-height:0!important}.groupResume{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;margin-bottom:8px!important}.teamTile{min-height:72px!important;padding:8px 6px!important;border-radius:15px!important}.teamTile .flagImg{width:44px!important;height:29px!important}.teamTile b{font-size:12px!important}.teamTile small{font-size:9px!important}
+  .fixtureQuickNav{margin:8px 0!important}.fixtureQuickNav a{padding:7px 11px!important;font-size:11px!important}.fixtureSections{display:grid!important;gap:10px!important;overflow:visible!important;margin:0!important;padding-bottom:8px!important}.fixtureSection{padding:11px!important;border-radius:20px!important;overflow:visible!important}.fixtureSectionHead{padding:9px 11px!important;margin:0 0 9px!important;border-radius:16px!important}.fixtureSectionHead h3{font-size:16px!important}.fixtureSectionHead p{font-size:11px!important}.fixtureMatchGrid{grid-template-columns:repeat(2,minmax(360px,1fr))!important;gap:10px!important}.match.fixtureCard{height:auto!important;min-height:220px!important;padding:12px!important;border-radius:18px!important}.match.fixtureCard .actions{margin-top:10px!important}.matchTop{margin-bottom:9px!important}.fixtureMetaLine{font-size:10.5px!important;margin-bottom:7px!important}.teams{grid-template-columns:1fr 52px 20px 52px 1fr!important;gap:6px!important}.team{font-size:13px!important}.team .flagImg{width:48px!important;height:32px!important}.score{width:52px!important;font-size:18px!important;padding:8px 2px!important;border-radius:13px!important}.btn{min-height:40px!important;padding:9px 10px!important;border-radius:14px!important}
+
+  /* Tablas y rankings */
+  #tabla > .card,#terceros > .card,#equiposFifa > .card,#jugadores > .card,#rondas > .card{height:auto!important;min-height:auto!important;overflow:visible!important;padding:12px!important;border-radius:22px!important}.tableWrap{max-width:100%!important;overflow:auto!important}table{min-width:900px!important}th{padding:9px 7px!important;font-size:10px!important;color:#53617a!important}td{padding:9px 7px!important;font-size:12.5px!important;color:var(--ux-ink)!important}.legendRow{margin-bottom:8px!important}
+
+  /* Clasificados / eliminados: listas legibles y sin alto cortado */
+  #clasificados .mathStatusHero{display:none!important}#clasificados .mathStatusStats{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;margin:0 0 10px!important}.mathMini{min-height:52px!important;padding:9px 11px!important;border-radius:16px!important}.mathMini b{font-size:20px!important}.mathMini span{font-size:9.5px!important}.mathColumns{display:grid!important;grid-template-columns:1fr 1fr!important;gap:12px!important;overflow:visible!important}.mathColumn{height:auto!important;max-height:none!important;overflow:visible!important;padding:14px!important;border-radius:20px!important}.mathColumnHead h3{font-size:19px!important}.mathColumnHead p{font-size:11px!important}.mathTeamCard{display:grid!important;grid-template-columns:minmax(170px,.9fr) minmax(108px,.45fr) minmax(230px,1.45fr)!important;gap:10px!important;align-items:center!important;padding:10px 0!important;margin:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;border:0!important;border-bottom:1px solid #e9eef7!important}.mathReason{margin:0!important;font-size:11.8px!important;line-height:1.34!important}
+
+  /* Análisis: tarjetas legibles, sin fondo oscuro ni texto invisible */
+  #analisis .analysisV133{display:flex!important;flex-direction:column!important;gap:11px!important;overflow:visible!important}.analysisTopGrid{grid-template-columns:minmax(0,2fr) minmax(320px,.9fr)!important;gap:12px!important;align-items:stretch!important}.analysisHeroCard{padding:15px 17px!important;border-radius:22px!important}.analysisHeroTitle{margin-bottom:18px!important}.analysisHeroTitle h2{font-size:20px!important}.analysisChampionName{font-size:28px!important}.analysisChampionV133 .flagImg{width:76px!important;height:52px!important}.analysisHeroChips{grid-template-columns:repeat(8,minmax(76px,1fr))!important;gap:7px!important;margin:12px 0 8px!important}.heroChip{min-height:50px!important;padding:7px 6px!important;border-radius:14px!important;background:#fff!important;color:var(--ux-ink)!important}.heroChip span{font-size:9.6px!important;color:var(--ux-muted)!important}.heroChip b{font-size:16px!important;color:var(--ux-ink)!important}.sideInsight{min-height:108px!important;padding:14px!important;border-radius:20px!important}.sideInsight h3{font-size:18px!important}.sideInsight p{font-size:12px!important}.analysisMetricGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important}.analysisMetricCard{min-height:92px!important;padding:12px 14px!important;border-radius:18px!important}.metricText h3{font-size:15px!important}.metricText p{font-size:11.6px!important;line-height:1.35!important}.fairplayV133{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important}.fairPlayMetricCard{min-height:74px!important;border-radius:18px!important}.analysisTeamsPair{display:grid!important;grid-template-columns:1fr 1fr!important;gap:12px!important}.analysisScrollColumn{min-height:340px!important;max-height:420px!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}.analysisScrollList{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow:auto!important}.analysisHighlightsCard{overflow:visible!important}.analysisReasonLine{color:#34425d!important}.analysisReasonLine span{color:#34425d!important}
+
+  .viewContext,.bottomPersistBar,.persistBar.bottomPersistBar{flex:0 0 var(--ux-status-h)!important;height:var(--ux-status-h)!important;min-height:var(--ux-status-h)!important;margin:2px 0 0!important;padding:4px 10px!important;border-radius:14px!important;font-size:10.5px!important;overflow:hidden!important}.viewContext .contextMain,.viewContext .contextAside{display:none!important}
+  .tabs{position:fixed!important;left:14px!important;right:14px!important;bottom:5px!important;width:auto!important;max-width:none!important;height:52px!important;min-height:52px!important;padding:5px!important;border-radius:20px!important;display:grid!important;grid-template-columns:repeat(9,minmax(84px,1fr))!important;gap:6px!important;overflow:hidden!important;z-index:9000!important;transform:none!important;margin:0!important;background:rgba(255,255,255,.72)!important}.tabs .tab{height:42px!important;min-height:42px!important;padding:4px 5px!important;border-radius:15px!important;font-size:9.5px!important;line-height:1.05!important;color:var(--ux-ink)!important;background:#fff!important}.tabs .tab b{font-size:13px!important;margin-bottom:2px!important}.tabs .tab.active{color:#fff!important;background:linear-gradient(135deg,var(--red),var(--orange) 28%,var(--green) 58%,var(--blue))!important}.tabClose{color:#fff!important;background:linear-gradient(135deg,var(--red),#ff5b00)!important}.toast{bottom:58px!important}.toast.show{bottom:64px!important}
 }
-.brand p,.quickHint{
-  display:none!important;
-}
-.hosts{
-  position:absolute!important;
-  left:84px!important;
-  bottom:8px!important;
-  margin:0!important;
-  gap:6px!important;
-  z-index:3!important;
-}
-.host{
-  padding:5px 9px!important;
-  font-size:10px!important;
-  border-radius:999px!important;
-  box-shadow:0 5px 12px rgba(0,0,0,.12)!important;
-}
-.themeStrip{display:none!important;}
-.heroVisuals{
-  right:18px!important;
-  top:10px!important;
-  gap:10px!important;
-  transform:scale(.72)!important;
-  transform-origin:right center!important;
-  opacity:.9!important;
-}
-.worldWatermark{
-  width:120px!important;
-  opacity:.12!important;
-}
-/* KPIs más finos */
-.kpis{
-  flex:0 0 auto!important;
-  margin:0!important;
-  gap:7px!important;
-  display:grid!important;
-  grid-template-columns:repeat(4,minmax(0,1fr))!important;
-}
-.kpi{
-  min-height:42px!important;
-  height:42px!important;
-  border-radius:14px!important;
-  padding:6px 10px!important;
-  overflow:hidden!important;
-}
-.kpi b{
-  font-size:18px!important;
-  line-height:1!important;
-}
-.kpi span{
-  margin-top:2px!important;
-  font-size:8.8px!important;
-  line-height:1.1!important;
-  letter-spacing:.25px!important;
-}
-/* Barra de búsqueda/acciones compacta */
-.toolbar{
-  flex:0 0 auto!important;
-  margin:0!important;
-  min-height:40px!important;
-  padding:5px!important;
-  border-radius:17px!important;
-  gap:6px!important;
-  display:flex!important;
-  align-items:center!important;
-  flex-wrap:nowrap!important;
-  overflow-x:auto!important;
-  overflow-y:hidden!important;
-  scrollbar-width:thin!important;
-}
-.toolbar .search{
-  flex:1 1 520px!important;
-  min-width:300px!important;
-  height:36px!important;
-  min-height:36px!important;
-  border-radius:14px!important;
-  padding:0 10px!important;
-}
-.toolbar .search input{
-  height:34px!important;
-  padding:0 5px!important;
-  font-size:12.5px!important;
-}
-.miniBtn,.authBtn,.authStatus{
-  flex:0 0 auto!important;
-  min-height:36px!important;
-  height:36px!important;
-  border-radius:13px!important;
-  padding:0 11px!important;
-  font-size:11.5px!important;
-  line-height:1!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  white-space:nowrap!important;
-}
-/* Centro como protagonista */
-.workspace{
-  flex:1 1 auto!important;
-  min-height:0!important;
-  height:auto!important;
-  width:100%!important;
-  margin:0!important;
-  gap:10px!important;
-  display:grid!important;
-  grid-template-columns:clamp(124px,8vw,154px) minmax(0,1fr)!important;
-  overflow:hidden!important;
-}
-.side{
-  height:100%!important;
-  min-height:0!important;
-  overflow-y:auto!important;
-  border-radius:16px!important;
-}
-.sideTitle{font-size:12px!important;padding:8px 6px!important;margin-bottom:6px!important;}
-.gbtn{min-height:42px!important;border-radius:14px!important;font-size:12px!important;padding:6px!important;}
-.content{
-  height:100%!important;
-  min-height:0!important;
-  overflow:hidden!important;
-  border-radius:0!important;
-}
-.section{
-  height:100%!important;
-  min-height:0!important;
-  overflow:auto!important;
-  padding:10px!important;
-  box-sizing:border-box!important;
-  scroll-padding-bottom:20px!important;
-}
-.section.active{display:block!important;}
-/* Más aire dentro de tarjetas y tablas centrales */
-.card,.tableWrap,.fixtureMatch,.analysisHeroCard,.analysisHighlightsCard,.analysisMetricCard,.fairPlayMetricCard,.sideInsight{
-  border-radius:18px!important;
-}
-.sectionHead{margin-bottom:8px!important;}
-.sectionHead h2{font-size:20px!important;line-height:1.15!important;}
-.tableWrap{max-height:none!important;}
-table th{font-size:10.5px!important;padding:10px 8px!important;}
-table td{padding:10px 8px!important;}
-.fixtureMatch{padding:10px!important;}
-/* Análisis: cards legibles pero no gigantes */
-#analisis .analysisV133{gap:12px!important;}
-#analisis .analysisTopGrid{
-  grid-template-columns:minmax(0,1.9fr) minmax(330px,.85fr)!important;
-  gap:12px!important;
-}
-#analisis .analysisHeroCard{padding:15px 16px!important;}
-#analisis .analysisChampionV133 .flagImg{width:74px!important;height:50px!important;border-radius:12px!important;}
-#analisis .analysisChampionName{font-size:27px!important;line-height:1.05!important;}
-#analisis .analysisHeroChips{grid-template-columns:repeat(8,minmax(88px,1fr))!important;gap:7px!important;}
-#analisis .heroChip{min-height:52px!important;padding:7px 6px!important;border-radius:13px!important;}
-#analisis .heroChip span{font-size:10px!important;}
-#analisis .heroChip b{font-size:16px!important;}
-#analisis .analysisReasonLine{font-size:12.2px!important;line-height:1.28!important;margin-top:6px!important;}
-#analisis .sideInsight{padding:13px 16px!important;min-height:92px!important;}
-#analisis .sideInsight h3{font-size:18px!important;margin-bottom:8px!important;}
-#analisis .analysisMetricGrid{
-  grid-template-columns:repeat(4,minmax(0,1fr))!important;
-  gap:10px!important;
-}
-#analisis .analysisMetricCard{
-  min-height:82px!important;
-  padding:12px 14px!important;
-  display:flex!important;
-  align-items:center!important;
-}
-#analisis .analysisMetricCard .metricIcon{width:38px!important;height:38px!important;min-width:38px!important;border-radius:13px!important;}
-#analisis .analysisMetricCard .metricText h3{font-size:15px!important;margin:0 0 5px!important;}
-#analisis .analysisMetricCard .metricText p{font-size:11.5px!important;line-height:1.3!important;margin:0!important;}
-#analisis .fairplayV133{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important;}
-#analisis .fairPlayMetricCard{min-height:76px!important;padding:12px!important;}
-#analisis .analysisTeamsPair{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;}
-#analisis .analysisScrollColumn{min-height:300px!important;max-height:none!important;}
-#analisis .analysisScrollList{max-height:255px!important;}
-#analisis .mathTeamCard{grid-template-columns:minmax(160px,.85fr) minmax(110px,.42fr) minmax(320px,1.4fr)!important;gap:10px!important;}
-#analisis .mathTeamCard .mathReason{font-size:11.6px!important;line-height:1.28!important;}
-/* Barra de guardado inferior menos invasiva */
-.viewContext{display:none!important;}
-.persistBar.bottomPersistBar{
-  flex:0 0 28px!important;
-  min-height:28px!important;
-  height:28px!important;
-  margin:0!important;
-  padding:5px 10px!important;
-  border-radius:13px!important;
-  font-size:10.5px!important;
-  display:flex!important;
-  align-items:center!important;
-}
-/* Navegación inferior compacta y siempre visible */
-.tabs{
-  position:fixed!important;
-  left:14px!important;
-  right:14px!important;
-  bottom:6px!important;
-  width:auto!important;
-  max-width:none!important;
-  height:54px!important;
-  min-height:54px!important;
-  padding:5px!important;
-  border-radius:19px!important;
-  gap:6px!important;
-  display:grid!important;
-  grid-template-columns:repeat(9,minmax(74px,1fr))!important;
-  overflow:hidden!important;
-  transform:none!important;
-  z-index:9000!important;
-}
-.tabs .tab{
-  min-height:42px!important;
-  height:42px!important;
-  padding:4px 5px!important;
-  border-radius:14px!important;
-  font-size:9.6px!important;
-  line-height:1.05!important;
-}
-.tabs .tab b{font-size:13px!important;margin-bottom:2px!important;}
-.toast{bottom:60px!important}.toast.show{bottom:66px!important;}
-/* Responsive: no achicar hasta volver ilegible */
-@media(max-width:1250px){
-  .hero{flex-basis:76px!important;min-height:76px!important;max-height:76px!important;}
-  .logoCup{width:48px!important;height:48px!important;min-width:48px!important;}
-  .brand h1{font-size:18px!important;}
-  .hosts{left:76px!important;}
-  .workspace{grid-template-columns:1fr!important;}
-  .side{height:auto!important;max-height:58px!important;overflow-x:auto!important;overflow-y:hidden!important;background:transparent!important;border:0!important;padding:0!important;}
-  .sideTitle{display:none!important;}
-  .groupRail{display:flex!important;gap:7px!important;overflow-x:auto!important;padding-bottom:4px!important;}
-  .gbtn{flex:0 0 72px!important;min-width:72px!important;}
-  #analisis .analysisTopGrid{grid-template-columns:1fr!important;}
-}
-@media(max-width:980px){
-  :root{--v138-nav-h:58px;}
-  .app{width:100%!important;padding:6px 8px 0!important;}
-  .heroVisuals{display:none!important;}
-  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
-  .toolbar{flex-wrap:wrap!important;min-height:auto!important;}
-  .toolbar .search{flex:1 1 100%!important;min-width:0!important;}
-  #analisis .analysisMetricGrid,#analisis .fairplayV133{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
-  #analisis .analysisTeamsPair{grid-template-columns:1fr!important;}
-  #analisis .analysisHeroChips{grid-template-columns:repeat(4,minmax(0,1fr))!important;}
-  .tabs{left:8px!important;right:8px!important;overflow-x:auto!important;display:flex!important;grid-template-columns:none!important;height:52px!important;min-height:52px!important;}
-  .tabs .tab{flex:0 0 82px!important;min-width:82px!important;height:40px!important;min-height:40px!important;}
-}
-@media(max-width:620px){
-  .hero{display:none!important;}
-  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
-  #analisis .analysisMetricGrid,#analisis .fairplayV133,#analisis .analysisHeroChips{grid-template-columns:1fr!important;}
-}
+@media(max-width:1250px) and (min-width:901px){.workspace.group-side{grid-template-columns:1fr!important}.side{height:auto!important;max-height:132px!important;margin-bottom:4px!important}.groupRail{display:flex!important;grid-template-columns:none!important;overflow-x:auto!important;gap:8px!important}.gbtn{min-width:82px!important;flex:0 0 auto!important}.fixtureMatchGrid{grid-template-columns:1fr!important}.analysisTopGrid,.analysisTeamsPair,.mathColumns{grid-template-columns:1fr!important}.analysisHeroChips{grid-template-columns:repeat(4,minmax(0,1fr))!important}.analysisMetricGrid,.fairplayV133{grid-template-columns:repeat(2,minmax(0,1fr))!important}.mathTeamCard{grid-template-columns:minmax(170px,.9fr) minmax(108px,.45fr) minmax(230px,1.45fr)!important}}
+@media(max-width:900px){html,body{height:auto!important;overflow:auto!important}.app{width:100%!important;max-width:none!important;height:auto!important;min-height:100dvh!important;padding:8px 8px 74px!important;display:block!important;overflow:visible!important}.hero{min-height:92px!important;border-radius:22px!important}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important}.toolbar{height:auto!important;flex-wrap:wrap!important}.toolbar .search{flex:1 1 100%!important}.workspace,.workspace.group-side,.workspace.selection-side,.workspace.no-side{display:block!important;height:auto!important;overflow:visible!important}.side{position:relative!important;max-height:210px!important;overflow:auto!important;margin-bottom:10px!important}.groupRail{grid-template-columns:repeat(2,minmax(0,1fr))!important}.content{height:auto!important;overflow:visible!important;padding:0!important}.section.active{display:block!important}.fixtureMatchGrid,#analisis .analysisTopGrid,#analisis .analysisMetricGrid,#analisis .fairplayV133,#analisis .analysisTeamsPair,.mathColumns{grid-template-columns:1fr!important}.mathTeamCard{grid-template-columns:1fr!important}.tabs{left:8px!important;right:8px!important;bottom:6px!important;height:54px!important;display:flex!important;overflow-x:auto!important;padding:5px!important}.tabs .tab{flex:0 0 84px!important;min-width:84px!important;height:42px!important;min-height:42px!important}}
+
+
+
+/* =========================================================
+   v147 QA UX/UI - capa final limpia
+   Objetivo: contraste consistente, altura útil, navegación estable,
+   sin textos invisibles ni contenedores que corten resultados.
+   ========================================================= */
+:root{--qa-bg:#071747;--qa-card:#ffffff;--qa-soft:#f8fbff;--qa-ink:#0b255f;--qa-muted:#59677f;--qa-line:#d8e4f5;--qa-nav-h:56px;--qa-radius:20px;}
+html,body{background:var(--qa-bg)!important;color:var(--qa-ink)!important;}
+.card,.fieldPanel,.match,.teamTile,.roster,.tableWrap,.mathColumn,.analysisHeroCard,.analysisHighlightsCard,.analysisMetricCard,.fairPlayMetricCard,.sideInsight,.fixtureSection,.fifaDetailCard,.playerRosterCard,.playerDetailSide,.roundCol,.scenario,.statCard,.barItem,.readOnlyNotice,.viewContext,.bottomPersistBar{background:linear-gradient(180deg,var(--qa-card),var(--qa-soft))!important;color:var(--qa-ink)!important;border:1px solid var(--qa-line)!important;text-shadow:none!important;}
+.card *,.fieldPanel *,.match *,.teamTile *,.roster *,.tableWrap *,.mathColumn *,.analysisHeroCard *,.analysisHighlightsCard *,.analysisMetricCard *,.fairPlayMetricCard *,.sideInsight *,.fixtureSection *,.fifaDetailCard *,.playerRosterCard *,.playerDetailSide *,.roundCol *,.scenario *,.statCard *,.barItem *{text-shadow:none!important;}
+.card h1,.card h2,.card h3,.card h4,.fieldPanel h1,.fieldPanel h2,.fieldPanel h3,.fieldPanel h4,.match h1,.match h2,.match h3,.match h4,.mathColumn h1,.mathColumn h2,.mathColumn h3,.mathColumn h4,.analysisHeroCard h1,.analysisHeroCard h2,.analysisHeroCard h3,.analysisMetricCard h3,.fairPlayMetricCard h4,.sideInsight h3,.fixtureSection h3,.roster b,.teamTile b,.team b,.barItem b,.mathTeamName,.playerName,.fifaDetailTitle h2{color:var(--qa-ink)!important;}
+.card p,.fieldPanel p,.match p,.fixtureSection p,.analysisMetricCard p,.sideInsight p,.team .code,.roster small,.teamTile small,.mathReason,.metricText p,.muted,small.muted{color:var(--qa-muted)!important;}
+.section > .sectionHead h2,.section > .compactTitle h2{color:#fff!important;text-shadow:0 2px 10px rgba(0,0,0,.35)!important;}.section > .sectionHead p,.section > .compactTitle p{color:#dce9ff!important;text-shadow:none!important;}
+.score{background:#f9fbff!important;color:var(--qa-ink)!important;border:1px solid #c7d5e8!important;}.state,.tag,.mathRoute,.legend,.host,.kpi,.miniBtn,.authBtn,.authStatus{white-space:nowrap;}
+@media(min-width:901px){html,body{height:100dvh!important;overflow:hidden!important;margin:0!important;padding:0!important;}.app{width:100vw!important;max-width:none!important;height:100dvh!important;min-height:100dvh!important;margin:0!important;padding:6px 14px calc(var(--qa-nav-h) + 8px)!important;display:flex!important;flex-direction:column!important;gap:6px!important;overflow:hidden!important;}.hero{flex:0 0 76px!important;height:76px!important;min-height:76px!important;max-height:76px!important;padding:7px 14px!important;border-radius:20px!important;overflow:hidden!important;}.logoCup{width:52px!important;height:52px!important;min-width:52px!important;border-radius:15px!important;}.brand h1{font-size:22px!important;line-height:1!important;}.brand p,.quickHint,.themeStrip{display:none!important;}.hosts{position:absolute!important;left:86px!important;bottom:7px!important;margin:0!important;gap:6px!important;max-width:calc(100% - 350px)!important;overflow:hidden!important;flex-wrap:nowrap!important;}.host{padding:5px 8px!important;font-size:10px!important;line-height:1!important;}.heroVisuals{right:14px!important;top:6px!important;transform:scale(.52)!important;transform-origin:right top!important;opacity:.75!important;}.kpis{flex:0 0 44px!important;height:44px!important;min-height:44px!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;margin:0!important;}.kpi{height:44px!important;min-height:44px!important;border-radius:15px!important;padding:6px 10px!important;}.kpi b{font-size:18px!important;line-height:1!important;}.kpi span{font-size:8.8px!important;line-height:1.1!important;}.toolbar{flex:0 0 44px!important;height:44px!important;min-height:44px!important;margin:0!important;padding:4px!important;border-radius:17px!important;display:flex!important;align-items:center!important;gap:7px!important;overflow:hidden!important;}.toolbar .search{height:36px!important;min-height:36px!important;border-radius:14px!important;flex:1 1 auto!important;min-width:260px!important;}.toolbar .search input{height:100%!important;font-size:12.5px!important;}.miniBtn,.authBtn,.authStatus{height:36px!important;min-height:36px!important;padding:7px 10px!important;border-radius:13px!important;font-size:11px!important;flex:0 0 auto!important;}.workspace,.workspace.group-side,.workspace.selection-side,.workspace.no-side{flex:1 1 auto!important;min-height:0!important;height:auto!important;display:grid!important;align-items:stretch!important;gap:10px!important;overflow:hidden!important;margin:0!important;}.workspace.group-side{grid-template-columns:162px minmax(0,1fr)!important;}.workspace.selection-side{grid-template-columns:252px minmax(0,1fr)!important;}.workspace.no-side{grid-template-columns:minmax(0,1fr)!important;}.side{height:100%!important;min-height:0!important;overflow:auto!important;position:relative!important;top:auto!important;border-radius:19px!important;padding:9px!important;}.content{height:100%!important;min-height:0!important;width:100%!important;overflow:auto!important;overflow-x:hidden!important;padding:0 6px 8px 0!important;scrollbar-width:thin!important;}.section{display:none!important;}.section.active{display:block!important;min-height:100%!important;height:auto!important;overflow:visible!important;padding:0!important;}.sectionHead{margin:0 0 8px!important;padding:0 4px!important;align-items:center!important;}.sectionHead h2{font-size:20px!important;line-height:1.12!important;}.sectionHead p{font-size:11px!important;line-height:1.25!important;}#fixture .fieldPanel{height:auto!important;min-height:auto!important;overflow:visible!important;padding:12px!important;border-radius:22px!important;display:block!important;}#fixture .fieldInner,.fixtureSections,.fixtureSection,.match.fixtureCard{height:auto!important;overflow:visible!important;}.groupResume{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important;margin-bottom:8px!important;}.teamTile{min-height:72px!important;padding:8px 6px!important;border-radius:15px!important;}.teamTile .flagImg{width:44px!important;height:29px!important;}.fixtureSections{display:grid!important;gap:10px!important;margin:0!important;padding-bottom:8px!important;}.fixtureMatchGrid{grid-template-columns:repeat(2,minmax(360px,1fr))!important;gap:10px!important;}.match.fixtureCard{min-height:220px!important;padding:12px!important;border-radius:18px!important;}.teams{grid-template-columns:1fr 52px 20px 52px 1fr!important;gap:6px!important;}.score{width:52px!important;font-size:18px!important;padding:8px 2px!important;border-radius:13px!important;}#tabla > .card,#terceros > .card,#equiposFifa > .card,#jugadores > .card,#rondas > .card{height:auto!important;min-height:auto!important;overflow:visible!important;padding:12px!important;border-radius:22px!important;}.tableWrap{max-width:100%!important;overflow:auto!important;} table{min-width:900px!important;} th{padding:9px 7px!important;font-size:10px!important;color:#53617a!important;} td{padding:9px 7px!important;font-size:12.5px!important;color:var(--qa-ink)!important;}.mathColumns{display:grid!important;grid-template-columns:1fr 1fr!important;gap:12px!important;overflow:visible!important;}.mathColumn{height:auto!important;max-height:none!important;overflow:visible!important;padding:14px!important;border-radius:20px!important;}.mathTeamCard{display:grid!important;grid-template-columns:minmax(170px,.9fr) minmax(108px,.45fr) minmax(230px,1.45fr)!important;gap:10px!important;align-items:center!important;padding:10px 0!important;margin:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;border:0!important;border-bottom:1px solid #e9eef7!important;}#analisis .analysisV133{display:flex!important;flex-direction:column!important;gap:11px!important;overflow:visible!important;}#analisis .analysisTopGrid{grid-template-columns:minmax(0,2fr) minmax(320px,.9fr)!important;gap:12px!important;}#analisis .analysisHeroChips{grid-template-columns:repeat(8,minmax(76px,1fr))!important;gap:7px!important;margin:12px 0 8px!important;}#analisis .analysisMetricGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important;}#analisis .analysisTeamsPair{display:grid!important;grid-template-columns:1fr 1fr!important;gap:12px!important;}#analisis .analysisScrollColumn{min-height:340px!important;max-height:420px!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;}#analisis .analysisScrollList{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow:auto!important;}.viewContext,.bottomPersistBar,.persistBar.bottomPersistBar{flex:0 0 26px!important;height:26px!important;min-height:26px!important;margin:2px 0 0!important;padding:4px 10px!important;border-radius:14px!important;font-size:10.5px!important;overflow:hidden!important;}.viewContext .contextMain,.viewContext .contextAside{display:none!important;}.tabs{position:fixed!important;left:14px!important;right:14px!important;bottom:5px!important;width:auto!important;max-width:none!important;height:52px!important;min-height:52px!important;padding:5px!important;border-radius:20px!important;display:grid!important;grid-template-columns:repeat(9,minmax(84px,1fr))!important;gap:6px!important;overflow:hidden!important;z-index:9000!important;transform:none!important;margin:0!important;background:rgba(255,255,255,.75)!important;}.tabs .tab{height:42px!important;min-height:42px!important;padding:4px 5px!important;border-radius:15px!important;font-size:9.5px!important;line-height:1.05!important;color:var(--qa-ink)!important;background:#fff!important;}.tabs .tab b{font-size:13px!important;margin-bottom:2px!important;}.tabs .tab.active{color:#fff!important;background:linear-gradient(135deg,var(--red),var(--orange) 28%,var(--green) 58%,var(--blue))!important;}.tabClose{color:#fff!important;background:linear-gradient(135deg,var(--red),#ff5b00)!important;}}
+@media(max-width:1250px) and (min-width:901px){.workspace.group-side{grid-template-columns:1fr!important;}.side{height:auto!important;max-height:132px!important;margin-bottom:4px!important;}.groupRail{display:flex!important;grid-template-columns:none!important;overflow-x:auto!important;gap:8px!important;}.gbtn{min-width:82px!important;flex:0 0 auto!important;}.fixtureMatchGrid,#analisis .analysisTopGrid,#analisis .analysisTeamsPair,.mathColumns{grid-template-columns:1fr!important;}.analysisHeroChips{grid-template-columns:repeat(4,minmax(0,1fr))!important;}.analysisMetricGrid,.fairplayV133{grid-template-columns:repeat(2,minmax(0,1fr))!important;}}
+@media(max-width:900px){html,body{height:auto!important;overflow:auto!important;}.app{width:100%!important;max-width:none!important;height:auto!important;min-height:100dvh!important;padding:8px 8px 74px!important;display:block!important;overflow:visible!important;}.hero{min-height:92px!important;border-radius:22px!important;}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;}.toolbar{height:auto!important;flex-wrap:wrap!important;}.toolbar .search{flex:1 1 100%!important;}.workspace,.workspace.group-side,.workspace.selection-side,.workspace.no-side{display:block!important;height:auto!important;overflow:visible!important;}.side{position:relative!important;max-height:210px!important;overflow:auto!important;margin-bottom:10px!important;}.groupRail{grid-template-columns:repeat(2,minmax(0,1fr))!important;}.content{height:auto!important;overflow:visible!important;padding:0!important;}.section.active{display:block!important;}.fixtureMatchGrid,#analisis .analysisTopGrid,#analisis .analysisMetricGrid,#analisis .fairplayV133,#analisis .analysisTeamsPair,.mathColumns{grid-template-columns:1fr!important;}.mathTeamCard{grid-template-columns:1fr!important;}.tabs{left:8px!important;right:8px!important;bottom:6px!important;height:54px!important;display:flex!important;overflow-x:auto!important;padding:5px!important;}.tabs .tab{flex:0 0 84px!important;min-width:84px!important;height:42px!important;min-height:42px!important;}}
+
+
+/* =========================================================
+   v148 QA UX/UI/CX - capa final de calidad visual y legibilidad
+   Objetivo: resultados legibles, contraste WCAG, menos fricción y layout estable.
+   ========================================================= */
+:root{--v148-ink:#071b49;--v148-muted:#43536f;--v148-soft:#f8fbff;--v148-line:#cbd8ea;--v148-panel:#ffffff;--v148-navy:#06194a}
+.card,.fieldPanel,.match,.teamTile,.tableWrap,.mathColumn,.analysisHeroCard,.analysisHighlightsCard,.analysisMetricCard,.fairPlayMetricCard,.sideInsight,.fixtureSection,.fifaDetailCard,.playerRosterCard,.roundCol,.scenario,.statCard,.barItem{background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%)!important;color:var(--v148-ink)!important;border-color:rgba(203,216,234,.95)!important}
+.card *, .fieldPanel *, .match *, .teamTile *, .tableWrap *, .mathColumn *, .analysisHeroCard *, .analysisHighlightsCard *, .analysisMetricCard *, .fairPlayMetricCard *, .sideInsight *, .fixtureSection *, .fifaDetailCard *, .playerRosterCard *, .roundCol *, .scenario *, .statCard *, .barItem *{text-rendering:optimizeLegibility}
+.sectionHead h2,.compactTitle h2,.fixtureSectionHead h3,.mathColumnHead h3,.metricText h3,.sideInsight h3,.analysisHeroTitle h2{color:var(--v148-ink)!important;letter-spacing:-.01em}
+.sectionHead p,.compactTitle p,.fixtureSectionHead p,.mathReason,.metricText p,.sideInsight p,.muted,.team .code,.teamTile small,.mathTeamName small{color:var(--v148-muted)!important}
+#fixture>.sectionHead h2,#tabla>.sectionHead h2,#terceros>.sectionHead h2,#clasificados>.sectionHead h2,#analisis>.sectionHead h2,#equiposFifa>.sectionHead h2,#jugadores>.sectionHead h2,#rondas>.sectionHead h2{color:#ffffff!important;text-shadow:0 1px 2px rgba(0,0,0,.18)}
+#fixture>.sectionHead p,#tabla>.sectionHead p,#terceros>.sectionHead p,#clasificados>.sectionHead p,#analisis>.sectionHead p,#equiposFifa>.sectionHead p,#jugadores>.sectionHead p,#rondas>.sectionHead p{color:rgba(255,255,255,.82)!important}
+.score,.koScore{opacity:1!important;filter:none!important;color:var(--v148-ink)!important;background:#ffffff!important;border:2px solid #bfd0e8!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 6px 12px rgba(7,27,73,.06)!important;font-weight:1000!important;text-align:center!important}
+.score:disabled,.koScore:disabled,body.readOnlyMode .score,body.readOnlyMode .koScore{opacity:1!important;filter:none!important;color:var(--v148-ink)!important;-webkit-text-fill-color:var(--v148-ink)!important;background:#ffffff!important;border-style:solid!important;cursor:default!important}
+.score::placeholder,.koScore::placeholder{color:#95a3b8!important;opacity:1!important}
+button:disabled{opacity:.52!important;filter:grayscale(.12)!important;cursor:not-allowed!important}
+input:disabled:not(.score):not(.koScore):not(.koTeamInput){opacity:.72!important}
+.koTeamInput:disabled{opacity:1!important;color:var(--v148-ink)!important;-webkit-text-fill-color:var(--v148-ink)!important;background:#fff!important}
+.match.fixtureCard{background:linear-gradient(180deg,#fff,#f9fcff)!important}.match.fixtureCard .team b,.match.fixtureCard .team{color:var(--v148-ink)!important}.match.fixtureCard .vs{color:#6f7d95!important}.match.fixtureCard .state{font-size:12px!important;font-weight:1000!important}
+.tableWrap table tbody td{color:var(--v148-ink)!important}.tableWrap table tbody td b,.tableWrap .teamName b{color:var(--v148-ink)!important}th{color:#4d5c76!important;background:#f3f7ff!important}.tableWrap tbody tr:hover{background:#eef6ff!important}
+.gbtn{color:var(--v148-ink)!important}.gbtn.active{color:#fff!important}.gbtn.active *{color:#fff!important}.host,.tag,.legend,.mathRoute,.state{letter-spacing:.01em}
+.analysisHeroChips .heroChip{background:#fff!important;border:1px solid #d6e3f4!important}.analysisHeroChips .heroChip b{color:var(--v148-ink)!important}.analysisHeroChips .heroChip span{color:var(--v148-muted)!important}.analysisChampionName{color:var(--v148-ink)!important}.analysisHeroSub{color:#43536f!important}.analysisReasonLine,.analysisReasonLine span{color:#273858!important}
+.analysisMetricCard,.fairPlayMetricCard{background:#fff!important}.analysisScrollList{scrollbar-width:thin;scrollbar-color:#93a2b8 #edf3fb}.analysisScrollList::-webkit-scrollbar{width:8px}.analysisScrollList::-webkit-scrollbar-track{background:#edf3fb;border-radius:999px}.analysisScrollList::-webkit-scrollbar-thumb{background:#93a2b8;border-radius:999px}
+.readOnlyNotice{background:linear-gradient(90deg,#fff7da,#ffffff)!important;color:#694f00!important;border-color:#f2cf68!important}.readOnlyNotice b,.readOnlyNotice strong{color:#4f3c00!important}
+.errorBox{background:#fff5f5!important;color:#811d1d!important;border:1px solid #ffc9c9!important;border-radius:18px!important;padding:14px!important}.warningAnalysis{background:#fff8dd!important;color:#6b4e00!important;border:1px solid #f4d477!important;border-radius:18px!important;padding:12px 14px!important;font-weight:900!important}
+.tabs{box-shadow:0 -10px 28px rgba(0,0,0,.20)!important}.tabs .tab{font-weight:1000!important}.tabs .tab:focus-visible,.miniBtn:focus-visible,.authBtn:focus-visible,.btn:focus-visible,.gbtn:focus-visible{outline:3px solid rgba(255,214,0,.85)!important;outline-offset:2px!important}
+@media(min-width:901px){.content{padding-bottom:10px!important}.workspace{gap:10px!important}.section.active{padding-bottom:0!important}.fixtureMatchGrid{align-items:stretch!important}.match.fixtureCard{min-height:228px!important}.analysisScrollColumn{max-height:min(440px,45vh)!important}.tabs .tab{font-size:10px!important}.bottomPersistBar{max-width:100%!important}}
+@media(max-width:1250px) and (min-width:901px){.score{font-size:20px!important}.fixtureMatchGrid{grid-template-columns:1fr!important}.match.fixtureCard{min-height:220px!important}.analysisHeroChips{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+@media(max-width:900px){.score{font-size:20px!important}.sectionHead h2,.compactTitle h2{color:#fff!important}.tabs .tab{font-size:10px!important}.analysisScrollColumn{max-height:none!important}.mathTeamCard{grid-template-columns:1fr!important}}
 
 </style>
 </head>
@@ -2448,7 +1985,7 @@ function fifaTeamSearchText(item){item=item||{};var meta=item.meta||{};var stats
 var STORAGE='fixture_mundial_2026_persistente_v9';var UI_TAB_STORAGE='fixture_mundial_2026_ui_tab_v1';var UI_GROUP_STORAGE='fixture_mundial_2026_ui_group_v1';var persistStatusClosed=false;
 var OLD_STORAGES=['fixture_mundial_2026_persistente_v8','fixture_mundial_2026_desktop_v110','fixture_mundial_2026_desktop_v109','fixture_mundial_2026_v108','fixture_mundial_2026_v7','fixture_mundial_2026_v6','fixture_mundial_2026_v5','fixture_mundial_2026_v4','fixture_mundial_2026'];
 var UI_PLAYER_STORAGE='fixture_mundial_2026_selected_player_v1';
-var selected='A';var active='fixture';var query='';var authState=window.__AUTH__||{authenticated:false,user:null};var matches=[];var playerSectionTab='summary';var fifaSelectedTeamCode='GER';var selectedPlayerId='';var analysisLoading=false;var playerStatsLoading=false;var playerImageDownloading=false;var playerManualDownloadStatus=null;var playerManualLiveLogs=[];var fifaTeamStats={teams:[],catalog:{},sources:[],notes:[]};var fifaPlayerStats={players:[],teamAggregates:{},sources:[],notes:[]};var playerCountryFilters=[];var knockoutRounds=null;var externalAnalysis=null;var unifiedAnalysis=null;var lastEventSearch=null;var lastPlayerImageStatus=null;var internetSync=null;var teamDiscipline={yellow:[],red:[],sources:[],notes:[]};var playerEvents={goals:[],assists:[],yellow:[],red:[]};var backendReady=false;var saveTimer=null;var lastSaveText='Pendiente de guardar';var backendLoadedOnce=false;
+var selected='A';var active='fixture';var query='';var authState=window.__AUTH__||{authenticated:false,user:null};var matches=[];var playerStatsDeferred=false;var playerCacheLoading=false;var playerSectionTab='summary';var fifaSelectedTeamCode='GER';var selectedPlayerId='';var analysisLoading=false;var playerStatsLoading=false;var playerImageDownloading=false;var playerManualDownloadStatus=null;var playerManualLiveLogs=[];var fifaTeamStats={teams:[],catalog:{},sources:[],notes:[]};var fifaPlayerStats={players:[],teamAggregates:{},sources:[],notes:[]};var playerCountryFilters=[];var knockoutRounds=null;var externalAnalysis=null;var unifiedAnalysis=null;var lastEventSearch=null;var lastPlayerImageStatus=null;var internetSync=null;var teamDiscipline={yellow:[],red:[],sources:[],notes:[]};var playerEvents={goals:[],assists:[],yellow:[],red:[]};var backendReady=false;var saveTimer=null;var lastSaveText='Pendiente de guardar';var backendLoadedOnce=false;
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 
 function linkifySource(src){
@@ -2467,6 +2004,7 @@ function handleFlagError(img){
     if(fb){fb.style.display='flex'}
   }catch(e){try{img.outerHTML='<span class="flagBlank"></span>'}catch(_){}}
 }
+try{window.handleFlagError=handleFlagError}catch(_flagExpose){}
 function flag(t){
   var iso=ISO[t]||'';
   var emoji=EMOJIS[t]||'🏳️';
@@ -2486,7 +2024,7 @@ function baseMatches(){
  Object.keys(GROUPS).forEach(function(g){for(var i=0;i<FIFA_GROUP_MATCH_PATTERN.length;i++){var p=FIFA_GROUP_MATCH_PATTERN[i];add(g,p[0],p[1],(dates[g]||[])[i]||'')}});
  return all;
 }
-function statePayload(){ensureKnockoutRounds();return {version:'v139-anti-oom-analysis',matches:matches,knockoutRounds:knockoutRounds,externalAnalysis:externalAnalysis,unifiedAnalysis:unifiedAnalysis,lastEventSearch:lastEventSearch,internetSync:internetSync,playerEvents:playerEvents,teamDiscipline:teamDiscipline,fifaTeamStats:fifaTeamStats,fifaPlayerStats:fifaPlayerStats,savedAt:new Date().toISOString()}}
+function statePayload(){ensureKnockoutRounds();return {version:'v142-clean-lite-state',matches:matches,knockoutRounds:knockoutRounds,externalAnalysis:externalAnalysis,unifiedAnalysis:unifiedAnalysis,lastEventSearch:lastEventSearch,internetSync:internetSync,playerEvents:playerEventsLite(),teamDiscipline:teamDiscipline,fifaTeamStats:fifaTeamStats,fifaPlayerStats:fifaPlayerStatsLite(),savedAt:new Date().toISOString()}}
 function fifaPlayerStatsLite(){
   var fp=fifaPlayerStats||{};
   return {
@@ -2504,16 +2042,29 @@ function fifaPlayerStatsLite(){
     imageCache:fp.imageCache||{}
   };
 }
+function playerEventsLite(){
+  var pe=playerEvents||{};
+  return {
+    goals:[],assists:[],yellow:[],red:[],
+    deferredEvents:true,
+    counts:{
+      goals:Array.isArray(pe.goals)?pe.goals.length:((pe.counts&&pe.counts.goals)||0),
+      assists:Array.isArray(pe.assists)?pe.assists.length:((pe.counts&&pe.counts.assists)||0),
+      yellow:Array.isArray(pe.yellow)?pe.yellow.length:((pe.counts&&pe.counts.yellow)||0),
+      red:Array.isArray(pe.red)?pe.red.length:((pe.counts&&pe.counts.red)||0)
+    }
+  };
+}
 function browserCachePayload(){
   ensureKnockoutRounds();
   return {
-    version:'v139-browser-cache-lite',
+    version:'v142-browser-cache-lite',
     matches:matches,
     knockoutRounds:knockoutRounds,
     externalAnalysis:externalAnalysis,
     unifiedAnalysis:unifiedAnalysis,
     internetSync:internetSync,
-    playerEvents:playerEvents,
+    playerEvents:playerEventsLite(),
     teamDiscipline:teamDiscipline,
     fifaTeamStats:fifaTeamStats,
     fifaPlayerStats:fifaPlayerStatsLite(),
@@ -2560,13 +2111,41 @@ function mergeFifaPlayerStatsSafe(incoming,current){
   out.preservedFromCache=out.preservedFromCache||['plantel anterior completo'];
   return out;
 }
-function applyPayload(data){if(!data)return;if(Array.isArray(data)){matches=data;return}if(data.matches&&Array.isArray(data.matches))matches=data.matches;if(data.knockoutRounds)knockoutRounds=normalizeKnockoutRounds(data.knockoutRounds);if(data.externalAnalysis)externalAnalysis=data.externalAnalysis;if(data.unifiedAnalysis)unifiedAnalysis=data.unifiedAnalysis;if(data.lastEventSearch)lastEventSearch=data.lastEventSearch;if(data.internetSync)internetSync=data.internetSync;if(data.playerEvents){playerEvents=Object.assign({goals:[],assists:[],yellow:[],red:[]},data.playerEvents)}if(data.teamDiscipline){teamDiscipline=Object.assign({yellow:[],red:[],sources:[],notes:[]},data.teamDiscipline)}if(data.fifaTeamStats){fifaTeamStats=Object.assign({teams:[],catalog:{},sources:[],notes:[]},mergeFifaTeamStatsSafe(data.fifaTeamStats,fifaTeamStats))}if(data.fifaPlayerStats){fifaPlayerStats=Object.assign({players:[],teamAggregates:{},sources:[],notes:[]},mergeFifaPlayerStatsSafe(data.fifaPlayerStats,fifaPlayerStats))}}
+function sanitizeLoadedMatches(list){
+  if(!Array.isArray(list))return list;
+  return list.map(function(m){
+    if(!m||typeof m!=='object')return m;
+    return {id:m.id,g:m.g,h:m.h,a:m.a,d:m.d,hg:(m.hg===undefined?null:m.hg),ag:(m.ag===undefined?null:m.ag),hSlot:m.hSlot,aSlot:m.aSlot};
+  });
+}
+function applyPayload(data){
+  if(!data)return;
+  if(Array.isArray(data)){matches=sanitizeLoadedMatches(data);return}
+  if(data.matches&&Array.isArray(data.matches))matches=sanitizeLoadedMatches(data.matches);
+  if(data.knockoutRounds)knockoutRounds=normalizeKnockoutRounds(data.knockoutRounds);
+  if(data.externalAnalysis)externalAnalysis=data.externalAnalysis;
+  if(data.unifiedAnalysis)unifiedAnalysis=data.unifiedAnalysis;
+  if(data.lastEventSearch)lastEventSearch=data.lastEventSearch;
+  if(data.internetSync)internetSync=data.internetSync;
+  if(data.playerEvents){playerEvents=Object.assign({goals:[],assists:[],yellow:[],red:[],deferredEvents:false,counts:{}},data.playerEvents)}
+  if(data.teamDiscipline){teamDiscipline=Object.assign({yellow:[],red:[],sources:[],notes:[]},data.teamDiscipline)}
+  if(data.fifaTeamStats){fifaTeamStats=Object.assign({teams:[],catalog:{},sources:[],notes:[]},mergeFifaTeamStatsSafe(data.fifaTeamStats,fifaTeamStats))}
+  if(data.fifaPlayerStats){
+    if(data.fifaPlayerStats.deferredPlayers){
+      playerStatsDeferred=true;
+      fifaPlayerStats=Object.assign({players:[],teamAggregates:{},sources:[],notes:[]},data.fifaPlayerStats,{players:[]});
+    }else{
+      playerStatsDeferred=false;
+      fifaPlayerStats=Object.assign({players:[],teamAggregates:{},sources:[],notes:[]},mergeFifaPlayerStatsSafe(data.fifaPlayerStats,fifaPlayerStats));
+    }
+  }
+}
 function setPersistStatus(msg,good){lastSaveText=msg||'';var el=document.getElementById('persistBar');if(el){if(!msg||persistStatusClosed){el.style.display='none';el.innerHTML='';return}el.style.display='flex';el.innerHTML='<span class="persistText">'+(good?'✅ ':'ℹ️ ')+esc(msg)+'</span><button class="persistClose" title="Cerrar aviso" onclick="window.closePersistStatus(event)">×</button>'}}
 window.closePersistStatus=function(ev){if(ev){ev.preventDefault();ev.stopPropagation()}persistStatusClosed=true;var el=document.getElementById('persistBar');if(el){el.style.display='none';el.innerHTML=''}}
 function clearPersistStatusSoon(ms){setTimeout(function(){if(active==='jugadores')setPersistStatus('',true)},ms||3000)}
 function load(){var loaded=false;try{if(window.__INITIAL_STATE__&&window.__INITIAL_STATE__.matches){applyPayload(window.__INITIAL_STATE__);loaded=true;setPersistStatus('Datos cargados desde archivo persistente',true)}}catch(e){}if(!loaded){try{var keys=[STORAGE].concat(OLD_STORAGES);for(var i=0;i<keys.length;i++){var raw=localStorage.getItem(keys[i]);if(!raw)continue;if(isLargeBrowserCache(raw)){try{localStorage.removeItem(keys[i])}catch(_e){}continue}applyPayload(JSON.parse(raw));loaded=true;break}}catch(e){}}if(!loaded){matches=baseMatches()}if(!matches||!matches.length)matches=baseMatches();knockoutRounds=normalizeKnockoutRounds(knockoutRounds);try{var rememberedGroup=localStorage.getItem(UI_GROUP_STORAGE);if(rememberedGroup&&GROUPS[rememberedGroup])selected=rememberedGroup;var rememberedTab=localStorage.getItem(UI_TAB_STORAGE);if(rememberedTab&&document.getElementById(rememberedTab))active=rememberedTab;selectedPlayerId=localStorage.getItem(UI_PLAYER_STORAGE)||''}catch(e){}saveBrowserCache()}
 async function apiCall(name,payload){
-  var routes={session:['GET','/api/session'],login:['POST','/api/login'],logout:['POST','/api/logout'],load_results:['GET','/api/load'],save_results:['POST','/api/save'],analyze_internet:['POST','/api/analyze'],analyze_full:['POST','/api/analyze_full'],search_match_events:['POST','/api/search_events'],cache_flags:['POST','/api/cache_flags'],cache_player_images:['POST','/api/cache_player_images'],player_image_save:['POST','/api/player_image_save'],player_image_attempt_log:['POST','/api/player_image_attempt_log'],player_image_status:['POST','/api/player_image_status'],player_image_log:['POST','/api/player_image_log'],player_image_sources_manual:['GET','/api/player_image_sources_manual'],player_image_manual_download_start:['POST','/api/player_image_manual_download_start'],player_image_manual_download_status:['GET','/api/player_image_manual_download_status'],sync_from_internet:['POST','/api/sync'],load_player_stats:['POST','/api/player_stats'],load_fifa_team_stats:['POST','/api/fifa_team_stats'],load_fifa_player_stats:['POST','/api/fifa_player_stats'],close_app:['POST','/api/close'],storage_status:['GET','/api/storage/status']};
+  var routes={session:['GET','/api/session'],login:['POST','/api/login'],logout:['POST','/api/logout'],load_results:['GET','/api/load'],load_full:['GET','/api/load_full'],load_player_cache:['GET','/api/load_players'],save_results:['POST','/api/save'],analyze_internet:['POST','/api/analyze'],analyze_full:['POST','/api/analyze_full'],search_match_events:['POST','/api/search_events'],cache_flags:['POST','/api/cache_flags'],cache_player_images:['POST','/api/cache_player_images'],player_image_save:['POST','/api/player_image_save'],player_image_attempt_log:['POST','/api/player_image_attempt_log'],player_image_status:['POST','/api/player_image_status'],player_image_log:['POST','/api/player_image_log'],player_image_sources_manual:['GET','/api/player_image_sources_manual'],player_image_manual_download_start:['POST','/api/player_image_manual_download_start'],player_image_manual_download_status:['GET','/api/player_image_manual_download_status'],sync_from_internet:['POST','/api/sync'],load_player_stats:['POST','/api/player_stats'],load_fifa_team_stats:['POST','/api/fifa_team_stats'],load_fifa_player_stats:['POST','/api/fifa_player_stats'],close_app:['POST','/api/close'],storage_status:['GET','/api/storage/status']};
   var r=routes[name];
   // v77: para la descarga TXT se usa primero el puente pywebview,
   // igual que el backend web ejecutado directamente. Si no existe, recién cae a HTTP web.
@@ -2596,7 +2175,7 @@ async function cacheFlagsLocal(auto){
 }
 window.cacheFlagsLocal=cacheFlagsLocal;
 
-async function loadFromPython(){if(backendLoadedOnce)return;backendLoadedOnce=true;try{var r=await apiCall('load_results',{});backendReady=!!(r&&r.ok);if(r&&r.ok&&r.data&&r.data.matches){applyPayload(r.data);saveBrowserCache();render();setPersistStatus('Datos cargados desde '+(r.path||'persistencia'),true);toast((r.storage==='supabase')?'Datos cargados desde Supabase':'Datos cargados')}else{await save(true)}}catch(e){setPersistStatus('Modo sin backend: se guarda en navegador. Internet no disponible.',false)}}
+async function loadFromPython(){if(backendLoadedOnce)return;backendLoadedOnce=true;try{var r=await apiCall('load_results',{});backendReady=!!(r&&r.ok);if(r&&r.ok&&r.data&&r.data.matches){applyPayload(r.data);saveBrowserCache();render();setPersistStatus('Datos cargados desde '+(r.path||'persistencia')+(r.light?' · modo liviano':''),true);toast((r.storage==='supabase')?'Datos cargados desde Supabase':'Datos cargados')}else{setPersistStatus('Sin datos persistentes: usando fixture base',false)}}catch(e){setPersistStatus('Modo sin backend: se guarda en navegador. Internet no disponible.',false)}}
 function rawScoreComplete(m){return !!(m&&m.hg!==null&&m.ag!==null&&!isNaN(m.hg)&&!isNaN(m.ag))}
 function parsePeruKickoffMs(m){
   try{
@@ -2768,9 +2347,9 @@ function refreshMatchStateLabels(id){
   });
 }
 function refreshTimedMatchViews(){
-  var el=document.activeElement;
-  if(el&&el.classList&&el.classList.contains('score')){refreshMatchStateLabels();return}
-  if(['fixture','tabla','terceros','clasificados','analisis','rondas'].indexOf(active)>=0){render()}else{refreshMatchStateLabels();updateKpis();refreshUXContext()}
+  // v142: solo toca etiquetas visibles. No recalcula tablas, candidatos ni contexto.
+  refreshMatchStateLabels();
+  updateKpis();
 }
 window.autoSaveMatch=function(id){if(!requireAuth('registrar resultados')){render();return}updateMatchFromInputs(id);saveBrowserCache();saveDebounced();refreshMatchStateLabels(id);updateKpis();refreshUXContext()};
 window.saveMatch=function(id){if(!requireAuth('guardar resultados'))return;var m=updateMatchFromInputs(id);save(false);render();var st=m?matchAutoStatus(m):null;toast(st&&st.key==='live'?'Marcador guardado · partido en juego':(st&&st.key==='done'?'Resultado finalizado':'Marcador guardado · pendiente por horario'))};
@@ -2813,7 +2392,7 @@ function matchHTML(m){
 }
 function filteredMatches(){var q=query.toLowerCase().trim();var out=[];for(var i=0;i<matches.length;i++){var m=matches[i];if(m.g!==selected)continue;if(q){var hay=(name(m.h)+' '+name(m.a)+' '+code(m.h)+' '+code(m.a)+' '+(m.hSlot||'')+' '+(m.aSlot||'')+' '+m.g).toLowerCase();if(hay.indexOf(q)<0)continue}out.push(m)}return out}
 function renderFixture(){var rows=table(selected);var html=readonlyNoticeHTML()+'<div class="sectionHead"><div><h2>Grupo '+selected+' · Fixture</h2><p>Orden oficial FIFA por posiciones: '+selected+'1 vs '+selected+'2, '+selected+'3 vs '+selected+'4, '+selected+'1 vs '+selected+'3, '+selected+'4 vs '+selected+'2, '+selected+'4 vs '+selected+'1 y '+selected+'2 vs '+selected+'3.</p></div><span class="tag green">2 directos + posible 3.º</span></div><div class="fieldPanel"><div class="fieldInner">'+renderSummary(rows);var ms=filteredMatches();if(!ms.length){html+='<div class="empty">No hay partidos para la búsqueda actual.</div>'}else{html+='<div class="fixtureQuickNav"><a href="#fix-j1">Jornada 1</a><a href="#fix-j2">Jornada 2</a><a href="#fix-j3">Jornada 3</a></div><div class="fixtureSections">';FIXTURE_ROUNDS.forEach(function(r,ri){var list=ms.filter(function(m){return r.idx.indexOf(matchPatternIndex(m))>=0});if(!list.length)return;html+='<section class="fixtureSection" id="fix-j'+(ri+1)+'"><div class="fixtureSectionHead"><div><h3>'+esc(r.title)+'</h3><p>'+esc(r.desc)+'</p></div><span class="fixtureSectionBadge">'+list.length+' partidos</span></div><div class="fixtureMatchGrid">';list.forEach(function(m){html+=matchHTML(m)});html+='</div></section>'});html+='</div>'}html+='</div></div>';document.getElementById('fixture').innerHTML=html}
-function renderTabla(){var rows=table(selected);var complete=groupComplete(selected);var orden=complete?'Orden final FIFA aplicado: puntos y, si hay empate, enfrentamiento directo entre equipos empatados; luego DG/GF generales, conducta y Ranking FIFA.':'Orden provisional con validación FIFA: si dos o más equipos empatan en puntos y ya jugaron entre sí, se aplica enfrentamiento directo; si todavía falta el cruce, se usa DG/GF como referencia provisional.';var html='<div class="sectionHead"><div><h2>Tabla del Grupo '+selected+'</h2><p>'+orden+'</p></div><span class="tag">Actualizable</span></div><div class="card">'+tableHTML(rows,false)+'<div class="legendRow"><span class="legend qual">1.º y 2.º clasifican</span><span class="legend third">3.º compite entre mejores terceros</span></div></div>';document.getElementById('tabla').innerHTML=html}
+function renderTabla(){var rows=table(selected);var complete=groupComplete(selected);var orden=complete?'Orden final FIFA aplicado: puntos y, si hay empate, enfrentamiento directo entre equipos empatados; luego DG/GF generales, conducta y Ranking FIFA.':'Orden provisional con validación FIFA: si dos o más equipos empatan en puntos y ya jugaron entre sí, se aplica enfrentamiento directo; si todavía falta el cruce, se usa DG/GF como referencia provisional.';var html='<div class="sectionHead"><div><h2>Tabla del Grupo '+selected+'</h2><p>'+orden+'</p></div><span class="tag">Actualizable</span></div><div class="card">'+tableHTML(rows,false)+'<div class="legendRow"><span class="legend qual">1.º y 2.º clasifican</span><span class="legend third">3.º compite entre mejores terceros</span></div><div class="rulesMini">Regla FIFA v97: en igualdad de puntos dentro del grupo se prioriza el enfrentamiento directo entre los equipos empatados. Para mejores terceros no existe enfrentamiento directo entre grupos: se usa PTS · DG · GF · conducta · Ranking FIFA.</div></div>';document.getElementById('tabla').innerHTML=html}
 function allThirds(){var gs=Object.keys(GROUPS);var arr=[];for(var i=0;i<gs.length;i++){var t=table(gs[i]);if(t[2])arr.push(t[2])}arr.sort(thirdComparator);return arr}
 function thirdRouteCell(r,idx,rows){
   rows=rows||allThirds();var st=thirdRaceStatus(r,idx,rows);
@@ -2843,6 +2422,17 @@ function simulateGroupStates(g){
   resetGroupMathCache();
   var cached=GROUP_MATH_CACHE.groups[g];if(cached&&cached.states)return cached.states;
   var rem=groupRemainingMatches(g),base=cloneMatchesList(matches),out=[];
+  /* v146 anti-bloqueo: no simular 17^N marcadores cuando el grupo está muy abierto.
+     Con 4, 5 o 6 partidos pendientes el cálculo puede congelar el navegador.
+     En ese caso se usa una lectura conservadora por puntos máximos y no se declara
+     1.º asegurado/eliminado por simulación hasta que queden 3 o menos partidos. */
+  if(rem.length>3){
+    out=[{matches:base,rows:tableFromMatches(g,base),limited:true}];
+    out.limited=true;
+    GROUP_MATH_CACHE.groups[g]=GROUP_MATH_CACHE.groups[g]||{};
+    GROUP_MATH_CACHE.groups[g].states=out;
+    return out;
+  }
   function rec(i,list){
     if(i>=rem.length){out.push({matches:list,rows:tableFromMatches(g,list)});return}
     var m=rem[i];
@@ -2885,6 +2475,18 @@ function buildGroupMathCache(g){
       if(rank<=3)p.possibleTop3=true;
     })
   });
+  if(states.limited){
+    var maxList=teams.map(function(t){return Number(maxMap[t]||0)}).sort(function(a,b){return b-a});
+    teams.forEach(function(team){
+      var p=profiles[team], mp=Number(p.maxPts||0);
+      p.possibleTop1=mp>=Number(maxList[0]||0);
+      p.possibleTop2=mp>=Number(maxList[1]||0);
+      p.possibleTop3=mp>=Number(maxList[2]||0);
+      p.bestPossibleRank=p.possibleTop1?1:(p.possibleTop2?2:(p.possibleTop3?3:4));
+      p.worstPossibleRank=4;
+      p.simulatedFor='cálculo rápido v146: puntos máximos; simulación completa se activa con 3 o menos partidos pendientes';
+    });
+  }
   teams.forEach(function(team){
     var p=profiles[team];
     if(p.bestPossibleRank===99)p.bestPossibleRank=p.currentRank||4;
@@ -2979,7 +2581,7 @@ function renderClasificados(){
   html+='</div></div>';
   html+='<div class="card mathWatchList"><div class="sectionHead"><div><h2>En disputa</h2><p>Equipos que todavía no están clasificados ni eliminados matemáticamente.</p></div><span class="tag gold">'+alive.length+'</span></div>';
   if(alive.length){html+='<div class="mathWatchGrid">';alive.sort(function(a,b){return (a.profile.g||'').localeCompare(b.profile.g||'')||b.profile.currentPts-a.profile.currentPts||name(a.profile.team).localeCompare(name(b.profile.team))}).slice(0,48).forEach(function(st){var p=st.profile,r=p.row||{};html+='<div class="mathWatchItem"><span class="flagMini">'+flag(p.team)+'</span> '+teamSeedHTML(p.team)+esc(name(p.team))+'<small>Grupo '+esc(p.g)+' · '+(r.pts||0)+' pts · Máx. '+(p.maxPts||0)+' · posible '+(p.bestPossibleRank||'-')+'.º-'+(p.worstPossibleRank||'-')+'.º</small></div>'});html+='</div>'}else{html+='<div class="mathEmpty">No quedan equipos en disputa.</div>'}
-  html+='</div>';
+  html+='<div class="mathRulesNote">Base FIFA usada: clasifican 1.º y 2.º de cada grupo y los 8 mejores terceros. Se prioriza primero el desempate directo (victoria olímpica / enfrentamiento directo) dentro de cada grupo; después DG/GF, conducta y Ranking FIFA. En grupos incompletos la simulación solo se usa para confirmar 1.º lugar asegurado y eliminados. Para Top 2 no se simulan marcadores: si por puntos máximos posibles ya aseguró clasificación, aparece como clasificado. Para terceros, solo aparece como clasificado cuando su grupo ya cerró y por puntos ya no puede caer fuera del Top 8 de terceros; si aún puede depender de terceros, queda en disputa.</div></div>';
   document.getElementById('clasificados').innerHTML=html;
 }
 
@@ -3127,15 +2729,7 @@ window.runUnifiedAnalysis=async function(withInternet){
     analysisLoading=false;
   }
 }
-function eventSummary(m){var ev=m.events||{};var src=(ev.internetSources||[]);var notes=ev.notes||'';var html='<div class="muted">';if(src.length){html+='Fuentes encontradas: '+src.length+' · Última búsqueda: '+esc(ev.internetUpdatedAt||'-')}else{html+='Sin búsqueda web cargada para este partido.'}html+='</div>';if(notes){html+='<div class="insight" style="margin-top:8px;white-space:pre-wrap">'+esc(notes).slice(0,900)+(notes.length>900?'...':'')+'</div>'}return html}
-function renderEventos(){
-  var doneGroup=filteredMatches().filter(isDone).length;
-  var html='<div class="sectionHead"><div><h2>Goles, tarjetas y eventos desde internet</h2><p>Ya no se importa CSV. Este módulo busca reportes del partido en internet y guarda titulares/fuentes en cada encuentro.</p></div><span class="tag red">Búsqueda web</span></div><div class="card"><div class="sectionHead"><div><h2>Buscar información automáticamente</h2><p>Usa internet para encontrar goleadores, tarjetas amarillas, rojas, sanciones y reportes. Primero guarda marcadores para mejorar la precisión.</p></div></div><div class="actions"><button class="btn" onclick="window.searchEventsInternet(&quot;group&quot;)">Buscar eventos del Grupo '+selected+'</button><button class="btn gold" onclick="window.searchEventsInternet(&quot;completed&quot;)">Buscar todos los partidos con resultado</button></div><p class="muted" style="margin-top:10px">Partidos con resultado en este grupo: '+doneGroup+'. La búsqueda guarda fuentes y notas para revisión; si un dato no se encuentra, no lo inventa.</p><div id="eventSearchStatus">'+eventSearchBlock()+'</div></div><div class="card"><h2>Partidos del Grupo '+selected+'</h2>';
-  filteredMatches().forEach(function(m){var st=matchAutoStatus(m);html+='<div class="match"><div class="matchTop"><span class="date">'+esc(m.d)+' · Grupo '+m.g+'</span><span class="state '+(st.className||'')+'" data-match-state-id="'+esc(m.id)+'">'+esc(st.label)+'</span></div><div class="teams"><div class="team"><span class="flag">'+flag(m.h)+'</span>'+esc(name(m.h))+'<span class="code">'+code(m.h)+'</span></div><div class="score">'+(m.hg===null?'-':m.hg)+'</div><div class="vs">vs</div><div class="score">'+(m.ag===null?'-':m.ag)+'</div><div class="team"><span class="flag">'+flag(m.a)+'</span>'+esc(name(m.a))+'<span class="code">'+code(m.a)+'</span></div></div><div class="actions"><button class="btn" onclick="window.searchEventsInternet(&quot;match&quot;,&quot;'+m.id+'&quot;)">Buscar este partido</button></div>'+eventSummary(m)+'</div>'});
-  html+='</div>';document.getElementById('eventos').innerHTML=html
-}
-function eventSearchBlock(){if(!lastEventSearch)return '<p class="muted">Todavía no se ejecutó búsqueda de eventos.</p>';if(!lastEventSearch.ok)return '<div class="errorBox">'+esc(lastEventSearch.error||'No se pudo buscar eventos')+'</div>';var html='<p class="muted">Búsqueda finalizada: '+lastEventSearch.updated_count+' partidos actualizados de '+lastEventSearch.searched_count+' consultados.</p>';(lastEventSearch.findings||[]).slice(0,8).forEach(function(f){html+='<div class="insight"><b>'+esc(f.match)+'</b><small>'+f.items_found+' hallazgos · '+esc(f.query||'')+'</small></div>'});return html}
-window.searchEventsInternet=async function(scope,id){showTab('eventos');var box=document.getElementById('eventSearchStatus');if(box)box.innerHTML='<p class="muted">Buscando reportes, goleadores y tarjetas en internet...</p>';try{var payload=statePayload();payload.group=selected;payload.scope=scope||'group';payload.match_id=id||'';var res=await apiCall('search_match_events',payload);lastEventSearch=res;if(res&&res.ok&&res.matches){matches=res.matches;save(true);render();toast('Búsqueda de eventos actualizada')}else{renderEventos()}}catch(e){lastEventSearch={ok:false,error:'No se pudo conectar al backend web. Detalle: '+(e.message||String(e))};renderEventos()}}
+/* v147: módulo visual antiguo de eventos eliminado. Los eventos se consolidan en Jugadores/Análisis; ya no existe pestaña #eventos. */
 
 window.loadPlayerStatsFromInternet=async function(){
   if(!requireAuth('cargar jugadores FIFA'))return;
@@ -3662,6 +3256,31 @@ window.showPlayerImageLog=async function(){
 }
 
 function playerStatsRows(){return (fifaPlayerStats&&Array.isArray(fifaPlayerStats.players))?fifaPlayerStats.players:[]}
+async function loadPlayersCached(auto){
+  if(playerCacheLoading)return;
+  if(playerStatsRows().length && !playerStatsDeferred)return;
+  playerCacheLoading=true;
+  if(!auto)toast('Cargando planteles FIFA...');
+  setPersistStatus('Cargando jugadores FIFA desde servidor...',false);
+  try{
+    var r=await apiCall('load_player_cache',{});
+    if(r&&r.ok&&r.fifaPlayerStats){
+      applyPayload({fifaPlayerStats:r.fifaPlayerStats});
+      saveBrowserCache();
+      setPersistStatus('Jugadores FIFA cargados bajo demanda',true);
+      if(active==='jugadores'){renderJugadores()}
+      refreshUXContext();
+    }else{
+      setPersistStatus('No hay planteles FIFA guardados. Usa Cargar jugadores.',false);
+      if(active==='jugadores'){renderJugadores()}
+    }
+  }catch(e){
+    setPersistStatus('No se pudo cargar jugadores FIFA: '+(e.message||String(e)),false);
+  }finally{
+    playerCacheLoading=false;
+  }
+}
+window.loadPlayersCached=loadPlayersCached;
 function selectedPlayerCodes(){return playerCountryFilters.length?[String(playerCountryFilters[0]).toUpperCase()]:[]}
 function playerStatsFiltered(){var rows=playerStatsRows();var selectedCodes=selectedPlayerCodes();if(selectedCodes.length){rows=rows.filter(function(p){return selectedCodes.indexOf(String(p.code||'').toUpperCase())>=0})}var q=(query||'').toLowerCase().trim();if(q){rows=rows.filter(function(p){var hay=[p.player,p.shortName,p.team,name(p.team||''),p.code,teamSearchAliases(p.code),p.position,p.jersey].join(' ').toLowerCase();return hay.indexOf(q)>=0})}return rows}
 function numStat(v){var n=Number(v||0);return isFinite(n)?n:0}
@@ -3813,7 +3432,7 @@ function renderJugadores(){
   var html='<div class="sectionHead compactTitle"><div><h2>Jugadores FIFA</h2></div><span class="tag green">'+rows.length+'</span></div>';
   html+=renderPlayerManualLiveLog();
   html+=playerFreshnessBlock();
-  if(!allRows.length){html+='<div class="warningAnalysis">No hay jugadores cargados. Presiona <b>🌐 Cargar jugadores</b> para consultar squad + players.json de FIFA. También puedes usar <b>📥 Iniciar descarga TXT</b> si existe FOTOS.txt en la carpeta raíz.</div>'+jugadoresActionsPanel();document.getElementById('jugadores').innerHTML=html;return}
+  if(!allRows.length){if(playerStatsDeferred||playerCacheLoading){html+='<div class="warningAnalysis"><b>⏳ Cargando planteles FIFA bajo demanda...</b><br>La app carga planteles solo bajo demanda para evitar bloqueos de memoria.</div>'+jugadoresActionsPanel();document.getElementById('jugadores').innerHTML=html;if(!playerCacheLoading)setTimeout(function(){loadPlayersCached(true)},80);return}html+='<div class="warningAnalysis">No hay jugadores cargados. Presiona <b>🌐 Cargar jugadores</b> para consultar squad + players.json de FIFA. También puedes usar <b>📥 Iniciar descarga TXT</b> si existe FOTOS.txt en la carpeta raíz.</div>'+jugadoresActionsPanel();document.getElementById('jugadores').innerHTML=html;return}
   html+=playerImageStatusBlock();
   var sorted=rows.slice().sort(function(a,b){return numStat(b.goals)-numStat(a.goals)||numStat(b.assists)-numStat(a.assists)||String(a.team||'').localeCompare(String(b.team||''))||Number(a.jersey||999)-Number(b.jersey||999)});
   html+='<div class="playerRosterLayout '+(selectedPlayer?'hasDetail':'')+'"><div class="card playerRosterCard"><div class="sectionHead"><div><h2>Lista</h2></div><span class="tag">'+sorted.length+'</span></div><div class="playerPhotoGrid">';
@@ -4089,15 +3708,7 @@ function analysisStatusMetaText(st){
   if(st.status==='qualified')return 'Estado: '+(st.route||'Clasificado');
   return 'Estado: '+(st.route||'En disputa');
 }
-function analysisMiniTeamCard(x,type){
-  if(!x)return '';
-  var cls=type==='bad'?'out':'';
-  var label=analysisOutcomeLabel(x,type);
-  var st=x.status||mathStatusSafe(x.team)||{};
-  var reason=type==='bad'?disappointmentReason(x):highlightReason(x);
-  var exp=analysisExpectedProfile(x);
-  return '<div class="mathTeamCard '+cls+'"><div class="mathTeamTop"><div class="mathTeamName"><span class="flagMini">'+flag(x.team)+'</span><div>'+teamSeedHTML(x.team)+esc(name(x.team))+'<small>'+esc(code(x.team))+' · Grupo '+esc(x.g)+' · '+analysisPtsText(x)+' · '+analysisDgText(x)+'</small></div></div><span class="mathRoute">'+esc(label)+'</span></div><p class="mathReason">'+esc(reason)+'</p><div class="mathMetaRow"><span class="mathMeta">Actual: '+analysisActualRankText(x)+'</span><span class="mathMeta">Esperado: '+esc(exp.expectedRank+'.º')+'</span><span class="mathMeta">Ranking '+(exp.fifaRank&&exp.fifaRank<999?('#'+exp.fifaRank):'-')+'</span><span class="mathMeta">'+esc(analysisStatusMetaText(st))+'</span></div></div>';
-}
+/* v148: analysisMiniTeamCard antiguo eliminado; se usa la versión compacta y legible definida junto al renderer v133. */
 function highlightReason(x){
   var exp=analysisExpectedProfile(x),st=x.status||mathStatusSafe(x.team)||{},team=name(x.team),pos=analysisActualRankText(x),verb=analysisGroupVerb(x),stats=analysisStatSummary(x),rank=Number(x.rank||4),route=st.route||'En disputa';
   if(st.status==='qualified'){
@@ -4153,29 +3764,7 @@ function analysisFairPlayPick(rows,mode){
   });
   return list[0]||null;
 }
-function analysisFairPlayCard(item,title,desc,type,primary){
-  var cls=type==='bad'?'bad':'good';
-  if(!item)return '<div class="fairPlayMetricCard empty"><h4>'+esc(title)+'</h4><p>No hay datos FIFA suficientes para este criterio.</p></div>';
-  var main=primary==='fouls'?statValue(item.fouls):statValue(item.yellow)+' / '+statValue(item.red);
-  var small=primary==='fouls'?'faltas realizadas':'TA / TR recibidas';
-  return '<div class="fairPlayMetricCard '+cls+'"><div class="fairPlayMetricTop"><div><h4>'+esc(title)+'</h4><p>'+esc(desc)+'</p></div><span>'+main+'</span></div><div class="fairPlayTeam"><span class="flagMini">'+flag(item.team)+'</span><div><b>'+esc(name(item.team))+'</b><small>'+esc(code(item.team))+' · Grupo '+esc(item.g||'-')+' · '+esc(small)+'</small></div></div><div class="fairPlayCompactMeta">Faltas '+statValue(item.fouls)+' · TA '+statValue(item.yellow)+' · TR '+statValue(item.red)+' · Conducta '+statValue(item.cardPts)+'</div><div class="mathMetaRow"><span class="mathMeta">Faltas '+statValue(item.fouls)+'</span><span class="mathMeta">TA '+statValue(item.yellow)+'</span><span class="mathMeta">TR '+statValue(item.red)+'</span><span class="mathMeta">Pts conducta '+statValue(item.cardPts)+'</span></div></div>';
-}
-function analysisFairPlayPanel(combined){
-  var rows=analysisFairPlayRows(combined);
-  var bestFouls=analysisFairPlayPick(rows,'bestFouls');
-  var bestCards=analysisFairPlayPick(rows,'bestCards');
-  var worstFouls=analysisFairPlayPick(rows,'worstFouls');
-  var worstCards=analysisFairPlayPick(rows,'worstCards');
-  var unique={};[bestFouls,bestCards,worstFouls,worstCards].forEach(function(x){if(x)unique[x.team]=1});
-  var count=Object.keys(unique).length;
-  var html='<div class="mathColumn fairPlayColumn"><div class="mathColumnHead"><div><h3>🟢 Fair play / Disciplina</h3><p>Si el líder por faltas y el líder por tarjetas son equipos distintos, se muestran ambos. Lo mismo para los peores registros.</p></div><span class="tag gold">'+count+' equipos</span></div><div class="fairPlayGrid">';
-  html+=analysisFairPlayCard(bestFouls,'Mejor fair play por faltas','Menos faltas realizadas.','good','fouls');
-  html+=analysisFairPlayCard(bestCards,'Mejor fair play por tarjetas','Menos tarjetas recibidas.','good','cards');
-  html+=analysisFairPlayCard(worstFouls,'Peor disciplina por faltas','Más faltas realizadas.','bad','fouls');
-  html+=analysisFairPlayCard(worstCards,'Peor disciplina por tarjetas','Más tarjetas recibidas.','bad','cards');
-  html+='</div></div>';
-  return html;
-}
+/* v148: analysisFairPlayCard/Panel antiguos eliminados; se conserva solo la versión compacta usada en Análisis. */
 function analysisFairPlayScenarioCards(combined){
   var rows=analysisFairPlayRows(combined);
   var bestFouls=analysisFairPlayPick(rows,'bestFouls');
@@ -4189,77 +3778,9 @@ function analysisFairPlayScenarioCards(combined){
   html+=analysisFairPlayCard(worstCards,'Peor disciplina por tarjetas','Más tarjetas recibidas.','bad','cards');
   return html;
 }
-function analysisHighlightsPanel(combined){
-  var played=(combined||[]).filter(function(x){return x.pj>0});
-  var buckets={surprises:[],deceptions:[]};
-  played.forEach(function(x){
-    var item=Object.assign({},x);
-    item.sorpresaScore=surpriseScore(item);
-    item.decepcionScore=deceptionScore(item);
-    var sOk=isSurpriseCandidate(item)&&item.sorpresaScore>=35;
-    var dOk=isDeceptionCandidate(item)&&item.decepcionScore>=40;
-    if(sOk&&dOk){
-      var st=item.status||mathStatusSafe(item.team)||{};
-      var rank=Number(item.rank||4);
-      /* Un equipo nunca puede figurar como sorpresa y decepción a la vez.
-         Si ya clasificó o está en Top 2, se prioriza como sorpresa; si está fuera del Top 2 o eliminado, se prioriza como decepción. */
-      if(st.status==='qualified'||rank<=2){buckets.surprises.push(item)}
-      else{buckets.deceptions.push(item)}
-    }else if(sOk){
-      buckets.surprises.push(item);
-    }else if(dOk){
-      buckets.deceptions.push(item);
-    }
-  });
-  var destacados=buckets.surprises.sort(function(a,b){return b.sorpresaScore-a.sorpresaScore||b.pts-a.pts||b.dg-a.dg||name(a.team).localeCompare(name(b.team))}).slice(0,10);
-  var sorpresaMap={};destacados.forEach(function(x){sorpresaMap[x.team]=1});
-  var decepciones=buckets.deceptions.filter(function(x){return !sorpresaMap[x.team]}).sort(function(a,b){return b.decepcionScore-a.decepcionScore||a.score100-b.score100||name(a.team).localeCompare(name(b.team))}).slice(0,10);
-  var html='<div class="card analysisHighlightsCard" style="margin-top:14px"><div class="sectionHead"><div><h2>Equipos destacados y equipos decepción</h2><p>Hasta 10 equipos por bloque solo cuando cumplen los criterios. Cada lista usa desplazamiento interno y ningún equipo puede aparecer como sorpresa y decepción a la vez. Fair play queda arriba, integrado en la misma grilla y ordenado en solo 2 líneas visuales.</p></div><span class="tag gold">Vista v127</span></div><div class="analysisHighlightsLayout"><div class="analysisTeamsPair"><div class="mathColumn analysisScrollColumn"><div class="mathColumnHead"><div><h3>⭐ Equipos destacados / sorpresas</h3><p>Outsiders que superan su expectativa por resultados.</p></div><span class="tag green">'+destacados.length+'</span></div><div class="analysisScrollList">';
-  if(destacados.length){destacados.forEach(function(x){html+=analysisMiniTeamCard(x,'good')})}else{html+='<div class="mathEmpty">Aún no hay sorpresas claras con los resultados registrados.</div>'}
-  html+='</div></div><div class="mathColumn analysisScrollColumn"><div class="mathColumnHead"><div><h3>⚠️ Equipos decepción</h3><p>Favoritos o candidatos fuertes que no están cumpliendo.</p></div><span class="tag red">'+decepciones.length+'</span></div><div class="analysisScrollList">';
-  if(decepciones.length){decepciones.forEach(function(x){html+=analysisMiniTeamCard(x,'bad')})}else{html+='<div class="mathEmpty">Aún no hay decepciones claras con los resultados registrados.</div>'}
-  html+='</div></div></div></div></div>';
-  return html;
-}
+/* v148: analysisHighlightsPanel antiguo eliminado; se usa el panel limpio sin duplicidad de equipos. */
 
-function renderAnalisisCore(){
-  var summary=analysisSummary();
-  var stats=allTeamStats();
-  var played=playedTeamStats();
-  var fifaRows=fifaTeamRowsSorted();
-  var fifaMap=fifaStatsByCode();
-  var bestAttack=bestBy(played,function(x){return x.gfpg},true);
-  var bestDefense=bestBy(played,function(x){return -x.gcpg},true);
-  var biggest=summary.biggest;
-  var undefeated=played.filter(function(x){return x.pp===0&&x.pj>0}).sort(function(a,b){return b.pts-a.pts||b.dg-a.dg||b.gf-a.gf});
-  var model=championCandidateModel(stats,summary);
-  var combined=model.rows;
-  var cand=model.champion||null;
-  var confidence=cand?cand.confidence:0;
-  var fifaTopGoals=fifaRows.slice().sort(function(a,b){return Number(b.goals||0)-Number(a.goals||0)||name(a.team).localeCompare(name(b.team))})[0]||null;
-  var fifaTopAssists=fifaRows.slice().sort(function(a,b){return Number(b.assists||0)-Number(a.assists||0)||name(a.team).localeCompare(name(b.team))})[0]||null;
-  var fifaTopXg=fifaRows.slice().sort(function(a,b){return Number(b.xg||0)-Number(a.xg||0)||name(a.team).localeCompare(name(b.team))})[0]||null;
-  var html='<div class="sectionHead compactTitle"><div><h2>Análisis</h2></div><span class="tag green">Resultados + FIFA</span></div><div class="statusStrip compactStrip"><div class="statusMini"><b>'+doneCount(matches)+' partidos</b></div><div class="statusMini"><b>'+fifaRows.length+' equipos FIFA</b></div><div class="statusMini"><b>'+playerStatsRows().length+' jugadores</b></div></div>';
-  html+='<div class="card"><div class="sectionHead"><div><h2>Lectura general</h2><p>Este panel reemplaza los análisis separados. Todo se interpreta en una sola vista: rendimiento en partidos, forma del grupo y métricas FIFA por equipo.</p></div><span class="tag">Análisis único</span></div>';
-  if(!summary.done&&!fifaRows.length){html+='<div class="warningAnalysis">Aún no hay resultados ni estadísticas FIFA cargadas. Registra marcadores o presiona “Actualizar con internet”.</div>'}
-  html+='<div class="statGrid"><div class="statCard"><b>'+summary.done+'</b><span>Partidos analizados</span><small>De '+matches.length+' partidos de fase de grupos.</small></div><div class="statCard"><b>'+summary.goals+'</b><span>Goles por resultados</span><small>Promedio '+summary.avg.toFixed(2)+' por partido.</small></div><div class="statCard"><b>'+fifaRows.length+'</b><span>Equipos FIFA cargados</span><small>Estadísticas oficiales vinculadas por IdTeam.</small></div><div class="statCard"><b>'+fifaTeamTotal('goals')+'</b><span>Goles FIFA</span><small>Dato oficial agregado por selección.</small></div><div class="statCard"><b>'+fifaTeamTotal('assists')+'</b><span>Asistencias FIFA</span><small>Recalculadas desde jugadores cuando está disponible.</small></div><div class="statCard"><b>'+fifaTeamTotal('yellow')+' / '+fifaTeamTotal('red')+'</b><span>TA / TR FIFA</span><small>Disciplina oficial por equipo.</small></div></div>';
-  html+='<div class="unifiedPanel unifiedPanelWide" style="margin-top:14px"><div class="analysisChampionColumn">';
-  html+='<div class="championCard"><div class="championMain"><div class="championFlag">'+(cand?flag(cand.team):'<span class="flagBlank"></span>')+'</div><div><p class="championSub">Predicción de posible campeón</p><h2 class="championTitle">'+(cand?esc(name(cand.team)):'Sin candidato')+'</h2><p class="championSub">'+(cand?code(cand.team)+' · Grupo '+cand.g+' · Índice '+cand.score100+'/100 · Prob. calibrada '+cand.prob+'%':'Carga resultados o estadísticas FIFA')+'</p></div></div><div class="confidence"><span style="width:'+confidence+'%"></span></div><p class="muted" style="margin-top:8px">Confianza del modelo: '+confidence+'%. El índice usa forma en el grupo, ataque, defensa, posesión/pases, profundidad de jugadores, Ranking FIFA real, disciplina y estado matemático.</p>'+(cand?'<div class="mathMetaRow" style="margin-top:10px">'+componentPills(cand)+'</div><p class="muted" style="margin-top:8px"><b>Por qué:</b> '+esc(cand.reason)+'</p><p class="muted"><b>Riesgo:</b> '+esc(cand.risk)+'</p>':'')+'</div>';
-  html+='</div><div class="analysisSideColumn">';
-  html+='<div class="scenario"><h3>Resumen FIFA destacado</h3><p><b>Goles:</b> '+(fifaTopGoals?esc(name(fifaTopGoals.team))+' ('+statValue(fifaTopGoals.goals)+')':'Pendiente')+'</p><p><b>Asistencias:</b> '+(fifaTopAssists?esc(name(fifaTopAssists.team))+' ('+statValue(fifaTopAssists.assists)+')':'Pendiente')+'</p><p><b>xG:</b> '+(fifaTopXg?esc(name(fifaTopXg.team))+' ('+statValue(fifaTopXg.xg)+')':'Pendiente')+'</p></div>';
-  html+='<div class="scenario"><h3>Invictos por resultados</h3><p>'+(undefeated.length?undefeated.slice(0,6).map(function(x){return esc(name(x.team))}).join(' · '):'Sin invictos calculados todavía')+'</p></div>';
-  html+='</div>';
-  html+='<div class="scenarioGrid scenarioGridFull"><div class="scenario"><h3>Tendencia de resultados</h3><p>Victorias local: '+summary.homeWins+' · Empates: '+summary.draws+' · Victorias visitante: '+summary.awayWins+'.</p></div><div class="scenario"><h3>Mayor goleada</h3><p>'+(biggest?esc(name(biggest.match.h))+' '+biggest.match.hg+' - '+biggest.match.ag+' '+esc(name(biggest.match.a))+' · Grupo '+biggest.match.g:'Sin datos suficientes')+'</p></div><div class="scenario"><h3>Mejor ataque local</h3><p>'+(bestAttack?esc(name(bestAttack.team))+' · '+bestAttack.gf+' goles registrados':'Sin datos')+'</p></div><div class="scenario"><h3>Mejor defensa local</h3><p>'+(bestDefense?esc(name(bestDefense.team))+' · '+bestDefense.gc+' goles recibidos':'Sin datos')+'</p></div>'+analysisFairPlayScenarioCards(combined)+'</div>';
-  html+='</div>';
-  html+=analysisHighlightsPanel(combined);
-  html+='<div class="card" style="margin-top:14px"><div class="sectionHead"><div><h2>Top candidatos a campeón</h2><p>Modelo 0-100 balanceado. Ahora usa el Ranking FIFA real como fuerza previa fuerte, para evitar que una goleada temprana coloque primero a un equipo que no parte como favorito #1.</p></div><span class="tag green">Modelo predictivo v135</span></div><div class="barList">';
-  var top=combined.slice(0,10);if(top.length){top.forEach(function(x,i){var width=Math.max(4,Math.round(x.score100));var f=x.fifa||{};var statusTxt=x.status?x.status.route:'En disputa';html+='<div class="barItem"><div class="barTop"><span><b>'+(i+1)+'. '+esc(name(x.team))+'</b> <small>'+code(x.team)+' · Grupo '+x.g+' · '+esc(statusTxt)+'</small></span><b>'+x.score100+'/100 · '+x.prob+'%</b></div><div class="bar"><span style="width:'+width+'%"></span></div><div class="mathMetaRow" style="margin-top:8px">'+componentPills(x)+'</div><small class="muted"><b>Lectura:</b> '+esc(x.reason)+'<br><b>Riesgo:</b> '+esc(x.risk)+'<br>FIFA: Ranking '+(x.fifaRank?('#'+x.fifaRank):'-')+' · GF '+statValue(f.goals)+' · xG '+statValue(f.xg)+' · TA/TR '+statValue(x.yellow)+'/'+statValue(x.red)+' · Jugadores '+statValue((x.player&&x.player.players)||f.playersWithStats||f.players)+'</small></div>'})}else{html+='<p class="muted">Sin candidatos hasta cargar resultados o estadísticas FIFA.</p>'}html+='</div></div>';
-  html+='<div class="card" style="margin-top:14px"><div class="sectionHead"><div><h2>Detalle web y fuentes</h2><p>La información de internet se muestra aquí mismo, sin crear un segundo análisis.</p></div></div><div id="internetResult">'+unifiedInternetBlock()+'</div></div>';
-  html+=analisisActionsPanel();
-  html+=adminToolsPanel();
-  html+='</div>';
-  document.getElementById('analisis').innerHTML=html;
-}
+/* v147: renderAnalisisCore antiguo eliminado. Se usa el renderer futbolero unificado sin local/visitante. */
 function renderAnalisisFallback(errorMsg){
   var rows=[];
   try{ rows=allTeamStats().filter(function(x){return x.pj>0}).sort(function(a,b){return b.score-a.score||b.pts-a.pts||b.dg-a.dg||b.gf-a.gf}); }catch(e){ rows=[]; }
@@ -4293,7 +3814,7 @@ function renderAnalisis(){
 function v133MetricCard(icon,title,body,kind){return '<div class="card analysisMetricCard '+(kind||'')+'"><div class="metricIcon">'+icon+'</div><div class="metricText"><h3>'+esc(title)+'</h3><p>'+body+'</p></div></div>'}
 function v133ChampionChip(icon,label,val){return '<div class="heroChip"><i>'+icon+'</i><div><span>'+esc(label)+'</span><b>'+esc(val)+'</b></div></div>'}
 function v133TopFifaLine(icon,label,row,key){return '<p>'+icon+' <b>'+esc(label)+':</b> '+(row?esc(name(row.team))+' ('+statValue(row[key])+')':'Pendiente')+'</p>'}
-function renderAnalisisCoreV133(){
+function renderAnalisisCore(){
   var summary=analysisSummary();
   var stats=allTeamStats();
   var played=playedTeamStats();
@@ -4347,7 +3868,7 @@ function renderAnalisisCoreV133(){
   html+='</div>';
   html+='<div class="analysisMetricGrid fairplayV133">'+analysisFairPlayScenarioCards(combined)+'</div>';
   html+=analysisHighlightsPanel(combined);
-  html+='<div class="card" style="margin-top:2px"><div class="sectionHead"><div><h2>Ranking completo de candidatos</h2><p>Modelo 0-100 balanceado con Ranking FIFA real, forma, ataque, defensa, disciplina y estado matemático.</p></div><span class="tag green">Modelo v135</span></div><div class="barList">';
+  html+='<div class="card" style="margin-top:2px"><div class="sectionHead"><div><h2>Ranking completo de candidatos</h2><p>Modelo 0-100 balanceado con Ranking FIFA real, forma, ataque, defensa, disciplina y estado matemático.</p></div><span class="tag green">Modelo v148</span></div><div class="barList">';
   var top=combined.slice(0,10);if(top.length){top.forEach(function(x,i){var width=Math.max(4,Math.round(x.score100));var f=x.fifa||{};var statusTxt=x.status?x.status.route:'En disputa';html+='<div class="barItem"><div class="barTop"><span><b>'+(i+1)+'. '+esc(name(x.team))+'</b> <small>'+code(x.team)+' · Grupo '+x.g+' · '+esc(statusTxt)+'</small></span><b>'+x.score100+'/100 · '+x.prob+'%</b></div><div class="bar"><span style="width:'+width+'%"></span></div><small class="muted"><b>Lectura:</b> '+esc(x.reason)+'<br><b>Riesgo:</b> '+esc(x.risk)+'<br>FIFA: Ranking '+(x.fifaRank?('#'+x.fifaRank):'-')+' · GF '+statValue(f.goals)+' · xG '+statValue(f.xg)+' · TA/TR '+statValue(x.yellow)+'/'+statValue(x.red)+'</small></div>'})}else{html+='<p class="muted">Sin candidatos hasta cargar resultados o estadísticas FIFA.</p>'}
   html+='</div></div>';
   html+='<div class="card"><div class="sectionHead"><div><h2>Detalle web y fuentes</h2><p>La información de internet se mantiene como soporte del análisis, sin duplicar los indicadores principales.</p></div></div><div id="internetResult">'+unifiedInternetBlock()+'</div></div>';
@@ -4356,24 +3877,23 @@ function renderAnalisisCoreV133(){
   html+='</div>';
   document.getElementById('analisis').innerHTML=html;
 }
-renderAnalisisCore = renderAnalisisCoreV133;
 
-analysisFairPlayCard = function(item,title,desc,type,primary){
+function analysisFairPlayCard(item,title,desc,type,primary){
   var cls=type==='bad'?'bad':'good';
   if(!item)return '<div class="fairPlayMetricCard empty"><div class="fairPlayMetricTop"><div><h4>'+esc(title)+'</h4></div><span>-</span></div><div class="fairPlayTeam"><b>Sin datos</b></div></div>';
   var main=primary==='fouls'?statValue(item.fouls)+' faltas':statValue(item.yellow)+' TA / '+statValue(item.red)+' TR';
   return '<div class="fairPlayMetricCard '+cls+'"><div class="fairPlayMetricTop"><div><h4>'+esc(title)+'</h4></div><span>'+main+'</span></div><div class="fairPlayTeam"><span class="flagMini">'+flag(item.team)+'</span><div><b>'+esc(name(item.team))+'</b><small>'+esc(code(item.team))+' · Grupo '+esc(item.g||'-')+'</small></div></div></div>';
-};
+}
 
-analysisMiniTeamCard = function(x,type){
+function analysisMiniTeamCard(x,type){
   if(!x)return '';
   var cls=type==='bad'?'out':'';
   var label=analysisOutcomeLabel(x,type);
   var reason=type==='bad'?disappointmentReason(x):highlightReason(x);
   return '<div class="mathTeamCard '+cls+'"><div class="mathTeamTop"><div class="mathTeamName"><span class="flagMini">'+flag(x.team)+'</span><div>'+teamSeedHTML(x.team)+esc(name(x.team))+'<small>'+esc(code(x.team))+' · Grupo '+esc(x.g)+' · '+analysisPtsText(x)+' · '+analysisDgText(x)+'</small></div></div><span class="mathRoute">'+esc(label)+'</span></div><p class="mathReason">'+esc(reason)+'</p></div>';
-};
+}
 
-analysisHighlightsPanel = function(combined){
+function analysisHighlightsPanel(combined){
   var played=(combined||[]).filter(function(x){return x.pj>0});
   var buckets={surprises:[],deceptions:[]};
   played.forEach(function(x){
@@ -4392,7 +3912,7 @@ analysisHighlightsPanel = function(combined){
   if(decepciones.length){decepciones.forEach(function(x){html+=analysisMiniTeamCard(x,'bad')})}else{html+='<div class="mathEmpty">Aún no hay decepciones claras con los resultados registrados.</div>'}
   html+='</div></div></div></div>';
   return html;
-};
+}
 
 function fifaTeamRowsSorted(){
   var rows=(fifaTeamStats&&fifaTeamStats.teams)?fifaTeamStats.teams:[];
@@ -4422,7 +3942,7 @@ function renderEquiposFifa(){
   html+=equiposFifaActionsPanel();
   document.getElementById('equiposFifa').innerHTML=html;
 }
-function renderEquipos(){var gs=Object.keys(GROUPS);var html='<div class="sectionHead"><div><h2>Selecciones y códigos FIFA</h2><p>Cada selección muestra bandera y código FIFA de 3 letras.</p></div><span class="tag red">48 equipos</span></div>';for(var i=0;i<gs.length;i++){var g=gs[i];html+='<div class="card"><div class="sectionHead"><div><h2>Grupo '+g+'</h2><p>'+GROUPS[g].map(function(t){return teamSlot(t)+' '+code(t)}).join(' · ')+'</p></div></div><div class="gridTeams">';for(var j=0;j<GROUPS[g].length;j++){var t=GROUPS[g][j];html+='<div class="roster"><span class="flag">'+flag(t)+'</span><div><b>'+teamSeedHTML(t)+esc(name(t))+'</b><small>'+code(t)+' · '+teamSlot(t)+'</small></div></div>'}html+='</div></div>'}html+='<div class="card"><h2>Ajustes</h2><p class="muted">Los resultados se guardan localmente en el dispositivo. Puedes reiniciar todo para volver a empezar.</p><div class="actions"><button class="btn red" onclick="window.resetAll()">Reiniciar resultados</button></div></div>';document.getElementById('equipos').innerHTML=html}
+/* v147: renderEquipos antiguo eliminado; la vista vigente es renderEquiposFifa(). */
 
 window.closeApplication=async function(){
   if(!requireAuth('cerrar la aplicación'))return;
@@ -4497,7 +4017,7 @@ function refreshUXContext(){
   html+='<div class="contextMini"><b>'+esc(String(counter.main))+'</b><span>'+esc(counter.label)+'</span></div>';
   html+='<div class="contextMini"><b>'+esc(String(doneCount(matches)))+'</b><span>partidos con resultado</span></div>';
   html+='<div class="contextMini"><b>'+esc(String((fifaTeamStats&&fifaTeamStats.teams?fifaTeamStats.teams.length:0)))+'</b><span>equipos FIFA cargados</span></div>';
-  html+='<div class="contextMini"><b>'+esc(String(playerStatsRows().length))+'</b><span>jugadores disponibles</span></div>';
+  html+='<div class="contextMini"><b>'+esc(String(playerStatsRows().length||((fifaPlayerStats&&fifaPlayerStats.loadedPlayers)||0)))+'</b><span>'+(playerStatsDeferred?'jugadores diferidos':'jugadores disponibles')+'</span></div>';
   html+='</div>';
   box.innerHTML=html;
 }
@@ -4531,9 +4051,9 @@ function render(){
 }
 
 function updateSearchPlaceholder(){var el=document.getElementById('search');if(!el)return;if(active==='jugadores')el.placeholder='Buscar jugador, país, código o slug FIFA: Balogun, IRN, ir-iran...';else if(active==='equiposFifa')el.placeholder='Buscar selección, código o slug FIFA: ARG, BEL, IRN, ir-iran...';else if(active==='clasificados')el.placeholder='Buscar clasificados, eliminados o motivo: MEX, 1.º asegurado, eliminado...';else el.placeholder='Buscar selección, código o slug FIFA: ARG, BEL, IRN, ir-iran...'}
-function showTab(tab){if(tab!=='jugadores'){document.body.classList.remove('players-detail-open')}if(tab==='eventos')tab='jugadores';active=tab;try{localStorage.setItem(UI_TAB_STORAGE,active)}catch(e){}updateSearchPlaceholder();var secs=document.querySelectorAll('.section');for(var j=0;j<secs.length;j++)secs[j].className=secs[j].className.replace(' active','');var sec=document.getElementById(active);if(sec)sec.className+=' active';var tabs=document.querySelectorAll('.tab');for(var k=0;k<tabs.length;k++)tabs[k].className=tabs[k].className.replace(' active','');var t=document.querySelector('[data-tab="'+active+'"]');if(t){t.className+=' active';try{t.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'})}catch(_scrollTab){}}clearInactiveSections(active);render();try{window.scrollTo({top:0,behavior:'smooth'})}catch(e){window.scrollTo(0,0)}}
-function bind(){var ts=document.querySelectorAll('.tab');for(var i=0;i<ts.length;i++){ts[i].onclick=function(){if(this.getAttribute('data-action')==='closeApp'){window.closeApplication();return}var target=this.getAttribute('data-tab');if(target==='analisis'){showTab('analisis');return}if(target)showTab(target)}}var searchEl=document.getElementById('search');searchEl.oninput=function(){query=this.value||'';if(active==='jugadores'){renderSideNavigation();renderJugadores();refreshUXContext()}else if(active==='equiposFifa'){renderSideNavigation();renderEquiposFifa();refreshUXContext()}else if(active==='clasificados'){renderClasificados();refreshUXContext()}else showTab('fixture')};searchEl.onfocus=function(){document.body.classList.add('search-focus')};searchEl.onblur=function(){document.body.classList.remove('search-focus')};document.getElementById('clearBtn').onclick=function(){query='';document.getElementById('search').value='';render();toast('Búsqueda limpia')};document.getElementById('saveNowBtn').onclick=function(){if(requireAuth('guardar datos'))save(false)};var loginBtn=document.getElementById('loginBtn');if(loginBtn)loginBtn.onclick=function(){canEdit()?doLogout():showLoginModal()};var lf=document.getElementById('loginForm');if(lf)lf.onsubmit=doLogin;var lc=document.getElementById('loginCancelBtn');if(lc)lc.onclick=hideLoginModal;var lo=document.getElementById('loginOverlay');if(lo)lo.onclick=function(ev){if(ev.target===lo)hideLoginModal()};var fa=document.getElementById('fullAnalysisBtn');if(fa)fa.onclick=function(){if(requireAuth('actualizar análisis'))window.runUnifiedAnalysis(true)};var adminBtn=document.getElementById('adminToolsBtn');if(adminBtn)adminBtn.onclick=function(){if(requireAuth('abrir administración'))window.scrollToAdminPanel()};var restoreInput=document.getElementById('adminRestoreFile');if(restoreInput)restoreInput.onchange=function(){window.handleRestoreBackup(this.files&&this.files[0]);this.value=''};updateEditModeUI();document.addEventListener('keydown',function(e){var tag=(document.activeElement&&document.activeElement.tagName||'').toLowerCase();if(e.key==='/'&&tag!=='input'&&tag!=='textarea'){e.preventDefault();searchEl.focus();searchEl.select()}if(e.key==='Escape'){if(tag==='input'&&document.activeElement===searchEl){searchEl.blur()}query='';searchEl.value='';render()}})}
-try{load();bind();render();setPersistStatus('Cargando persistencia...',false);setTimeout(refreshAuthState,80);setTimeout(loadFromPython,150);setInterval(refreshTimedMatchViews,60000);window.addEventListener('beforeunload',function(){try{saveBrowserCache()}catch(e){}})}catch(e){document.getElementById('fixture').innerHTML='<div class="errorBox">Error al iniciar: '+esc(e.message)+'</div>'}
+function showTab(tab){if(tab!=='jugadores'){document.body.classList.remove('players-detail-open')}if(tab==='eventos')tab='jugadores';active=tab;try{localStorage.setItem(UI_TAB_STORAGE,active)}catch(e){}updateSearchPlaceholder();var secs=document.querySelectorAll('.section');for(var j=0;j<secs.length;j++)secs[j].className=secs[j].className.replace(' active','');var sec=document.getElementById(active);if(sec)sec.className+=' active';var tabs=document.querySelectorAll('.tab');for(var k=0;k<tabs.length;k++)tabs[k].className=tabs[k].className.replace(' active','');var t=document.querySelector('[data-tab="'+active+'"]');if(t){t.className+=' active';try{t.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'})}catch(_scrollTab){}}clearInactiveSections(active);render();if(active==='jugadores'&&(playerStatsDeferred||(!playerStatsRows().length&&!playerCacheLoading))){setTimeout(function(){loadPlayersCached(true)},80)}try{window.scrollTo({top:0,behavior:'smooth'})}catch(e){window.scrollTo(0,0)}}
+function bind(){var ts=document.querySelectorAll('.tab');for(var i=0;i<ts.length;i++){ts[i].onclick=function(){if(this.getAttribute('data-action')==='closeApp'){window.closeApplication();return}var target=this.getAttribute('data-tab');if(target==='analisis'){showTab('analisis');return}if(target)showTab(target)}}var searchEl=document.getElementById('search');searchEl.oninput=function(){query=this.value||'';if(active==='jugadores'){renderSideNavigation();renderJugadores();refreshUXContext()}else if(active==='equiposFifa'){renderSideNavigation();renderEquiposFifa();refreshUXContext()}else if(active==='clasificados'){renderClasificados();refreshUXContext()}else{render();refreshUXContext()}};searchEl.onfocus=function(){document.body.classList.add('search-focus')};searchEl.onblur=function(){document.body.classList.remove('search-focus')};document.getElementById('clearBtn').onclick=function(){query='';document.getElementById('search').value='';render();toast('Búsqueda limpia')};document.getElementById('saveNowBtn').onclick=function(){if(requireAuth('guardar datos'))save(false)};var loginBtn=document.getElementById('loginBtn');if(loginBtn)loginBtn.onclick=function(){canEdit()?doLogout():showLoginModal()};var lf=document.getElementById('loginForm');if(lf)lf.onsubmit=doLogin;var lc=document.getElementById('loginCancelBtn');if(lc)lc.onclick=hideLoginModal;var lo=document.getElementById('loginOverlay');if(lo)lo.onclick=function(ev){if(ev.target===lo)hideLoginModal()};var fa=document.getElementById('fullAnalysisBtn');if(fa)fa.onclick=function(){if(requireAuth('actualizar análisis'))window.runUnifiedAnalysis(true)};var adminBtn=document.getElementById('adminToolsBtn');if(adminBtn)adminBtn.onclick=function(){if(requireAuth('abrir administración'))window.scrollToAdminPanel()};var restoreInput=document.getElementById('adminRestoreFile');if(restoreInput)restoreInput.onchange=function(){window.handleRestoreBackup(this.files&&this.files[0]);this.value=''};updateEditModeUI();document.addEventListener('keydown',function(e){var tag=(document.activeElement&&document.activeElement.tagName||'').toLowerCase();if(e.key==='/'&&tag!=='input'&&tag!=='textarea'){e.preventDefault();searchEl.focus();searchEl.select()}if(e.key==='Escape'){if(tag==='input'&&document.activeElement===searchEl){searchEl.blur()}query='';searchEl.value='';render()}})}
+try{load();bind();render();setPersistStatus('Cargando persistencia...',false);setTimeout(refreshAuthState,80);setTimeout(loadFromPython,150);setInterval(refreshTimedMatchViews,120000);/* beforeunload pesado retirado v142 */}catch(e){document.getElementById('fixture').innerHTML='<div class="errorBox">Error al iniciar: '+esc(e.message)+'</div>'}
 })();
 </script>
 </body>
