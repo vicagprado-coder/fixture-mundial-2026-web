@@ -3815,6 +3815,22 @@ function clamp(n,min,max){n=Number(n);if(!isFinite(n))n=0;return Math.max(min,Ma
 function round1(n){n=Number(n);return isFinite(n)?Number(n.toFixed(1)):0}
 function normalizeRows(rows,key,higherBetter,neutralMissing){var vals=rows.map(function(r){return Number(r[key])}).filter(function(v){return isFinite(v)});var min=Math.min.apply(null,vals),max=Math.max.apply(null,vals);if(!vals.length||min===max){rows.forEach(function(r){r[key+'Score']=neutralMissing===undefined?50:neutralMissing});return}rows.forEach(function(r){var v=Number(r[key]);if(!isFinite(v)){r[key+'Score']=neutralMissing===undefined?50:neutralMissing;return}var score=((v-min)/(max-min))*100;if(!higherBetter)score=100-score;r[key+'Score']=pct(score)})}
 function playerAggregateByCode(){var map={};playerStatsRows().forEach(function(p){var c=String(p.code||'').toUpperCase();if(!c)return;if(!map[c])map[c]={players:0,goals:0,assists:0,xg:0,shotsOnTarget:0,shots:0,sprints:0,totalDistance:0,topSpeed:0,minutes:0,yellow:0,red:0};var a=map[c];a.players++;a.goals+=Number(p.goals||0);a.assists+=Number(p.assists||0);a.xg+=Number(p.xg||0);a.shotsOnTarget+=Number(p.shotsOnTarget||0);a.shots+=Number(p.shots||0);a.sprints+=Number(p.sprints||0);a.totalDistance+=Number(p.totalDistance||0);a.topSpeed=Math.max(a.topSpeed,Number(p.topSpeed||0));a.minutes+=Number(p.timePlayed||0);a.yellow+=Number(p.yellow||0);a.red+=Number(p.red||0)});Object.keys(map).forEach(function(c){map[c].goalInvolvement=map[c].goals+map[c].assists});return map}
+function analysisHasNumber(obj,keys){obj=obj||{};for(var i=0;i<(keys||[]).length;i++){var v=obj[keys[i]];if(v!==undefined&&v!==null&&v!==''&&isFinite(Number(v)))return true}return false}
+function analysisCardTotals(f,pm){
+  f=f||{};pm=pm||{};
+  var hasOfficialYellow=analysisHasNumber(f,['yellow','yellowCards']);
+  var hasOfficialRed=analysisHasNumber(f,['red','redCards','directRed','directRedCards','indirectRed','indirectRedCards']);
+  var officialYellow=analysisFirstNumber([f.yellow,f.yellowCards],0);
+  var direct=analysisFirstNumber([f.directRed,f.directRedCards],0);
+  var indirect=analysisFirstNumber([f.indirectRed,f.indirectRedCards],0);
+  var officialRed=analysisFirstNumber([f.red,f.redCards],null);
+  if(officialRed===null)officialRed=(Number(direct||0)||0)+(Number(indirect||0)||0);
+  return {
+    yellow:hasOfficialYellow?Number(officialYellow||0):Number(pm.yellow||0),
+    red:hasOfficialRed?Number(officialRed||0):Number(pm.red||0),
+    source:(hasOfficialYellow||hasOfficialRed)?'FIFA Team Stats':'Suma jugadores'
+  };
+}
 function passAccuracyFromFifa(f){var p=Number(f.passes||0),ok=Number(f.passesCompleted||0);if(p>0)return (ok/p)*100;return Number(f.passAccuracy||0)||0}
 function mathStatusSafe(team){try{return mathStatusForTeam(team)}catch(e){return {status:'alive',route:'En disputa',reason:'Sin estado matemático calculado'}}}
 function rankingCandidateScore(rank){
@@ -3838,9 +3854,9 @@ function championCandidateModel(stats,summary){
     var rankPoints=Number(f.fifaRankingPoints||f.rankingPoints||rankInfo.points||0);
     if(rank&&rank<999){f.fifaRank=rank;f.fifaRankingPoints=rankPoints}
     var fm=Math.max(1,Number(f.matches||x.pj||1));
-    var fRed=Number(f.red||0)||((Number(f.directRed||0)||0)+(Number(f.indirectRed||0)||0));
-    var tr=fRed+(Number(pm.red||0)||0);
-    var y=(Number(f.yellow||0)||0)+(Number(pm.yellow||0)||0);
+    var cards=analysisCardTotals(f,pm);
+    var tr=cards.red;
+    var y=cards.yellow;
     var goalsConceded=Number(f.goalsConceded||0);if(!hasFifa)goalsConceded=x.gc||0;
     var ptsRate=x.pj?x.pts/(3*x.pj):0.45;
     var form=pct((ptsRate*55)+(clamp((x.dgpj+2)/4,0,1)*20)+(clamp(x.gfpg/3,0,1)*12)+(clamp((2-x.gcpg)/2,0,1)*13));
