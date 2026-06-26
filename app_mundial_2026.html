@@ -2954,6 +2954,117 @@ input:disabled:not(.score):not(.koScore):not(.koTeamInput){opacity:.72!important
   }
 }
 
+
+
+/* ===== AJUSTE HERO SUPERIOR v2 ===== */
+@media(min-width:901px){
+  .hero{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) 330px!important;
+    grid-template-areas:
+      "brand visuals"
+      "hosts visuals"!important;
+    align-items:center!important;
+    column-gap:14px!important;
+    row-gap:6px!important;
+    flex:0 0 94px!important;
+    height:94px!important;
+    min-height:94px!important;
+    max-height:94px!important;
+    padding:10px 16px!important;
+    overflow:hidden!important;
+  }
+  .hero .brand{
+    grid-area:brand!important;
+    max-width:none!important;
+    width:100%!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:12px!important;
+    z-index:2!important;
+  }
+  .hero .brand > div{min-width:0!important;}
+  .hero .brand h1{font-size:22px!important;line-height:1.02!important;margin:0!important;white-space:nowrap!important;}
+  .hero .brand p,
+  .hero .quickHint,
+  .hero .themeStrip{display:none!important;}
+  .hero .logoCup{
+    width:56px!important;
+    height:56px!important;
+    min-width:56px!important;
+    border-radius:17px!important;
+  }
+  .hero .hosts{
+    grid-area:hosts!important;
+    position:static!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    top:auto!important;
+    margin:0!important;
+    max-width:none!important;
+    width:100%!important;
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:6px!important;
+    overflow:visible!important;
+    z-index:2!important;
+  }
+  .hero .host{
+    padding:6px 10px!important;
+    font-size:10.5px!important;
+    line-height:1!important;
+    white-space:nowrap!important;
+  }
+  .hero .heroVisuals{
+    grid-area:visuals!important;
+    position:relative!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:auto!important;
+    width:100%!important;
+    height:72px!important;
+    transform:none!important;
+    transform-origin:center right!important;
+    opacity:1!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+    gap:12px!important;
+    margin:0!important;
+    z-index:2!important;
+  }
+  .hero .mascotVisual{
+    max-width:180px!important;
+    max-height:78px!important;
+    width:auto!important;
+    height:auto!important;
+    object-fit:contain!important;
+  }
+  .hero .ballVisual{
+    width:96px!important;
+    height:76px!important;
+    object-fit:contain!important;
+    border-radius:22px!important;
+    background:rgba(255,255,255,.20)!important;
+  }
+  .hero .worldWatermark{
+    right:8px!important;
+    bottom:5px!important;
+    width:150px!important;
+    opacity:.10!important;
+  }
+}
+@media(max-width:900px){
+  .hero{
+    min-height:120px!important;
+  }
+  .hero .brand,
+  .hero .hosts,
+  .hero .themeStrip{
+    max-width:none!important;
+  }
+}
+
 </style>
 </head>
 <body>
