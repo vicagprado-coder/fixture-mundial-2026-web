@@ -3753,7 +3753,7 @@ function renderClasificados(){
   var alive=statuses.filter(function(x){return x.status==='alive'});
   var done=doneCount(matches),total=matches.length,allDone=allGroupsComplete();
   var html='<div class="mathStatusHero"><h2>Clasificados y eliminados matemáticos</h2><p>Listado automático en base a los marcadores guardados. Primero revisa el desempate directo (victoria olímpica / enfrentamiento directo) dentro del grupo y luego evalúa puntos, mejores terceros y demás criterios FIFA para detectar pases o eliminaciones matemáticas.</p></div>';
-  var top1Count=qualified.filter(function(x){return String(x.route||'').indexOf('1.º')>=0}).length;html+='<div class="mathStatusStats"><div class="mathMini"><b>'+qualified.length+'</b><span>Clasificados</span></div><div class="mathMini"><b>'+top1Count+'</b><span>1.º asegurado</span></div><div class="mathMini"><b>'+eliminated.length+'</b><span>Eliminados</span></div><div class="mathMini"><b>'+alive.length+'</b><span>En disputa</span></div></div>';
+  var top1Count=qualified.filter(function(x){return String(x.route||'').indexOf('1.º')>=0}).length;html+='<div class="mathStatusStats"><div class="mathMini"><b>'+qualified.length+'</b><span>Clasificados</span></div><div class="mathMini"><b>'+top1Count+'</b><span>1.º asegurado</span></div><div class="mathMini"><b>'+eliminated.length+'</b><span>Eliminados</span></div><div class="mathMini"><b>'+alive.length+'</b><span>En disputa</span></div><div class="mathMini"><b>'+done+'/'+total+'</b><span>Partidos jugados</span></div></div>';
   html+='<div class="mathColumns"><div class="mathColumn"><div class="mathColumnHead"><div><h3>✅ Clasificados</h3><p>Equipos con pase matemático a ronda de 32. Si alguno ya aseguró el 1.º lugar se marca como “1.º lugar asegurado”; si solo aseguró Top 2 por puntos máximos, se marca como “Top 2 asegurado”.</p></div><span class="tag green">'+qualified.length+'</span></div>';
   if(qualified.length){qualified.sort(function(a,b){return (a.profile.g||'').localeCompare(b.profile.g||'')||a.profile.currentRank-b.profile.currentRank||name(a.profile.team).localeCompare(name(b.profile.team))}).forEach(function(st){html+=mathTeamCard(st,'in')})}else{html+='<div class="mathEmpty">Aún no hay clasificados matemáticos con los resultados actuales.</div>'}
   html+='</div><div class="mathColumn"><div class="mathColumnHead"><div><h3>❌ Eliminados</h3><p>Equipos sin ruta matemática al Top 2 ni a mejores terceros.</p></div><span class="tag red">'+eliminated.length+'</span></div>';
@@ -5040,16 +5040,15 @@ function analysisStatSummary(x){
 }
 function analysisOutcomeLabel(x,type){
   var st=(x&&x.status)||mathStatusSafe(x&&x.team)||{};
-  var base=type==='bad'?'Decepción':'Sorpresa';
-  if(st.status==='eliminated')return base+' · Eliminado';
+  if(st.status==='eliminated')return 'Eliminado';
   if(st.status==='qualified'){
-    if(String(st.route||'').toLowerCase().indexOf('tercero')>=0)return base+' · Mejor tercero';
-    return base+' · Clasificado';
+    if(String(st.route||'').toLowerCase().indexOf('tercero')>=0)return 'Mejor tercero';
+    return 'Clasificado';
   }
-  if(type==='bad'&&Number((x&&x.rank)||0)>=3)return base+' · En riesgo';
-  if(type!=='bad'&&Number((x&&x.rank)||4)<=2)return base+' · Zona Top 2';
-  if(type!=='bad'&&Number((x&&x.rank)||4)===3)return base+' · Pelea terceros';
-  return base;
+  if(type==='bad'&&Number((x&&x.rank)||0)>=3)return 'En riesgo';
+  if(type!=='bad'&&Number((x&&x.rank)||4)<=2)return 'Zona Top 2';
+  if(type!=='bad'&&Number((x&&x.rank)||4)===3)return 'Pelea terceros';
+  return 'En disputa';
 }
 function analysisStatusMetaText(st){
   st=st||{};
