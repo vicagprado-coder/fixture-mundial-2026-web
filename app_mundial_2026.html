@@ -2558,6 +2558,328 @@ input:disabled:not(.score):not(.koScore):not(.koTeamInput){opacity:.72!important
   #rondas .koInfoStrip{grid-template-columns:1fr;gap:7px}
 }
 
+
+
+/* ===== v152 Rondas en 3 bloques: 16vos+8vos / 4tos+Semis / Final+3er ===== */
+#rondas .koThreeBlockShell{
+  display:grid!important;
+  gap:18px!important;
+  min-width:0!important;
+  padding:18px!important;
+  background:
+    linear-gradient(180deg,rgba(2,11,34,.74),rgba(2,15,42,.86)),
+    radial-gradient(circle at 50% 10%,rgba(61,179,255,.22),transparent 38%),
+    radial-gradient(circle at 16% 75%,rgba(0,176,80,.14),transparent 26%),
+    url('assets/fondo_total_mundial_2026.jpg') center/cover no-repeat!important;
+}
+#rondas .koThreeBlock{
+  position:relative;
+  z-index:1;
+  border-radius:24px;
+  padding:14px;
+  border:1px solid rgba(255,255,255,.18);
+  background:linear-gradient(180deg,rgba(4,22,55,.68),rgba(1,14,38,.76));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.05),0 16px 30px rgba(0,0,0,.18);
+  overflow:visible;
+}
+#rondas .koThreeBlock:before{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border-radius:20px;
+  pointer-events:none;
+  border:1px solid rgba(79,214,127,.08);
+  background:
+    linear-gradient(90deg,transparent 49.85%,rgba(255,255,255,.08) 50%,transparent 50.15%),
+    linear-gradient(0deg,transparent 49.85%,rgba(255,255,255,.06) 50%,transparent 50.15%);
+  background-size:100% 100%,100% 100%;
+}
+#rondas .koBlockLabel{
+  position:relative;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 0 12px;
+}
+#rondas .koBlockLabel b{
+  display:inline-flex;
+  align-items:center;
+  border-radius:999px;
+  padding:9px 15px;
+  background:linear-gradient(135deg,var(--red),var(--orange),var(--green),var(--blue));
+  color:#fff;
+  font-size:15px;
+  font-weight:1000;
+  letter-spacing:.2px;
+  box-shadow:0 10px 20px rgba(0,0,0,.2);
+}
+#rondas .koBlockLabel span{
+  color:#d6e9ff;
+  font-size:11px;
+  font-weight:1000;
+  text-transform:uppercase;
+  letter-spacing:.45px;
+}
+#rondas .koBlockOneGrid,
+#rondas .koBlockTwoGrid{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:minmax(600px,1fr) 44px minmax(600px,1fr);
+  gap:14px;
+  align-items:center;
+  min-width:1280px;
+}
+#rondas .koBlockTwoGrid{
+  grid-template-columns:minmax(520px,1fr) 54px minmax(520px,1fr);
+  min-width:1120px;
+}
+#rondas .koCenterMark{
+  align-self:stretch;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:24px;
+  text-shadow:0 0 18px rgba(91,194,255,.8);
+  position:relative;
+}
+#rondas .koCenterMark:before{
+  content:"";
+  position:absolute;
+  top:4px;
+  bottom:4px;
+  left:50%;
+  width:3px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:linear-gradient(180deg,transparent,rgba(112,203,255,.88),transparent);
+  box-shadow:0 0 16px rgba(112,203,255,.7);
+}
+#rondas .koCenterMark{isolation:isolate}
+#rondas .koCenterMark::after{
+  content:"";
+  width:42px;
+  height:42px;
+  position:absolute;
+  border-radius:50%;
+  background:rgba(3,16,45,.82);
+  border:1px solid rgba(255,255,255,.18);
+  z-index:-1;
+}
+#rondas .koPathLane{
+  display:grid;
+  gap:12px;
+}
+#rondas .koLaneHeader{
+  display:grid;
+  grid-template-columns:1.45fr 1fr;
+  gap:12px;
+  align-items:center;
+  color:#fff;
+  text-transform:uppercase;
+  font-weight:1000;
+  letter-spacing:.3px;
+  font-size:12px;
+  padding:0 4px;
+}
+#rondas .laneRight .koLaneHeader{grid-template-columns:1fr 1.45fr}
+#rondas .koLaneHeader span,
+#rondas .koLaneHeader b{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:32px;
+  border-radius:999px;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.14);
+  color:#dceeff;
+}
+#rondas .koLaneHeader b{
+  color:#fff;
+  background:linear-gradient(135deg,rgba(0,71,255,.55),rgba(0,176,80,.45));
+}
+#rondas .koPathPair{
+  display:grid;
+  grid-template-columns:minmax(0,1.48fr) 54px minmax(0,1fr);
+  gap:10px;
+  align-items:center;
+  position:relative;
+}
+#rondas .koPathPair.rtl{grid-template-columns:minmax(0,1fr) 54px minmax(0,1.48fr)}
+#rondas .koPathSources{
+  display:grid;
+  gap:8px;
+}
+#rondas .koPathNext{
+  display:flex;
+  align-items:center;
+}
+#rondas .koPathNext .koSplitCard{width:100%}
+#rondas .koPathConnector{
+  position:relative;
+  align-self:stretch;
+  min-height:120px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+#rondas .koPathConnector span{
+  position:absolute;
+  width:28px;
+  height:2px;
+  background:rgba(99,196,255,.92);
+  box-shadow:0 0 12px rgba(99,196,255,.75);
+}
+#rondas .koPathConnector span:first-child{top:34%;}
+#rondas .koPathConnector span:nth-child(3){bottom:34%;}
+#rondas .koPathConnector i{
+  position:absolute;
+  top:34%;
+  bottom:34%;
+  width:2px;
+  background:rgba(99,196,255,.92);
+  box-shadow:0 0 12px rgba(99,196,255,.75);
+}
+#rondas .koPathConnector.toRight span{left:0;right:auto}
+#rondas .koPathConnector.toRight span:first-child,
+#rondas .koPathConnector.toRight span:nth-child(3){width:50%}
+#rondas .koPathConnector.toRight i{left:50%}
+#rondas .koPathConnector.toRight:after{content:"›";right:1px}
+#rondas .koPathConnector.toLeft span{right:0;left:auto}
+#rondas .koPathConnector.toLeft span:first-child,
+#rondas .koPathConnector.toLeft span:nth-child(3){width:50%}
+#rondas .koPathConnector.toLeft i{right:50%}
+#rondas .koPathConnector.toLeft:after{content:"‹";left:1px}
+#rondas .koPathConnector:after{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  color:#8ed9ff;
+  font-size:32px;
+  font-weight:1000;
+  line-height:1;
+  text-shadow:0 0 14px rgba(99,196,255,.95);
+}
+#rondas .koPathConnector em{
+  position:absolute;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:max-content;
+  max-width:140px;
+  padding:4px 7px;
+  border-radius:999px;
+  background:rgba(5,22,54,.92);
+  color:#c9ecff;
+  border:1px solid rgba(112,203,255,.25);
+  font-style:normal;
+  font-size:9px;
+  font-weight:1000;
+  white-space:normal;
+  text-align:center;
+  line-height:1.15;
+}
+#rondas .koSplitCard{
+  min-height:0!important;
+  border-radius:16px!important;
+  padding:9px 9px 10px!important;
+  border-color:rgba(166,210,255,.48)!important;
+}
+#rondas .koSourceCard{opacity:.98}
+#rondas .koNextCard{
+  border-color:rgba(255,210,72,.62)!important;
+  box-shadow:0 0 0 1px rgba(255,210,72,.12),0 15px 25px rgba(0,0,0,.24)!important;
+}
+#rondas .koSplitCard:after{display:none!important}
+#rondas .koSplitHead{
+  gap:4px!important;
+  margin-bottom:6px!important;
+}
+#rondas .koTag.matchNo{
+  background:linear-gradient(135deg,var(--red),var(--blue))!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.28)!important;
+  font-size:10px!important;
+}
+#rondas .koSplitRouteHint{
+  margin:-1px 0 6px;
+  color:#bfe5ff;
+  font-size:9.5px;
+  font-weight:1000;
+  line-height:1.2;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+#rondas .koFinalBlockGrid{
+  position:relative;
+  z-index:2;
+  display:grid;
+  grid-template-columns:minmax(190px,.75fr) minmax(330px,1.05fr) minmax(310px,.95fr) minmax(190px,.75fr);
+  gap:18px;
+  align-items:center;
+  min-width:1050px;
+}
+#rondas .koFinalSourcePills{
+  display:grid;
+  gap:10px;
+  justify-items:center;
+  color:#fff;
+  font-weight:1000;
+  text-align:center;
+}
+#rondas .koFinalSourcePills span,
+#rondas .koFinalSourcePills b,
+#rondas .koFinalSourcePills i{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  min-height:36px;
+  padding:8px 12px;
+  background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.16);
+  color:#e4f3ff;
+  font-size:12px;
+  font-style:normal;
+}
+#rondas .koFinalSourcePills b{background:linear-gradient(135deg,var(--gold),var(--orange));color:#102047}
+#rondas .koFinalSourcePills.losers b{background:linear-gradient(135deg,#8ed9ff,var(--blue));color:#fff}
+#rondas .koFinalLane{
+  gap:10px!important;
+  justify-items:stretch!important;
+}
+#rondas .koFinalCup{
+  justify-self:center;
+  width:74px!important;
+  height:74px!important;
+  font-size:34px!important;
+}
+#rondas .koFinalCup.bronze{font-size:30px!important;background:radial-gradient(circle,#70421a 0%,rgba(3,16,45,.42) 70%)!important}
+#rondas .koFinalLane .koFinalCard,
+#rondas .koFinalLane .koThirdCard{
+  max-width:none!important;
+  width:100%!important;
+  min-height:0!important;
+}
+#rondas .koInfoStrip{display:none!important}
+@media(max-width:1200px){
+  #rondas .koThreeBlockShell{overflow:auto!important}
+}
+@media(max-width:900px){
+  #rondas .koThreeBlockShell{padding:10px!important;gap:14px!important}
+  #rondas .koThreeBlock{padding:10px!important;border-radius:20px!important}
+  #rondas .koBlockOneGrid{min-width:980px;grid-template-columns:minmax(450px,1fr) 36px minmax(450px,1fr);gap:10px}
+  #rondas .koBlockTwoGrid{min-width:860px;grid-template-columns:minmax(390px,1fr) 42px minmax(390px,1fr);gap:10px}
+  #rondas .koPathPair{grid-template-columns:minmax(0,1.35fr) 42px minmax(0,1fr);gap:8px}
+  #rondas .koPathPair.rtl{grid-template-columns:minmax(0,1fr) 42px minmax(0,1.35fr)}
+  #rondas .koFinalBlockGrid{min-width:850px;grid-template-columns:150px 1fr 1fr 150px;gap:12px}
+  #rondas .koPathConnector em{display:none}
+  #rondas .koTag{font-size:8.5px!important;padding:4px 6px!important}
+}
+
 </style>
 </head>
 <body>
@@ -4363,14 +4685,22 @@ function koCompactDate(txt){return String(txt||'Fecha').replace(/^\S+\s+/,'').re
 function koSplitTags(no,m){
   var sch=koSchedule(no)||{};
   var st=koAutoStatus(m,no);
-  return '<div class="koSplitHead"><span class="koTag date">📅 '+esc(koCompactDate(sch.date||'Fecha'))+'</span><span class="koTag pe">🕒 '+esc(sch.timePe||'Hora Perú')+'</span><span class="koTag et">'+esc(sch.timeEt||'ET')+'</span><span class="koTag state '+esc(st.className||'')+'">'+esc(st.label)+'</span></div>';
+  return '<div class="koSplitHead"><span class="koTag matchNo">🏟️ '+esc(no||'Partido')+'</span><span class="koTag date">📅 '+esc(koCompactDate(sch.date||'Fecha'))+'</span><span class="koTag pe">🕒 '+esc(sch.timePe||'Hora Perú')+'</span><span class="koTag et">'+esc(sch.timeEt||'ET')+'</span><span class="koTag state '+esc(st.className||'')+'">'+esc(st.label)+'</span></div>';
 }
 function koSplitMatchCardHTML(roundKey,m,idx,side,extraClass){
   m=m||{};
   var no=m.matchNo||('P'+(idx+1));
   var w=winnerFromKo(m);
+  var routeHint='';
+  if(m.srcHome||m.srcAway){
+    var connectorLabel=(m.srcMode==='loser'?'Perdedores ':'Ganadores ')+[m.srcHome,m.srcAway].filter(Boolean).join(' + ');
+    routeHint='<div class="koSplitRouteHint">🔗 '+esc(connectorLabel)+' → '+esc(no)+'</div>';
+  }else if(m.homeSeed||m.awaySeed){
+    routeHint='<div class="koSplitRouteHint">🔗 '+esc((m.homeSeed||'')+' vs '+(m.awaySeed||''))+(m.thirdGroups?' · 3.º posibles: '+esc(m.thirdGroups):'')+'</div>';
+  }
   var html='<div class="koSplitCard '+esc(side||'')+' '+esc(extraClass||'')+'" data-match="'+esc(no)+'">';
   html+=koSplitTags(no,m);
+  html+=routeHint;
   html+='<div class="koSplitLines">';
   html+='<div class="koSplitLine">'+koMiniTeamControl(roundKey,idx,'h',m.home,m.homeSeed||'Equipo 1')+koMiniScoreControl(roundKey,idx,'hg',m.hg)+koMiniScoreControl(roundKey,idx,'ph',m.ph)+'</div>';
   html+='<div class="koSplitLine">'+koMiniTeamControl(roundKey,idx,'a',m.away,m.awaySeed||'Equipo 2')+koMiniScoreControl(roundKey,idx,'ag',m.ag)+koMiniScoreControl(roundKey,idx,'pa',m.pa)+'</div>';
@@ -4388,6 +4718,67 @@ function koSplitColumnHTML(label,roundKey,indexes,side,klass){
   html+='</div>';
   return html;
 }
+
+
+function koPathConnectorHTML(label,side){
+  return '<div class="koPathConnector '+esc(side||'')+'"><span></span><i></i><span></span><em>'+esc(label||'Avanza')+'</em></div>';
+}
+function koPathSourcesHTML(roundKey,indexes,side){
+  ensureKnockoutRounds();
+  var arr=knockoutRounds[roundKey]||[];
+  var html='<div class="koPathSources">';
+  (indexes||[]).forEach(function(i){html+=koSplitMatchCardHTML(roundKey,arr[i]||blankKoMatch(roundKey,i),i,side||'source','koSourceCard')});
+  html+='</div>';
+  return html;
+}
+function koPathPairHTML(prevRoundKey,prevIndexes,nextRoundKey,nextIdx,direction,label){
+  ensureKnockoutRounds();
+  var nextArr=knockoutRounds[nextRoundKey]||[];
+  var nextCard=koSplitMatchCardHTML(nextRoundKey,nextArr[nextIdx]||blankKoMatch(nextRoundKey,nextIdx),nextIdx,(direction==='rtl'?'left':'right'),'koNextCard');
+  var sources=koPathSourcesHTML(prevRoundKey,prevIndexes,(direction==='rtl'?'right':'left'));
+  var html='<div class="koPathPair '+esc(direction||'ltr')+'">';
+  if(direction==='rtl'){
+    html+='<div class="koPathNext">'+nextCard+'</div>'+koPathConnectorHTML(label,'toLeft')+sources;
+  }else{
+    html+=sources+koPathConnectorHTML(label,'toRight')+'<div class="koPathNext">'+nextCard+'</div>';
+  }
+  html+='</div>';
+  return html;
+}
+function koBlockHTML(title,sub,klass,inner){
+  return '<section class="koThreeBlock '+esc(klass||'')+'"><div class="koBlockLabel"><b>'+esc(title||'')+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</div>'+inner+'</section>';
+}
+function koR16BlockHTML(){
+  var left=[{n:0,s:[1,4],l:'M74 + M77 → M89'},{n:1,s:[0,2],l:'M73 + M75 → M90'},{n:2,s:[3,5],l:'M76 + M78 → M91'},{n:3,s:[6,7],l:'M79 + M80 → M92'}];
+  var right=[{n:4,s:[10,11],l:'M83 + M84 → M93'},{n:5,s:[8,9],l:'M81 + M82 → M94'},{n:6,s:[13,15],l:'M86 + M88 → M95'},{n:7,s:[12,14],l:'M85 + M87 → M96'}];
+  var html='<div class="koBlockOneGrid"><div class="koPathLane laneLeft"><div class="koLaneHeader"><span>16vos</span><b>8vos</b></div>';
+  left.forEach(function(x){html+=koPathPairHTML('r32',x.s,'r16',x.n,'ltr',x.l)});
+  html+='</div><div class="koCenterMark">⚽</div><div class="koPathLane laneRight"><div class="koLaneHeader"><b>8vos</b><span>16vos</span></div>';
+  right.forEach(function(x){html+=koPathPairHTML('r32',x.s,'r16',x.n,'rtl',x.l)});
+  html+='</div></div>';
+  return koBlockHTML('16vos + 8vos','extremos hacia octavos', 'blockR16', html);
+}
+function koQuarterSemiBlockHTML(){
+  var left=[{n:0,s:[0,1],l:'M97 + M98 → M101'}];
+  var right=[{n:1,s:[2,3],l:'M99 + M100 → M102'}];
+  var html='<div class="koBlockTwoGrid"><div class="koPathLane laneLeft"><div class="koLaneHeader"><span>4tos</span><b>Semifinal</b></div>';
+  left.forEach(function(x){html+=koPathPairHTML('r8',x.s,'r4',x.n,'ltr',x.l)});
+  html+='</div><div class="koCenterMark">🏟️</div><div class="koPathLane laneRight"><div class="koLaneHeader"><b>Semifinal</b><span>4tos</span></div>';
+  right.forEach(function(x){html+=koPathPairHTML('r8',x.s,'r4',x.n,'rtl',x.l)});
+  html+='</div></div>';
+  return koBlockHTML('4tos + Semifinales','llaves hacia finalistas', 'blockSemi', html);
+}
+function koFinalBlockHTML(){
+  ensureKnockoutRounds();
+  var finalMatch=(knockoutRounds.r2||[])[0]||blankKoMatch('r2',0);
+  var thirdMatch=(knockoutRounds.r3||[])[0]||blankKoMatch('r3',0);
+  var html='<div class="koFinalBlockGrid"><div class="koFinalSourcePills"><span>Ganador M101</span><span>Ganador M102</span><i>→</i><b>M104</b></div>';
+  html+='<div class="koFinalLane"><div class="koFinalCup">🏆</div>'+koSplitMatchCardHTML('r2',finalMatch,0,'center','koFinalCard')+'</div>';
+  html+='<div class="koFinalLane koThirdLane"><div class="koFinalCup bronze">🥉</div>'+koSplitMatchCardHTML('r3',thirdMatch,0,'center','koThirdCard')+'</div>';
+  html+='<div class="koFinalSourcePills losers"><span>Perdedor M101</span><span>Perdedor M102</span><i>→</i><b>M103</b></div></div>';
+  return koBlockHTML('Final + 3er puesto','campeón, subcampeón y podio', 'blockFinal', html);
+}
+
 function renderRondas(){
   ensureKnockoutRounds();
   var champ=finalWinner();
@@ -4396,22 +4787,10 @@ function renderRondas(){
   var route=safeCurrentThirdRoute();
   var html='';
   if(canEdit())html+='<div class="koActions adminOnly"><button class="btn" '+lockedAttr()+' onclick="window.loadQualifiedToR32()">Cargar cruces FIFA</button><button class="btn gold" '+lockedAttr()+' onclick="window.refreshRoundGroupResults()">Actualizar grupos</button><button class="btn red" '+lockedAttr()+' onclick="window.clearAllKnockout()">Reiniciar</button></div>';
-  html+='<div class="koBracketScroller"><div class="koSplitShell">';
-  html+='<div class="koSplitPart koPartOne">';
-  html+='<div class="koPartOneGrid">';
-  html+=koSplitColumnHTML('16vos','r32',[0,1,2,3,4,5,6,7],'left','outer');
-  html+=koSplitColumnHTML('8vos','r16',[0,1,2,3],'left','middle');
-  html+=koSplitColumnHTML('4tos','r8',[0,1,2,3],'center','center');
-  html+=koSplitColumnHTML('8vos','r16',[4,5,6,7],'right','middle');
-  html+=koSplitColumnHTML('16vos','r32',[8,9,10,11,12,13,14,15],'right','outer');
-  html+='</div></div>';
-  html+='<div class="koSplitPart koPartTwo">';
-  html+='<div class="koPartTwoGrid">';
-  html+=koSplitColumnHTML('Semifinales','r4',[0],'left','semiLeft');
-  html+='<div class="koFinalLane"><div class="koFinalCup">🏆</div><div class="koRoundLabel">Final</div>'+koSplitMatchCardHTML('r2',(knockoutRounds.r2||[])[0]||blankKoMatch('r2',0),0,'center','koFinalCard')+'<div class="koRoundLabel">3er puesto</div>'+koSplitMatchCardHTML('r3',(knockoutRounds.r3||[])[0]||blankKoMatch('r3',0),0,'center','koThirdCard')+'</div>';
-  html+=koSplitColumnHTML('Semifinales','r4',[1],'right','semiRight');
-  html+='</div></div>';
-  html+='<div class="koInfoStrip"><div class="koInfoItem"><span class="koInfoIcon">👥</span><div><b>16vos en extremos</b>Las llaves nacen a izquierda y derecha.</div></div><div class="koInfoItem"><span class="koInfoIcon">➡️</span><div><b>Avanza el ganador</b>Cada ganador se conecta hacia el centro.</div></div><div class="koInfoItem"><span class="koInfoIcon">🏆</span><div><b>Camino a la copa</b>Semifinales, final y campeón.</div></div><div class="koInfoItem"><span class="koInfoIcon">🥉</span><div><b>3er puesto</b>Los perdedores de semis juegan M103.</div></div></div>';
+  html+='<div class="koBracketScroller"><div class="koSplitShell koThreeBlockShell">';
+  html+=koR16BlockHTML();
+  html+=koQuarterSemiBlockHTML();
+  html+=koFinalBlockHTML();
   html+='</div></div>';
   if(canEdit()){html+='<div class="koActions adminOnly" style="margin-top:10px"><button class="btn gold" '+lockedAttr()+' onclick="window.advanceRound(\'r32\')">Pasar ganadores 16vos</button><button class="btn gold" '+lockedAttr()+' onclick="window.advanceRound(\'r16\')">Pasar ganadores 8vos</button><button class="btn gold" '+lockedAttr()+' onclick="window.advanceRound(\'r8\')">Pasar ganadores 4tos</button><button class="btn gold" '+lockedAttr()+' onclick="window.advanceRound(\'r4\')">Pasar finalistas y 3er puesto</button></div>'}
   html+=renderFinalPodium();
