@@ -108,7 +108,7 @@ FALLBACK_RANKING = {
     "CAN": {"rank": 28, "points": 1550.00}, "QAT": {"rank": 30, "points": 1536.00},
     "EGY": {"rank": 31, "points": 1530.00}, "NOR": {"rank": 32, "points": 1525.00},
     "SCO": {"rank": 33, "points": 1518.00}, "PAR": {"rank": 35, "points": 1509.00},
-    "RSA": {"rank": 38, "points": 1491.00}, "CIV": {"rank": 40, "points": 1480.00},
+    "RSA": {"rank": 38, "points": 1491.00}, "SWE": {"rank": 38, "points": 1491.00}, "CIV": {"rank": 40, "points": 1480.00},
     "TUN": {"rank": 42, "points": 1472.00}, "ALG": {"rank": 43, "points": 1469.00},
     "CZE": {"rank": 44, "points": 1464.00}, "BIH": {"rank": 52, "points": 1420.00},
     "KSA": {"rank": 54, "points": 1410.00}, "NZL": {"rank": 57, "points": 1395.00},
@@ -372,12 +372,9 @@ class QuietHandler(http.server.SimpleHTTPRequestHandler):
 
     def _serve_app_html(self) -> None:
         html = HTML_FILE.read_text(encoding="utf-8")
+        # v139: evitar inyectar el estado completo en el HTML.
+        # El frontend lo cargará mediante /api/load para reducir memoria inicial.
         state = None
-        try:
-            if self.api:
-                state = self.api.load_results().get("data")
-        except Exception:
-            state = None
         boot = "<script>window.__INITIAL_STATE__ = " + json.dumps(state, ensure_ascii=False) + ";</script>"
         if "</head>" in html:
             html = html.replace("</head>", boot + "\n</head>", 1)
@@ -1913,11 +1910,12 @@ class AppApi:
             for item in contenders:
                 item["injury_news_risk"] = 0
                 item["injury_headlines"] = []
-                # Ajuste final: rendimiento 65%, ranking 25%, disciplina/FIFA 10%.
+                # Ajuste final v123: rendimiento 50%, Ranking FIFA 38%, disciplina 12%.
+                # Evita que una goleada temprana sobrepese demasiado al ranking FIFA real.
                 item["mixed_score"] = round(
-                    item["result_score"] * 0.65
-                    + item["ranking_score"] * 0.25
-                    + item["discipline_score"] * 0.10,
+                    item["result_score"] * 0.50
+                    + item["ranking_score"] * 0.38
+                    + item["discipline_score"] * 0.12,
                     2,
                 )
             contenders.sort(key=lambda x: x["mixed_score"], reverse=True)
@@ -4279,7 +4277,7 @@ class AppApi:
             code = s["code"]
             rank_info = ranking.get(code, {"rank": 120, "points": 1200})
             rank = int(rank_info.get("rank", 120))
-            rank_score = max(10, 100 - min(rank, 120) * 0.75)
+            rank_score = max(10, min(100, 100 - (math.log(max(rank, 1)) / math.log(120)) * 70))
             pj = max(1, int(s["pj"]))
             ppg = s["pts"] / pj
             gfpg = s["gf"] / pj

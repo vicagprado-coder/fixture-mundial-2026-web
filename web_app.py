@@ -186,10 +186,11 @@ def add_common_headers(response: Response) -> Response:
 
 def _serve_html() -> Response:
     html = HTML_FILE.read_text(encoding="utf-8")
-    try:
-        state = _persistent_load().get("data")
-    except Exception:
-        state = None
+    # v139: no inyectar el estado completo en el HTML.
+    # El estado puede incluir planteles/jugadores y crecer varios MB; cargarlo en el HTML
+    # duplica memoria en Chrome y puede provocar Out of Memory al abrir Análisis.
+    # La app lo solicita después por /api/load.
+    state = None
     boot = (
         "<script>"
         "window.__APP_MODE__='web';"
