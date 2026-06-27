@@ -3167,6 +3167,324 @@ input:disabled:not(.score):not(.koScore):not(.koTeamInput){opacity:.72!important
   }
 }
 
+
+
+/* ===== v154 Rondas móvil: final/3er iguales y layout responsive ===== */
+#rondas .koSemiCenter .koFinalCard,
+#rondas .koSemiCenter .koThirdCard{
+  width:100%!important;
+  max-width:none!important;
+  min-height:132px!important;
+}
+#rondas .koSemiCenter .koThirdCard{
+  border-color:rgba(255,205,74,.62)!important;
+}
+@media(max-width:900px){
+  #rondas .koBracketScroller{
+    overflow:visible!important;
+    width:100%!important;
+  }
+  #rondas .koSplitShell.koThreeBlockShell{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:12px!important;
+    min-width:0!important;
+    width:100%!important;
+    overflow:visible!important;
+    padding:8px!important;
+  }
+  #rondas .koThreeBlock{
+    width:100%!important;
+    min-width:0!important;
+    overflow:visible!important;
+    padding:10px!important;
+    border-radius:18px!important;
+  }
+  #rondas .koBlockLabel{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:5px!important;
+    margin-bottom:10px!important;
+  }
+  #rondas .koBlockLabel b{
+    width:100%!important;
+    justify-content:center!important;
+    text-align:center!important;
+    font-size:12px!important;
+    padding:8px 10px!important;
+  }
+  #rondas .koBlockLabel span{
+    text-align:center!important;
+    font-size:9px!important;
+  }
+  #rondas .koBlockOneGrid,
+  #rondas .koBlockTwoGrid,
+  #rondas .koSemiFinalGrid,
+  #rondas .koFinalBlockGrid{
+    display:block!important;
+    min-width:0!important;
+    width:100%!important;
+  }
+  #rondas .koCenterMark{
+    display:none!important;
+  }
+  #rondas .koPathLane,
+  #rondas .koSemiSide,
+  #rondas .koSemiCenter{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:8px!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0 0 12px!important;
+  }
+  #rondas .koLaneHeader,
+  #rondas .laneRight .koLaneHeader{
+    grid-template-columns:1fr 1fr!important;
+    gap:6px!important;
+    padding:0!important;
+  }
+  #rondas .koLaneHeader span,
+  #rondas .koLaneHeader b{
+    min-height:28px!important;
+    font-size:10px!important;
+  }
+  #rondas .koPathPair,
+  #rondas .koPathPair.rtl{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    gap:7px!important;
+    width:100%!important;
+    min-width:0!important;
+    margin-bottom:12px!important;
+  }
+  #rondas .koPathPair.rtl .koPathSources{order:1!important}
+  #rondas .koPathPair.rtl .koPathConnector{order:2!important}
+  #rondas .koPathPair.rtl .koPathNext{order:3!important}
+  #rondas .koPathSources,
+  #rondas .koPathNext{
+    width:100%!important;
+    min-width:0!important;
+  }
+  #rondas .koSplitCard,
+  #rondas .koPathSources .koSplitCard,
+  #rondas .koPathNext .koSplitCard,
+  #rondas .koSemiSide .koSplitCard,
+  #rondas .koSemiCenter .koSplitCard{
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+  #rondas .koPathConnector,
+  #rondas .koMiniConnector{
+    min-height:32px!important;
+    height:32px!important;
+    align-self:center!important;
+    width:100%!important;
+  }
+  #rondas .koPathConnector span,
+  #rondas .koPathConnector i,
+  #rondas .koMiniConnector span{
+    display:none!important;
+  }
+  #rondas .koPathConnector:after,
+  #rondas .koMiniConnector.toFinalLeft:after,
+  #rondas .koMiniConnector.toFinalRight:after{
+    content:"↓"!important;
+    left:50%!important;
+    right:auto!important;
+    top:50%!important;
+    transform:translate(-50%,-50%)!important;
+    font-size:24px!important;
+  }
+  #rondas .koMiniConnector em,
+  #rondas .koPathConnector em{
+    display:none!important;
+  }
+  #rondas .koSemiCenter .koFinalCup{
+    width:54px!important;
+    height:54px!important;
+    font-size:26px!important;
+    margin:2px auto!important;
+  }
+  #rondas .koSemiCenter .koFinalCard,
+  #rondas .koSemiCenter .koThirdCard{
+    min-height:124px!important;
+    width:100%!important;
+  }
+  #rondas .koSplitHead{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:4px!important;
+  }
+  #rondas .koTag{
+    font-size:8.5px!important;
+    padding:4px 6px!important;
+  }
+  #rondas .koSplitLine{
+    grid-template-columns:minmax(0,1fr) 34px 34px!important;
+    gap:5px!important;
+  }
+  #rondas .koSplitCard .koMiniScore,
+  #rondas .koSplitCard .koMiniScoreView{
+    width:34px!important;
+    min-width:34px!important;
+    height:28px!important;
+    font-size:11px!important;
+  }
+  #rondas .koSplitCard .koMiniTeamDisplay,
+  #rondas .koSplitCard .koMiniTeamInput{
+    min-height:30px!important;
+    font-size:10px!important;
+    padding:6px 7px!important;
+  }
+}
+
+
+
+/* ===== v156 MOBILE GLOBAL FIX - toda la web =====
+   Ajuste responsive general para celular: encabezado, KPIs, toolbar,
+   secciones, tablas, cards, análisis, jugadores, clasificados y rondas. */
+@media(max-width:900px){
+  html,body{
+    width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    min-height:100dvh!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    touch-action:pan-y!important;
+  }
+  body:before{background-attachment:scroll!important;background-position:center top!important}
+  .app{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    height:auto!important;
+    min-height:100dvh!important;
+    overflow:visible!important;
+    padding:8px 8px calc(76px + env(safe-area-inset-bottom,0px))!important;
+    margin:0!important;
+    display:block!important;
+  }
+  .hero{
+    width:100%!important;
+    min-height:112px!important;
+    height:auto!important;
+    max-height:none!important;
+    display:grid!important;
+    grid-template-columns:1fr auto!important;
+    grid-template-areas:"brand visuals" "hosts hosts"!important;
+    gap:7px!important;
+    padding:10px!important;
+    border-radius:18px!important;
+    overflow:hidden!important;
+  }
+  .hero .brand{grid-area:brand!important;max-width:none!important;width:100%!important;gap:8px!important;align-items:center!important;min-width:0!important;z-index:2!important}
+  .hero .brand>div{min-width:0!important}
+  .hero .logoCup{width:44px!important;height:44px!important;min-width:44px!important;border-radius:13px!important;border-width:2px!important}
+  .hero .brand h1{font-size:16px!important;line-height:1.05!important;letter-spacing:-.3px!important;white-space:normal!important;margin:0!important}
+  .hero .brand p,.hero .quickHint,.themeStrip,.worldWatermark{display:none!important}
+  .hero .heroVisuals{
+    grid-area:visuals!important;
+    position:relative!important;
+    right:auto!important;top:auto!important;bottom:auto!important;
+    width:128px!important;height:48px!important;
+    transform:none!important;opacity:1!important;margin:0!important;
+    display:flex!important;justify-content:flex-end!important;align-items:center!important;gap:6px!important;z-index:2!important;
+  }
+  .hero .mascotVisual{max-width:78px!important;max-height:48px!important;width:auto!important;height:auto!important;object-fit:contain!important}
+  .hero .ballVisual{width:42px!important;height:42px!important;border-radius:14px!important;object-fit:contain!important;padding:2px!important}
+  .hero .hosts{
+    grid-area:hosts!important;
+    position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+    max-width:100%!important;width:100%!important;margin:0!important;
+    display:flex!important;gap:5px!important;flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;
+    padding-bottom:1px!important;scrollbar-width:none!important;z-index:2!important;
+  }
+  .hero .hosts::-webkit-scrollbar{display:none!important}
+  .hero .host{flex:0 0 auto!important;padding:5px 7px!important;font-size:8.5px!important;line-height:1!important;border-bottom-width:2px!important;white-space:nowrap!important}
+
+  .kpis{width:100%!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;margin:7px 0!important;height:auto!important;min-height:0!important}
+  .kpi{height:auto!important;min-height:42px!important;border-radius:13px!important;padding:7px 8px!important;overflow:hidden!important}
+  .kpi b{font-size:16px!important;line-height:1!important}.kpi span{font-size:8px!important;line-height:1.05!important;margin-top:3px!important}
+
+  .toolbar{width:100%!important;height:auto!important;min-height:0!important;display:flex!important;flex-wrap:wrap!important;gap:6px!important;margin:7px 0!important;padding:0!important;overflow:visible!important;background:transparent!important}
+  .toolbar .search{flex:1 1 100%!important;min-width:0!important;height:38px!important;border-radius:14px!important}
+  .toolbar .search input{font-size:11.5px!important;padding:9px 8px!important;min-width:0!important}
+  .miniBtn,.authBtn,.authStatus,.btn{min-height:34px!important;height:auto!important;border-radius:12px!important;padding:8px 9px!important;font-size:9.5px!important;line-height:1.05!important;white-space:nowrap!important}
+  .toolbar .miniBtn,.toolbar .authBtn,.toolbar .authStatus{flex:1 1 calc(33.333% - 6px)!important;min-width:88px!important;text-align:center!important;justify-content:center!important}
+
+  .workspace,.workspace.group-side,.workspace.selection-side,.workspace.no-side{display:block!important;width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important;margin:0!important}
+  .side{position:relative!important;top:auto!important;width:100%!important;max-width:100%!important;max-height:128px!important;height:auto!important;overflow:auto!important;margin:0 0 8px!important;border-radius:16px!important;padding:8px!important}
+  .sideTitle{font-size:8.5px!important;margin:0 0 5px!important;text-align:left!important}
+  .groupRail{display:flex!important;grid-template-columns:none!important;gap:6px!important;overflow-x:auto!important;overflow-y:hidden!important;padding-bottom:2px!important;scrollbar-width:thin!important}
+  .gbtn{flex:0 0 58px!important;min-width:58px!important;min-height:42px!important;border-radius:13px!important;font-size:12px!important;padding:6px 4px!important}
+  .content{width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important;padding:0!important}
+  .section.active{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important;padding:0!important}
+  .sectionHead,.compactTitle{display:block!important;margin:8px 0!important;padding:0 2px!important;color:#fff!important}
+  .sectionHead h2,.compactTitle h2{font-size:17px!important;line-height:1.12!important;color:#fff!important;text-shadow:0 1px 2px rgba(0,0,0,.28)!important;margin:0!important}
+  .sectionHead p,.compactTitle p{font-size:10.5px!important;line-height:1.3!important;color:rgba(255,255,255,.86)!important;margin:4px 0 0!important}
+  .tag{font-size:9px!important;padding:5px 7px!important}
+
+  .card,.fieldPanel,.match,.teamTile,.roster,.mathColumn,.analysisHeroCard,.analysisHighlightsCard,.analysisMetricCard,.fairPlayMetricCard,.sideInsight,.fixtureSection,.fifaDetailCard,.playerRosterCard,.playerDetailCard,.playerHubCard,.playerSummaryCard,.roundCol,.scenario,.statCard,.barItem,.readOnlyNotice,.viewContext,.bottomPersistBar{
+    width:100%!important;max-width:100%!important;border-radius:16px!important;padding:10px!important;margin:7px 0!important;overflow:hidden!important;
+  }
+  .split,.analysisGrid,.analysisTopGrid,.analysisMetricGrid,.analysisTeamsPair,.fairplayV133,.playerOverview,.playerSummaryGrid,.playerHubGrid,.playerCategoryGrid,.unifiedPanel,.metricList,.scenarioGrid,.mathColumns,.fixtureMatchGrid,.gridTeams,.playerGrid,.playerPhotoGrid,.fifaTeamGrid,.fifaDetailGrid,.groupResume{
+    display:grid!important;grid-template-columns:1fr!important;gap:8px!important;min-width:0!important;
+  }
+  .groupResume{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .teamTile{min-height:74px!important}.teamTile .flagImg{width:42px!important;height:28px!important}.teamTile b{font-size:11.5px!important}.teamTile small{font-size:8.5px!important}
+
+  .fieldPanel{padding:10px!important}.fieldPanel:before,.fieldPanel:after{display:none!important}.fieldInner{min-width:0!important}
+  .fixtureSections{display:grid!important;gap:9px!important;min-width:0!important}.fixtureSection{padding:10px!important;overflow:visible!important}.fixtureSectionHead{display:block!important;padding:8px!important;border-radius:14px!important}.fixtureSectionHead h3{font-size:14px!important}.fixtureSectionHead p{font-size:10px!important}
+  .match.fixtureCard,.match{min-height:0!important;padding:10px!important;border-radius:16px!important;overflow:hidden!important}
+  .matchTop{gap:5px!important;flex-wrap:wrap!important;margin-bottom:8px!important}.date,.state{font-size:8.5px!important;padding:5px 6px!important}
+  .teams{grid-template-columns:minmax(0,1fr) 42px 14px 42px minmax(0,1fr)!important;gap:4px!important;align-items:center!important}
+  .team{font-size:10px!important;min-width:0!important;overflow:hidden!important}.team .flagImg{width:38px!important;height:26px!important}.team .code{font-size:8px!important}
+  .score{width:42px!important;min-width:42px!important;font-size:15px!important;border-radius:11px!important;padding:7px 1px!important}.vs{font-size:10px!important}
+  .actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;margin-top:8px!important}
+
+  .tableWrap{width:100%!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;border-radius:15px!important;-webkit-overflow-scrolling:touch!important}
+  table{min-width:760px!important;width:max-content!important}th{font-size:8px!important;padding:7px 5px!important;white-space:nowrap!important}td{font-size:9.5px!important;padding:7px 5px!important;white-space:nowrap!important}.pos{width:22px!important;height:22px!important;font-size:9px!important;border-radius:8px!important}.teamName{gap:5px!important}.flagMini .flagImg{width:27px!important;height:18px!important}
+  .legendRow{gap:5px!important}.legend{font-size:8.5px!important;padding:5px 7px!important}
+
+  .mathStatusStats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}.mathMini{min-height:44px!important;padding:8px!important;border-radius:14px!important}.mathMini b{font-size:16px!important}.mathMini span{font-size:8px!important}
+  .mathTeamCard{display:grid!important;grid-template-columns:1fr!important;gap:7px!important;padding:9px 4px!important;overflow:visible!important}.mathTeamTop{display:flex!important;align-items:flex-start!important;gap:7px!important}.mathTeamName{font-size:12px!important;min-width:0!important}.mathTeamName .flagImg{width:34px!important;height:23px!important}.mathTeamName small{font-size:8.5px!important;line-height:1.2!important}.mathRoute{justify-self:start!important;white-space:normal!important;font-size:9px!important;padding:6px 8px!important}.mathReason{font-size:10px!important;line-height:1.32!important;white-space:normal!important;overflow:visible!important}
+  .analysisScrollColumn{min-height:0!important;max-height:none!important;height:auto!important;overflow:visible!important}.analysisScrollList{max-height:none!important;overflow:visible!important;padding-right:0!important}
+  .analysisHeroCard{display:block!important}.analysisChampionV133,.championMain{display:flex!important;gap:10px!important;align-items:center!important}.analysisChampionName,.championTitle{font-size:20px!important}.analysisHeroChips{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}.analysisMetricCard{min-height:82px!important;padding:10px!important}.metricIcon{width:34px!important;height:34px!important;font-size:18px!important}.metricText h3{font-size:13px!important}.metricText p{font-size:10px!important}
+  .barTop{font-size:11px!important}.barName{min-width:0!important}.barList{gap:7px!important}.barItem{padding:10px!important}
+
+  .playerHeroTop,.playerSourceHeader,.playerSummaryTop,.playerDetailHeader,.playerDetailLead{display:block!important}.playerKpiRow,.playerSourceStats,.eventStats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}.playerHeroTitle h3{font-size:18px!important}.playerHeroTitle p{font-size:10.5px!important}.playerHeroBadge{display:inline-block!important;margin-top:8px!important}.playerTinyKpi{padding:9px!important;border-radius:14px!important}.playerTinyKpi b{font-size:18px!important}.playerTinyKpi span{font-size:8px!important}.playerMiniItem,.playerEventCard,.eventRow{gap:7px!important;padding:8px!important;border-radius:13px!important;font-size:10px!important}
+  .fifaTeamCard,.playerTile{min-width:0!important}.fifaDetailCard h3,.playerCard h3{font-size:14px!important}.playerCard .count{font-size:24px!important}
+
+  #rondas .koBracketScroller{width:100%!important;max-width:100%!important;overflow-x:hidden!important;overflow-y:visible!important;padding:0!important}
+  #rondas .koSplitShell,#rondas .koThreeBlockShell{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;width:100%!important;min-width:0!important;max-width:100%!important;overflow:visible!important;padding:8px!important;border-radius:16px!important}
+  #rondas .koThreeBlock{width:100%!important;min-width:0!important;max-width:100%!important;overflow:hidden!important;padding:9px!important;border-radius:15px!important}
+  #rondas .koBlockLabel{display:block!important;margin-bottom:8px!important}#rondas .koBlockLabel b{font-size:10.5px!important;padding:7px 8px!important;border-radius:10px!important}#rondas .koBlockLabel span{display:block!important;margin-top:4px!important;font-size:8px!important}
+  #rondas .koBlockOneGrid,#rondas .koBlockTwoGrid,#rondas .koSemiFinalGrid,#rondas .koFinalBlockGrid{display:grid!important;grid-template-columns:1fr!important;gap:8px!important;width:100%!important;min-width:0!important;max-width:100%!important;overflow:visible!important}
+  #rondas .koCenterMark,#rondas .koPathConnector,#rondas .koMiniConnector{display:none!important}
+  #rondas .koLaneHeader{grid-template-columns:1fr 1fr!important;gap:6px!important;font-size:9px!important;padding:0!important}#rondas .laneRight .koLaneHeader{grid-template-columns:1fr 1fr!important}
+  #rondas .koPathLane,#rondas .koPathSources,#rondas .koSemiSide,#rondas .koSemiCenter{display:grid!important;gap:7px!important;width:100%!important;min-width:0!important}
+  #rondas .koPathPair,#rondas .koPathPair.rtl{display:grid!important;grid-template-columns:1fr!important;gap:7px!important;width:100%!important;min-width:0!important;max-width:100%!important}
+  #rondas .koPathNext{display:block!important;width:100%!important;min-width:0!important}
+  #rondas .koSplitCard,#rondas .koPathNext .koSplitCard,#rondas .koFinalLane .koFinalCard,#rondas .koFinalLane .koThirdCard,#rondas .koSemiCenter .koSplitCard{width:100%!important;max-width:100%!important;min-width:0!important;min-height:0!important;border-radius:13px!important;padding:8px!important;overflow:hidden!important}
+  #rondas .koSplitHead{display:flex!important;flex-wrap:wrap!important;gap:4px!important}.koTag,#rondas .koTag{font-size:7.5px!important;padding:4px 5px!important;line-height:1!important}
+  #rondas .koSplitRouteHint{font-size:8px!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;line-height:1.2!important}
+  #rondas .koSplitLine{grid-template-columns:minmax(0,1fr) 32px 32px!important;gap:4px!important}.koMiniTeamDisplay,#rondas .koMiniTeamDisplay,#rondas .koMiniTeamInput{min-height:30px!important;font-size:9px!important;border-radius:9px!important;padding:5px 6px!important}.koMiniScore,#rondas .koMiniScore,#rondas .koMiniScoreView{width:32px!important;height:30px!important;font-size:10px!important;border-radius:9px!important}.koSplitWinner,#rondas .koSplitWinner{font-size:8.5px!important;white-space:normal!important;overflow:visible!important}.koSplitActions,#rondas .koSplitActions{grid-template-columns:1fr 1fr!important;display:grid!important;gap:5px!important}.koFinalCup,#rondas .koFinalCup{width:44px!important;height:44px!important;font-size:22px!important;justify-self:center!important}.koActions{display:grid!important;grid-template-columns:1fr!important;gap:6px!important}
+
+  .finalPodiumWrap{padding:10px!important;border-radius:18px!important;overflow:hidden!important}.finalPodium{grid-template-columns:1fr!important;gap:8px!important}.podiumPlace{min-height:0!important;padding:10px!important;border-radius:16px!important}.podiumPlace h3{font-size:14px!important}.podiumTeamName{font-size:15px!important}
+  .championCard{padding:10px!important;border-radius:16px!important}.championFlag .flagImg{width:54px!important;height:36px!important}.championSub{font-size:10px!important;line-height:1.25!important}
+
+  .viewContext,.bottomPersistBar,.persistBar.bottomPersistBar{position:relative!important;height:auto!important;min-height:24px!important;max-height:none!important;padding:5px 8px!important;font-size:8.5px!important;margin:5px 0!important;overflow:hidden!important}
+  .tabs{position:fixed!important;left:6px!important;right:6px!important;bottom:6px!important;width:auto!important;max-width:none!important;height:54px!important;min-height:54px!important;padding:5px!important;border-radius:17px!important;display:flex!important;gap:5px!important;overflow-x:auto!important;overflow-y:hidden!important;z-index:9999!important;scrollbar-width:none!important;background:rgba(255,255,255,.86)!important;backdrop-filter:blur(12px)!important}
+  .tabs::-webkit-scrollbar{display:none!important}.tabs .tab{flex:0 0 68px!important;min-width:68px!important;height:42px!important;min-height:42px!important;border-radius:13px!important;padding:4px 3px!important;font-size:8px!important;line-height:1!important;color:var(--navy)!important;background:#fff!important}.tabs .tab b{font-size:12px!important;margin-bottom:1px!important}.tabs .tab.active{color:#fff!important;background:linear-gradient(135deg,var(--red),var(--orange),var(--green),var(--blue))!important}.tabClose{color:#fff!important;background:linear-gradient(135deg,var(--red),#ff5b00)!important}
+}
+@media(max-width:380px){
+  .hero .heroVisuals{width:106px!important}.hero .mascotVisual{max-width:64px!important}.hero .ballVisual{width:36px!important;height:36px!important}.hero .brand h1{font-size:14px!important}.toolbar .miniBtn,.toolbar .authBtn,.toolbar .authStatus{flex:1 1 calc(50% - 6px)!important;min-width:0!important}.teams{grid-template-columns:minmax(0,1fr) 36px 12px 36px minmax(0,1fr)!important}.score{width:36px!important;min-width:36px!important;font-size:13px!important}.tabs .tab{flex-basis:62px!important;min-width:62px!important;font-size:7.5px!important}
+}
+
 </style>
 </head>
 <body>
@@ -3861,6 +4179,19 @@ function mathStatusForTeam(team){
   if(groupComplete(g)&&rank<=2){return {status:'qualified',route:'Top 2 Grupo '+g,reason:'Grupo '+g+' completo: terminó '+rank+'.º con '+prof.currentPts+' pts, por eso ya está clasificado directo a ronda de 32.',profile:prof}}
   if(prof.guaranteedTop2ByPoints){return {status:'qualified',route:'Top 2 asegurado',reason:'Asegura clasificación directa por puntos máximos posibles: con '+prof.currentPts+' pts, como máximo un rival del Grupo '+g+' puede alcanzarlo o superarlo. No se simulan marcadores para este caso; solo se valida la clasificación por ventaja matemática de puntos. El orden mostrado mantiene primero victoria olímpica / enfrentamiento directo cuando corresponde y luego DG, GF, conducta y Ranking FIFA.',profile:prof}}
   if(prof.guaranteedBestThirdByPoints&&!allDone){return {status:'qualified',route:'Mejor tercero asegurado',reason:'Asegura clasificación como mejor tercero por puntos: el Grupo '+g+' ya está completo, terminó 3.º con '+prof.currentPts+' pts y, sin simular marcadores pendientes de otros grupos, como máximo '+thirdGroupsThatCanEqualOrPassPtsNoSim(g,prof.currentPts)+' terceros de otros grupos podrían igualarlo o superarlo por puntos. Al no poder caer fuera del Top 8 de terceros, aparece como clasificado.',profile:prof}}
+  if(groupComplete(g)&&rank===3&&!allDone){
+    try{
+      var thirds=allThirds();
+      var idxSafe=thirdRankIndex(team);
+      if(idxSafe>=0&&idxSafe<8){
+        var passers=thirdPossiblePassersBelow(thirds[idxSafe],idxSafe,thirds);
+        var neededToDrop=8-idxSafe;
+        if(passers.count<neededToDrop){
+          return {status:'qualified',route:'Mejor tercero asegurado',reason:'Asegura clasificación como mejor tercero: está '+(idxSafe+1)+'.º en la tabla de terceros y solo '+passers.count+' equipo(s) que están debajo podrían superarlo. Para quedar fuera necesitaría caer al 9.º puesto, es decir, que lo superen '+neededToDrop+'. Como eso ya no es posible, aparece como clasificado.',profile:prof}
+        }
+      }
+    }catch(e){}
+  }
   if(groupComplete(g)&&rank===3&&allDone){var idx=thirdRankIndex(team);if(idx>=0&&idx<8){return {status:'qualified',route:'Mejor tercero',reason:'Todos los grupos están completos y quedó '+(idx+1)+'.º en el ranking de mejores terceros, dentro del Top 8 que avanza.',profile:prof}}}
   if(groupComplete(g)&&rank===4){return {status:'eliminated',route:'Eliminado',reason:'Grupo '+g+' completo: terminó 4.º con '+prof.currentPts+' pts. Solo avanzan 1.º, 2.º y los 8 mejores terceros.',profile:prof}}
   if(groupComplete(g)&&rank===3){var idx2=thirdRankIndex(team);if(idx2>=8){return {status:'eliminated',route:'Descalificado por terceros',reason:'Ya jugó sus 3 partidos, terminó 3.º del Grupo '+g+' y actualmente está '+(idx2+1)+'.º en el ranking de mejores terceros. Al estar fuera del Top 8, no tiene forma de mejorar su posición con más puntos.',profile:prof}}}
