@@ -4171,6 +4171,51 @@ function guaranteedBestThirdByPointsNoSim(team,g,pts,rank){
   if(rank!==3||!groupComplete(g))return false;
   return thirdGroupsThatCanEqualOrPassPtsNoSim(g,pts)<=7;
 }
+function thirdRowCanOutrankTarget(row,target){
+  if(!row||!target)return false;
+  return thirdComparator(row,target)<0;
+}
+function groupCanProduceThirdAboveTarget(g,target){
+  if(!target)return true;
+  if(groupComplete(g)){
+    var r=table(g)[2];
+    return thirdRowCanOutrankTarget(r,target);
+  }
+  var states=simulateGroupStates(g)||[];
+  if(states.limited){
+    var maxPts=estimateThirdMaxPtsNoSim(g),targetPts=Number(target.pts||0);
+    if(maxPts>targetPts)return true;
+    if(maxPts<targetPts)return false;
+    return true;
+  }
+  for(var i=0;i<states.length;i++){
+    var r=(states[i].rows||[])[2];
+    if(thirdRowCanOutrankTarget(r,target))return true;
+  }
+  return false;
+}
+function guaranteedByBestThirdWorstCase(team){
+  var g=groupOfTeam(team),states=simulateGroupStates(g)||[];
+  if(!g||!states.length||states.limited)return null;
+  var checkedThird=0,worstTarget=null,maxCanPass=0,examples=[];
+  for(var i=0;i<states.length;i++){
+    var rows=states[i].rows||[],rank=-1,row=null;
+    for(var j=0;j<rows.length;j++){if(rows[j].team===team){rank=j+1;row=rows[j];break}}
+    if(rank<0||rank>3)return null;
+    if(rank===3){
+      checkedThird++;
+      var canPass=0,names=[];
+      Object.keys(GROUPS).forEach(function(og){
+        if(og===g)return;
+        if(groupCanProduceThirdAboveTarget(og,row)){canPass++;if(names.length<4)names.push('Grupo '+og)}
+      });
+      if(canPass>maxCanPass){maxCanPass=canPass;examples=names;worstTarget=row}
+      if(canPass>=8)return null;
+    }
+  }
+  if(!checkedThird)return null;
+  return {row:worstTarget,canPass:maxCanPass,examples:examples,checked:checkedThird};
+}
 function mathStatusForTeam(team){
   var prof=groupMathProfile(team),row=prof.row,g=prof.g,allDone=allGroupsComplete(),rank=prof.currentRank;
   var thirdRanges={};Object.keys(GROUPS).forEach(function(x){thirdRanges[x]=thirdPointsRangeForGroup(x)});
@@ -4178,6 +4223,8 @@ function mathStatusForTeam(team){
   if(prof.guaranteedTop1){return {status:'qualified',route:'1.º lugar asegurado',reason:'Asegura el 1.º lugar del Grupo '+g+': al evaluar los escenarios pendientes para el primer puesto y aplicar primero victoria olímpica / enfrentamiento directo, no existe escenario donde otro equipo lo supere. Luego se usan DG, GF, conducta y Ranking FIFA. Tiene '+prof.currentPts+' pts y su peor rango posible es 1.º.',profile:prof}}
   if(groupComplete(g)&&rank<=2){return {status:'qualified',route:'Top 2 Grupo '+g,reason:'Grupo '+g+' completo: terminó '+rank+'.º con '+prof.currentPts+' pts, por eso ya está clasificado directo a ronda de 32.',profile:prof}}
   if(prof.guaranteedTop2ByPoints){return {status:'qualified',route:'Top 2 asegurado',reason:'Asegura clasificación directa por puntos máximos posibles: con '+prof.currentPts+' pts, como máximo un rival del Grupo '+g+' puede alcanzarlo o superarlo. No se simulan marcadores para este caso; solo se valida la clasificación por ventaja matemática de puntos. El orden mostrado mantiene primero victoria olímpica / enfrentamiento directo cuando corresponde y luego DG, GF, conducta y Ranking FIFA.',profile:prof}}
+  var worstThirdSafe=guaranteedByBestThirdWorstCase(team);
+  if(worstThirdSafe){return {status:'qualified',route:'Clasificado mínimo por terceros',reason:'Asegura clasificación matemática aunque todavía pueda terminar 3.º del Grupo '+g+'. Se simularon los resultados pendientes del grupo y, en su peor escenario como tercero, como máximo '+worstThirdSafe.canPass+' terceros de otros grupos podrían quedar por encima. Para salir del Top 8 necesitaría que 8 terceros lo superen, por eso ya debe figurar como clasificado.',profile:prof}}
   if(prof.guaranteedBestThirdByPoints&&!allDone){return {status:'qualified',route:'Mejor tercero asegurado',reason:'Asegura clasificación como mejor tercero por puntos: el Grupo '+g+' ya está completo, terminó 3.º con '+prof.currentPts+' pts y, sin simular marcadores pendientes de otros grupos, como máximo '+thirdGroupsThatCanEqualOrPassPtsNoSim(g,prof.currentPts)+' terceros de otros grupos podrían igualarlo o superarlo por puntos. Al no poder caer fuera del Top 8 de terceros, aparece como clasificado.',profile:prof}}
   if(groupComplete(g)&&rank===3&&!allDone){
     try{
@@ -4224,7 +4271,7 @@ function renderClasificados(){
   html+='</div></div>';
   html+='<div class="card mathWatchList"><div class="sectionHead"><div><h2>En disputa</h2><p>Equipos que todavía no están clasificados ni eliminados matemáticamente.</p></div><span class="tag gold">'+alive.length+'</span></div>';
   if(alive.length){html+='<div class="mathWatchGrid">';alive.sort(function(a,b){return (a.profile.g||'').localeCompare(b.profile.g||'')||b.profile.currentPts-a.profile.currentPts||name(a.profile.team).localeCompare(name(b.profile.team))}).slice(0,48).forEach(function(st){var p=st.profile,r=p.row||{};html+='<div class="mathWatchItem"><span class="flagMini">'+flag(p.team)+'</span> '+teamSeedHTML(p.team)+esc(name(p.team))+'<small>Grupo '+esc(p.g)+' · '+(r.pts||0)+' pts · Máx. '+(p.maxPts||0)+' · posible '+(p.bestPossibleRank||'-')+'.º-'+(p.worstPossibleRank||'-')+'.º</small></div>'});html+='</div>'}else{html+='<div class="mathEmpty">No quedan equipos en disputa.</div>'}
-  html+='<div class="mathRulesNote">Base FIFA usada: clasifican 1.º y 2.º de cada grupo y los 8 mejores terceros. Se prioriza primero el desempate directo (victoria olímpica / enfrentamiento directo) dentro de cada grupo; después DG/GF, conducta y Ranking FIFA. En grupos incompletos la simulación solo se usa para confirmar 1.º lugar asegurado y eliminados. Para Top 2 no se simulan marcadores: si por puntos máximos posibles ya aseguró clasificación, aparece como clasificado. Para terceros, solo aparece como clasificado cuando su grupo ya cerró y por puntos ya no puede caer fuera del Top 8 de terceros; si aún puede depender de terceros, queda en disputa.</div></div>';
+  html+='<div class="mathRulesNote">Base FIFA usada: clasifican 1.º y 2.º de cada grupo y los 8 mejores terceros. Se prioriza primero el desempate directo (victoria olímpica / enfrentamiento directo) dentro de cada grupo; después DG/GF, conducta y Ranking FIFA. En grupos incompletos la simulación solo se usa para confirmar 1.º lugar asegurado y eliminados. Para Top 2 no se simulan marcadores: si por puntos máximos posibles ya aseguró clasificación, aparece como clasificado. Para mejores terceros ahora también se valida el peor caso: si un equipo todavía puede caer a 3.º pero, aun en ese escenario, no puede salir del Top 8 de terceros, aparece como clasificado.</div></div>';
   document.getElementById('clasificados').innerHTML=html;
 }
 
