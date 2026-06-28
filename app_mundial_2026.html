@@ -2672,6 +2672,17 @@ input:disabled:not(.score):not(.koScore):not(.koTeamInput){opacity:.72!important
   display:grid;
   gap:12px;
 }
+#rondas .koHalfBracket{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:14px;
+  align-items:start;
+}
+#rondas .koHalfSubLane{
+  display:grid;
+  gap:12px;
+}
+#rondas .koHalfSubLane .koPathPair{margin:0}
 #rondas .koLaneHeader{
   display:grid;
   grid-template-columns:1.45fr 1fr;
@@ -2934,6 +2945,7 @@ input:disabled:not(.score):not(.koScore):not(.koTeamInput){opacity:.72!important
   #rondas .koThreeBlockShell{padding:10px!important;gap:14px!important}
   #rondas .koThreeBlock{padding:10px!important;border-radius:20px!important}
   #rondas .koBlockOneGrid{min-width:980px;grid-template-columns:minmax(450px,1fr) 36px minmax(450px,1fr);gap:10px}
+#rondas .koHalfBracket{gap:10px}
   #rondas .koBlockTwoGrid{min-width:860px;grid-template-columns:minmax(390px,1fr) 42px minmax(390px,1fr);gap:10px}
   #rondas .koPathPair{grid-template-columns:minmax(0,1.35fr) 42px minmax(0,1fr);gap:8px}
   #rondas .koPathPair.rtl{grid-template-columns:minmax(0,1fr) 42px minmax(0,1.35fr)}
@@ -5460,18 +5472,19 @@ function koBlockHTML(title,sub,klass,inner){
   return '<section class="koThreeBlock '+esc(klass||'')+'"><div class="koBlockLabel"><b>'+esc(title||'')+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</div>'+inner+'</section>';
 }
 function koR16BlockHTML(){
-  /* Orden visual corregido para que las llaves sigan la ruta completa del cuadro:
-     - Parte alta hacia M101: M90 encima de M89 en el lado izquierdo, y M93 encima de M94 en el lado derecho.
-     - Parte baja hacia M102: M91 encima de M92 en el lado izquierdo, y M95 encima de M96 en el lado derecho. */
+  /* Orden visual tipo bracket completo:
+     Lado izquierdo del cuadro: M90, M89, M93 y M94.
+     Lado derecho del cuadro: M91, M92, M95 y M96.
+     Así, Brasil/Japón (M76) queda del lado derecho dentro de M91. */
   var left=[
     {n:1,s:[0,2],l:'M73 + M75 → M90'},
     {n:0,s:[1,4],l:'M74 + M77 → M89'},
-    {n:2,s:[3,5],l:'M76 + M78 → M91'},
-    {n:3,s:[6,7],l:'M79 + M80 → M92'}
+    {n:4,s:[10,11],l:'M83 + M84 → M93'},
+    {n:5,s:[8,9],l:'M81 + M82 → M94'}
   ];
   var right=[
-    {n:4,s:[10,11],l:'M83 + M84 → M93'},
-    {n:5,s:[8,9],l:'M81 + M82 → M94'},
+    {n:2,s:[3,5],l:'M76 + M78 → M91'},
+    {n:3,s:[6,7],l:'M79 + M80 → M92'},
     {n:6,s:[13,15],l:'M86 + M88 → M95'},
     {n:7,s:[12,14],l:'M85 + M87 → M96'}
   ];
@@ -5480,21 +5493,19 @@ function koR16BlockHTML(){
   html+='</div><div class="koCenterMark">⚽</div><div class="koPathLane laneRight"><div class="koLaneHeader"><b>8vos</b><span>16vos</span></div>';
   right.forEach(function(x){html+=koPathPairHTML('r32',x.s,'r16',x.n,'rtl',x.l)});
   html+='</div></div>';
-  return koBlockHTML('Bloque 1 · 16vos + 8vos','ordenado por la ruta real del cuadro: arriba va hacia M101 y abajo va hacia M102', 'blockR16', html);
+  return koBlockHTML('Bloque 1 · 16vos + 8vos','distribuido como bracket completo: lado izquierdo y lado derecho sin mezclar', 'blockR16', html);
 }
 function koR16ToQuarterBlockHTML(){
-  /* Se preserva el lado visual de origen:
-     - Lado izquierdo del cuadro: M89, M90, M91 y M92
-     - Lado derecho del cuadro: M93, M94, M95 y M96
-     La mezcla oficial para semifinales recién se refleja en el bloque 3. */
-  var left=[{n:0,s:[0,1],l:'M89 + M90 → M97'},{n:2,s:[2,3],l:'M91 + M92 → M99'}];
-  var right=[{n:1,s:[4,5],l:'M93 + M94 → M98'},{n:3,s:[6,7],l:'M95 + M96 → M100'}];
+  /* Continuidad visual del bracket completo:
+     lado izquierdo = M97 y M98; lado derecho = M99 y M100. */
+  var left=[{n:0,s:[0,1],l:'M89 + M90 → M97'},{n:1,s:[4,5],l:'M93 + M94 → M98'}];
+  var right=[{n:2,s:[2,3],l:'M91 + M92 → M99'},{n:3,s:[6,7],l:'M95 + M96 → M100'}];
   var html='<div class="koBlockTwoGrid"><div class="koPathLane laneLeft"><div class="koLaneHeader"><span>8vos</span><b>4tos</b></div>';
   left.forEach(function(x){html+=koPathPairHTML('r16',x.s,'r8',x.n,'ltr',x.l)});
   html+='</div><div class="koCenterMark">🎯</div><div class="koPathLane laneRight"><div class="koLaneHeader"><b>4tos</b><span>8vos</span></div>';
   right.forEach(function(x){html+=koPathPairHTML('r16',x.s,'r8',x.n,'rtl',x.l)});
   html+='</div></div>';
-  return koBlockHTML('Bloque 2 · 8vos + 4tos','los cruces mantienen su lado visual; la unión oficial para semifinales aparece en el bloque 3', 'blockQF', html);
+  return koBlockHTML('Bloque 2 · 8vos + 4tos','continuidad visual del bracket: M97/M98 a la izquierda y M99/M100 a la derecha', 'blockQF', html);
 }
 function koQuarterSemiBlockHTML(){
   var left=[{n:0,s:[0,1],l:'M97 + M98 → M101'}];
@@ -5530,7 +5541,7 @@ function renderRondas(){
   var route=safeCurrentThirdRoute();
   var html='';
   if(canEdit())html+='<div class="koActions adminOnly"><button class="btn" '+lockedAttr()+' onclick="window.loadQualifiedToR32()">Cargar cruces FIFA</button><button class="btn gold" '+lockedAttr()+' onclick="window.refreshRoundGroupResults()">Actualizar grupos</button><button class="btn red" '+lockedAttr()+' onclick="window.clearAllKnockout()">Reiniciar</button></div>';
-  html+='<div class="koOfficialNote"><b>Distribución oficial FIFA 26:</b> los dieciseisavos se agrupan por ruta de octavos/cuartos, no por orden cronológico. M89 une M74+M77, M90 une M73+M75, M91 une M76+M78, M92 une M79+M80, M93 une M83+M84, M94 une M81+M82, M95 une M86+M88 y M96 une M85+M87. Visualmente, los cruces del lado izquierdo (M90, M89, M91 y M92) se ordenan de arriba hacia abajo según su ruta al cuadro; del lado derecho se ordenan M93, M94, M95 y M96. Así, la parte alta corresponde a la llave que termina en M101 y la parte baja a la llave que termina en M102.</div>';
+  html+='<div class="koOfficialNote"><b>Distribución oficial FIFA 26:</b> el lado izquierdo del cuadro que llega a M101 se arma con M90 y M89 por un lado, y con M93 y M94 por el otro. El lado derecho del cuadro que llega a M102 se arma con M91 y M92 por un lado, y con M95 y M96 por el otro. Así, Canadá queda en el lado izquierdo del camino a la final y Brasil en el lado derecho.</div>';
   html+='<div class="koBracketScroller"><div class="koSplitShell koThreeBlockShell">';
   html+=koR16BlockHTML();
   html+=koR16ToQuarterBlockHTML();
