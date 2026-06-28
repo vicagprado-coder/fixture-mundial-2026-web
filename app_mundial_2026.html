@@ -5470,14 +5470,18 @@ function koR16BlockHTML(){
   return koBlockHTML('Bloque 1 · 16vos + 8vos','cruces iniciales hacia octavos', 'blockR16', html);
 }
 function koR16ToQuarterBlockHTML(){
-  var left=[{n:0,s:[0,1],l:'M89 + M90 → M97'},{n:1,s:[2,3],l:'M91 + M92 → M98'}];
-  var right=[{n:2,s:[4,5],l:'M93 + M94 → M99'},{n:3,s:[6,7],l:'M95 + M96 → M100'}];
+  /* Se preserva el lado visual de origen:
+     - Lado izquierdo del cuadro: M89, M90, M91 y M92
+     - Lado derecho del cuadro: M93, M94, M95 y M96
+     La mezcla oficial para semifinales recién se refleja en el bloque 3. */
+  var left=[{n:0,s:[0,1],l:'M89 + M90 → M97'},{n:2,s:[2,3],l:'M91 + M92 → M99'}];
+  var right=[{n:1,s:[4,5],l:'M93 + M94 → M98'},{n:3,s:[6,7],l:'M95 + M96 → M100'}];
   var html='<div class="koBlockTwoGrid"><div class="koPathLane laneLeft"><div class="koLaneHeader"><span>8vos</span><b>4tos</b></div>';
   left.forEach(function(x){html+=koPathPairHTML('r16',x.s,'r8',x.n,'ltr',x.l)});
   html+='</div><div class="koCenterMark">🎯</div><div class="koPathLane laneRight"><div class="koLaneHeader"><b>4tos</b><span>8vos</span></div>';
   right.forEach(function(x){html+=koPathPairHTML('r16',x.s,'r8',x.n,'rtl',x.l)});
   html+='</div></div>';
-  return koBlockHTML('Bloque 2 · 8vos + 4tos','octavos conectados con cuartos', 'blockQF', html);
+  return koBlockHTML('Bloque 2 · 8vos + 4tos','los cruces mantienen su lado visual; la unión oficial para semifinales aparece en el bloque 3', 'blockQF', html);
 }
 function koQuarterSemiBlockHTML(){
   var left=[{n:0,s:[0,1],l:'M97 + M98 → M101'}];
@@ -5513,6 +5517,7 @@ function renderRondas(){
   var route=safeCurrentThirdRoute();
   var html='';
   if(canEdit())html+='<div class="koActions adminOnly"><button class="btn" '+lockedAttr()+' onclick="window.loadQualifiedToR32()">Cargar cruces FIFA</button><button class="btn gold" '+lockedAttr()+' onclick="window.refreshRoundGroupResults()">Actualizar grupos</button><button class="btn red" '+lockedAttr()+' onclick="window.clearAllKnockout()">Reiniciar</button></div>';
+  html+='<div class="koOfficialNote"><b>Distribución oficial FIFA 26:</b> los dieciseisavos se agrupan por ruta de octavos/cuartos, no por orden cronológico. M89 une M74+M77, M90 une M73+M75, M91 une M76+M78, M92 une M79+M80, M93 une M83+M84, M94 une M81+M82, M95 une M86+M88 y M96 une M85+M87. Visualmente, los cruces del lado izquierdo (M89–M92) se mantienen a la izquierda y los del lado derecho (M93–M96) se mantienen a la derecha; la unión oficial para semifinales se refleja recién en el bloque 3.</div>';
   html+='<div class="koBracketScroller"><div class="koSplitShell koThreeBlockShell">';
   html+=koR16BlockHTML();
   html+=koR16ToQuarterBlockHTML();
