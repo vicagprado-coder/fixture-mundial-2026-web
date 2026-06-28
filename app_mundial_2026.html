@@ -4316,6 +4316,49 @@ function analysisCardTotals(f,pm){
 }
 function passAccuracyFromFifa(f){var p=Number(f.passes||0),ok=Number(f.passesCompleted||0);if(p>0)return (ok/p)*100;return Number(f.passAccuracy||0)||0}
 function mathStatusSafe(team){try{return mathStatusForTeam(team)}catch(e){return {status:'alive',route:'En disputa',reason:'Sin estado matemático calculado'}}}
+
+function knockoutProgressForTeam(team){
+  ensureKnockoutRounds();
+  var key=findTeamKey(team);var out={started:false,alive:false,eliminated:false,champion:false,runnerUp:false,thirdPlace:false,fourthPlace:false,round:'',advancedTo:'',matchNo:'',bonus:0,score:50,text:'Sin ronda eliminatoria registrada'};
+  if(!key)return out;
+  var rounds=[
+    {k:'r32',name:'16vos',next:'8vos',winBonus:8,score:58},
+    {k:'r16',name:'8vos',next:'4tos',winBonus:16,score:68},
+    {k:'r8',name:'4tos',next:'Semis',winBonus:26,score:78},
+    {k:'r4',name:'Semis',next:'Final',winBonus:38,score:88},
+    {k:'r2',name:'Final',next:'Campeón',winBonus:55,score:100},
+    {k:'r3',name:'3er puesto',next:'3er puesto',winBonus:48,score:94}
+  ];
+  rounds.forEach(function(r){
+    (knockoutRounds[r.k]||[]).forEach(function(m){
+      var h=findTeamKey(m.home),a=findTeamKey(m.away);if(h!==key&&a!==key)return;
+      out.started=true;out.alive=true;out.round=r.name;out.matchNo=m.matchNo||out.matchNo;out.score=Math.max(out.score,r.score);out.text='Jugando '+r.name+(m.matchNo?' ('+m.matchNo+')':'');
+      var w=winnerFromKo(m),wk=findTeamKey(w),l=loserFromKo(m),lk=findTeamKey(l);
+      if(wk){
+        if(wk===key){
+          out.eliminated=false;out.alive=true;out.advancedTo=r.next;out.bonus=Math.max(out.bonus,r.winBonus);out.score=Math.max(out.score,r.score+r.winBonus/2);out.text='Avanzó a '+r.next+' desde '+(m.matchNo||r.name);
+          if(r.k==='r2'){out.champion=true;out.alive=false;out.text='Campeón definido en M104';out.score=100;out.bonus=60}
+          if(r.k==='r3'){out.thirdPlace=true;out.alive=false;out.text='Ganó el 3er puesto';out.score=96;out.bonus=50}
+        }else if(lk===key){
+          out.eliminated=true;out.alive=false;out.round=r.name;out.matchNo=m.matchNo||out.matchNo;out.text='Eliminado en '+r.name+(m.matchNo?' ('+m.matchNo+')':'');out.score=Math.min(out.score,22);out.bonus=-35;
+          if(r.k==='r2'){out.runnerUp=true;out.text='Subcampeón del torneo';out.score=92;out.bonus=42}
+          if(r.k==='r3'){out.fourthPlace=true;out.text='Cuarto puesto';out.score=84;out.bonus=25}
+        }
+      }
+    });
+  });
+  return out;
+}
+function knockoutAnalysisText(ko){
+  if(!ko||!ko.started)return 'sin resultados de rondas';
+  if(ko.champion)return 'campeón del torneo';
+  if(ko.runnerUp)return 'subcampeón';
+  if(ko.thirdPlace)return 'tercer puesto';
+  if(ko.fourthPlace)return 'cuarto puesto';
+  if(ko.eliminated)return ko.text||'eliminado en rondas';
+  if(ko.advancedTo)return 'avanzó a '+ko.advancedTo;
+  return ko.text||'en disputa en rondas';
+}
 function rankingCandidateScore(rank){
   rank=Number(rank);
   if(!isFinite(rank)||rank<=0||rank>=999)return 50;
@@ -4323,8 +4366,8 @@ function rankingCandidateScore(rank){
   // Así un equipo #9 puede subir por rendimiento, pero no queda por encima del #1 solo por una goleada temprana.
   return pct(100-(Math.log(Math.max(rank,1))/Math.log(120))*70);
 }
-function candidateReason(x){var parts=[];var c=x.components||{};var arr=[['forma',c.forma],['ataque',c.ataque],['defensa',c.defensa],['control',c.control],['plantel',c.plantel],['ranking FIFA',c.ranking],['disciplina',c.disciplina]].sort(function(a,b){return b[1]-a[1]});if(arr[0])parts.push('fortaleza principal: '+arr[0][0]+' '+arr[0][1]+'/100');if(x.status&&x.status.status==='qualified')parts.push('clasificado matemáticamente');else if(x.status&&x.status.status==='eliminated')parts.push('eliminado matemáticamente');else parts.push('sigue en disputa');if(x.pj){parts.push(x.pts+' pts, DG '+(x.dg>0?'+':'')+x.dg+' en '+x.pj+' PJ')}if(x.hasFifa){parts.push('FIFA: xG '+statValue(x.fifa.xg)+' y '+statValue(x.fifa.shotsOnTarget)+' tiros al arco')}return parts.join(' · ')}
-function candidateRisks(x){var risks=[];if(!x.hasFifa)risks.push('sin estadísticas FIFA cargadas');if(!x.pj)risks.push('sin partidos registrados');if(x.components&&x.components.defensa<45)risks.push('defensa bajo el promedio');if(x.components&&x.components.disciplina<55)risks.push('disciplina puede restar');if(x.status&&x.status.status==='alive')risks.push('todavía no aseguró clasificación');if(!risks.length)risks.push('sin alerta fuerte con los datos actuales');return risks.join(' · ')}
+function candidateReason(x){var parts=[];var c=x.components||{};var arr=[['forma',c.forma],['ataque',c.ataque],['defensa',c.defensa],['control',c.control],['plantel',c.plantel],['ranking FIFA',c.ranking],['ronda',c.ronda],['disciplina',c.disciplina]].sort(function(a,b){return b[1]-a[1]});if(arr[0])parts.push('fortaleza principal: '+arr[0][0]+' '+arr[0][1]+'/100');if(x.knockout&&x.knockout.started)parts.push('rondas: '+knockoutAnalysisText(x.knockout));if(x.status&&x.status.status==='qualified')parts.push('clasificado matemáticamente');else if(x.status&&x.status.status==='eliminated')parts.push('eliminado matemáticamente');else parts.push('sigue en disputa');if(x.pj){parts.push(x.pts+' pts, DG '+(x.dg>0?'+':'')+x.dg+' en '+x.pj+' PJ')}if(x.hasFifa){parts.push('FIFA: xG '+statValue(x.fifa.xg)+' y '+statValue(x.fifa.shotsOnTarget)+' tiros al arco')}return parts.join(' · ')}
+function candidateRisks(x){var risks=[];if(x.knockout&&x.knockout.eliminated)risks.push('ya quedó fuera en rondas');if(!x.hasFifa)risks.push('sin estadísticas FIFA cargadas');if(!x.pj)risks.push('sin partidos registrados');if(x.components&&x.components.defensa<45)risks.push('defensa bajo el promedio');if(x.components&&x.components.disciplina<55)risks.push('disciplina puede restar');if(x.status&&x.status.status==='alive')risks.push('todavía no aseguró clasificación');if(x.knockout&&x.knockout.advancedTo)risks.push('rival de '+x.knockout.advancedTo+' pendiente');if(!risks.length)risks.push('sin alerta fuerte con los datos actuales');return risks.join(' · ')}
 function championCandidateModel(stats,summary){
   var fifaMap=fifaStatsByCode(),playerMap=playerAggregateByCode();
   var rows=stats.map(function(x){
@@ -4349,8 +4392,9 @@ function championCandidateModel(stats,summary){
     var depthRaw=(Number(pm.players||f.playersWithStats||f.players||0)*0.72)+(Number(pm.goalInvolvement||0)*2.2)+(Number(pm.xg||0)*1.1)+(Number(pm.shotsOnTarget||0)*0.24)+(Number(pm.sprints||0)*0.009)+(Number(pm.totalDistance||0)/160000)+(Number(pm.topSpeed||0)*0.14);
     var discipline=pct(100-((y/fm)*6)-(tr*28)-((Number(f.foulsAgainst||0)/fm)*0.22));
     var status=mathStatusSafe(x.team);
+    var ko=knockoutProgressForTeam(x.team);
     var rankingScore=rankingCandidateScore(rank);
-    return Object.assign({},x,{fifa:f,hasFifa:hasFifa,player:pm,red:tr,yellow:y,fifaRank:(rank&&rank<999)?rank:0,fifaRankingPoints:rankPoints,status:status,formScore:form,attackRaw:attackRaw,defenseRaw:defenseRaw,controlRaw:controlRaw,depthRaw:depthRaw,rankingScore:rankingScore,disciplineScore:discipline})
+    return Object.assign({},x,{fifa:f,hasFifa:hasFifa,player:pm,red:tr,yellow:y,fifaRank:(rank&&rank<999)?rank:0,fifaRankingPoints:rankPoints,status:status,knockout:ko,formScore:form,attackRaw:attackRaw,defenseRaw:defenseRaw,controlRaw:controlRaw,depthRaw:depthRaw,rankingScore:rankingScore,disciplineScore:discipline})
   });
   normalizeRows(rows,'attackRaw',true,50);
   normalizeRows(rows,'defenseRaw',true,50);
@@ -4361,14 +4405,31 @@ function championCandidateModel(stats,summary){
     var qualScore=62;
     if(x.status&&x.status.status==='qualified')qualScore=(route.indexOf('1.º')>=0?92:(route.indexOf('Top 2')>=0?86:78));
     if(x.status&&x.status.status==='eliminated')qualScore=0;
-    var base=(x.formScore*0.22)+(x.attackRawScore*0.14)+(x.defenseRawScore*0.13)+(x.controlRawScore*0.07)+(x.depthRawScore*0.06)+(x.rankingScore*0.30)+(x.disciplineScore*0.04)+(qualScore*0.04);
+    var ko=x.knockout||{};
+    if(ko.started){
+      if(ko.champion)qualScore=100;
+      else if(ko.runnerUp)qualScore=96;
+      else if(ko.thirdPlace)qualScore=94;
+      else if(ko.fourthPlace)qualScore=88;
+      else if(ko.eliminated)qualScore=0;
+      else if(ko.advancedTo)qualScore=Math.max(qualScore,Math.min(98,70+Number(ko.bonus||0)));
+    }
+    var base=(x.formScore*0.18)+(x.attackRawScore*0.13)+(x.defenseRawScore*0.12)+(x.controlRawScore*0.06)+(x.depthRawScore*0.05)+(x.rankingScore*0.24)+(x.disciplineScore*0.04)+(qualScore*0.06)+((ko.score||50)*0.12);
+    if(ko.started){
+      if(ko.champion)base=100;
+      else if(ko.runnerUp)base=Math.max(base,92);
+      else if(ko.thirdPlace)base=Math.max(base,90);
+      else if(ko.fourthPlace)base=Math.max(base,82);
+      else if(ko.eliminated)base=Math.min(18,base*0.22);
+      else if(ko.advancedTo)base=clamp(base+Number(ko.bonus||0),0,99);
+    }
     if(x.status&&x.status.status==='eliminated')base=Math.min(10,base*0.15);
     x.score100=round1(clamp(base,0,100));
-    x.components={forma:pct(x.formScore),ataque:pct(x.attackRawScore),defensa:pct(x.defenseRawScore),control:pct(x.controlRawScore),plantel:pct(x.depthRawScore),ranking:pct(x.rankingScore),disciplina:pct(x.disciplineScore),estado:pct(qualScore)};
+    x.components={forma:pct(x.formScore),ataque:pct(x.attackRawScore),defensa:pct(x.defenseRawScore),control:pct(x.controlRawScore),plantel:pct(x.depthRawScore),ranking:pct(x.rankingScore),disciplina:pct(x.disciplineScore),estado:pct(qualScore),ronda:pct(ko.score||50)};
     x.reason=candidateReason(x);x.risk=candidateRisks(x);x.confidence=candidateConfidence(x,rows,summary)
   });
   rows.sort(function(a,b){return b.score100-a.score100||b.components.ranking-a.components.ranking||b.pts-a.pts||b.dg-a.dg||b.components.ataque-a.components.ataque||name(a.team).localeCompare(name(b.team))});
-  var eligible=rows.filter(function(x){return !(x.status&&x.status.status==='eliminated')});
+  var eligible=rows.filter(function(x){return !(x.status&&x.status.status==='eliminated')&&!(x.knockout&&x.knockout.eliminated)});
   var topScore=eligible[0]?eligible[0].score100:0;var denom=0;var temp=20;
   eligible.forEach(function(x){x._p=Math.exp((x.score100-topScore)/temp);denom+=x._p});
   rows.forEach(function(x){x.prob=(x.status&&x.status.status==='eliminated')?0:(denom?Number(((x._p/denom)*100).toFixed(1)):0);delete x._p});
@@ -5271,35 +5332,47 @@ window.advanceRound=function(roundKey){
   var cfg=ROUND_CONFIG.filter(function(r){return r.key===roundKey})[0];
   if(!cfg||!cfg.next)return;
   var winners=mapWinnersByMatch(roundKey);
+  var hasWinner=Object.keys(winners).some(function(k){return !!findTeamKey(winners[k])});
+  if(!hasWinner){toast('Aún no hay ganadores definidos en esta ronda');return}
+
   var bp=NEXT_BLUEPRINTS[cfg.next]||[];
+  var existing=Array.isArray(knockoutRounds[cfg.next])?knockoutRounds[cfg.next]:[];
   var next=[];
   for(var i=0;i<bp.length;i++){
+    var prev=existing[i]||{};
     var m=blueprintMatch(bp[i],cfg.next,i,false);
-    m.home=winners[bp[i].srcHome]||bp[i].homeSeed||'';
-    m.away=winners[bp[i].srcAway]||bp[i].awaySeed||'';
+    m.home=winners[bp[i].srcHome]||prev.home||m.home||'';
+    m.away=winners[bp[i].srcAway]||prev.away||m.away||'';
+    m.hg=normalizeKoValue(prev.hg);
+    m.ag=normalizeKoValue(prev.ag);
+    m.ph=normalizeKoValue(prev.ph);
+    m.pa=normalizeKoValue(prev.pa);
     next.push(m);
   }
-  var missing=next.filter(function(m){return !findTeamKey(m.home)||!findTeamKey(m.away)}).length;
-  if(missing){toast('Faltan ganadores para completar '+cfg.next);return}
   knockoutRounds[cfg.next]=next;
 
   if(roundKey==='r4'){
     var losers={};
     (knockoutRounds.r4||[]).forEach(function(m){if(m.matchNo)losers[m.matchNo]=loserFromKo(m)});
     var bp3=NEXT_BLUEPRINTS.r3||[];
+    var existingThird=Array.isArray(knockoutRounds.r3)?knockoutRounds.r3:[];
     var third=[];
     for(var j=0;j<bp3.length;j++){
+      var prevT=existingThird[j]||{};
       var t=blueprintMatch(bp3[j],'r3',j,false);
-      t.home=losers[bp3[j].srcHome]||bp3[j].homeSeed||'';
-      t.away=losers[bp3[j].srcAway]||bp3[j].awaySeed||'';
+      t.home=losers[bp3[j].srcHome]||prevT.home||t.home||'';
+      t.away=losers[bp3[j].srcAway]||prevT.away||t.away||'';
+      t.hg=normalizeKoValue(prevT.hg);
+      t.ag=normalizeKoValue(prevT.ag);
+      t.ph=normalizeKoValue(prevT.ph);
+      t.pa=normalizeKoValue(prevT.pa);
       third.push(t);
     }
-    var missThird=third.filter(function(m){return !findTeamKey(m.home)||!findTeamKey(m.away)}).length;
-    if(!missThird){knockoutRounds.r3=third}
+    knockoutRounds.r3=third;
   }
 
   save(false);render();
-  toast(roundKey==='r4'?'Finalistas y partido por 3er puesto cargados':'Ganadores enviados a '+(ROUND_CONFIG.filter(function(r){return r.key===cfg.next})[0]||{}).title);
+  toast(roundKey==='r4'?'Ganadores disponibles enviados a final y perdedores disponibles al 3er puesto':'Ganadores disponibles enviados a '+(ROUND_CONFIG.filter(function(r){return r.key===cfg.next})[0]||{}).title);
 }
 function koValue(v){return (v===null||v===undefined)?'':v}
 function koMatchHTML(roundKey,m,idx){
@@ -5571,7 +5644,7 @@ function analysisActualRankText(x){
 function surpriseScore(x){
   var exp=analysisExpectedProfile(x),st=x.status||mathStatusSafe(x.team)||{},rank=Number(x.rank||4);
   var over=Math.max(0,exp.expectedRank-rank);
-  var statusBonus=st.status==='qualified'?32:(rank<=2?22:(rank===3?10:0));
+  var ko=x.knockout||knockoutProgressForTeam(x.team);var statusBonus=st.status==='qualified'?32:(rank<=2?22:(rank===3?10:0));if(ko&&ko.advancedTo)statusBonus+=Math.max(8,Number(ko.bonus||0));if(ko&&ko.champion)statusBonus+=45;if(ko&&ko.thirdPlace)statusBonus+=30;
   var underdogBonus=exp.isUnderdog?18:0;
   var rankBonus=exp.fifaRank>45?18:(exp.fifaRank>35?10:0);
   var perf=(Number(x.pts||0)*5)+(Number(x.dg||0)*4)+(x.pp===0&&x.pj?8:0);
@@ -5787,8 +5860,8 @@ function renderAnalisisCore(){
   html+='</div>';
   html+='<div class="analysisMetricGrid fairplayV133">'+analysisFairPlayScenarioCards(combined)+'</div>';
   html+=analysisHighlightsPanel(combined);
-  html+='<div class="card" style="margin-top:2px"><div class="sectionHead"><div><h2>Ranking completo de candidatos</h2><p>Modelo 0-100 balanceado con Ranking FIFA real, forma, ataque, defensa, disciplina y estado matemático.</p></div><span class="tag green">Modelo v148</span></div><div class="barList">';
-  var top=combined.slice(0,10);if(top.length){top.forEach(function(x,i){var width=Math.max(4,Math.round(x.score100));var f=x.fifa||{};var statusTxt=x.status?x.status.route:'En disputa';html+='<div class="barItem"><div class="barTop"><span><b>'+(i+1)+'. '+esc(name(x.team))+'</b> <small>'+code(x.team)+' · Grupo '+x.g+' · '+esc(statusTxt)+'</small></span><b>'+x.score100+'/100 · '+x.prob+'%</b></div><div class="bar"><span style="width:'+width+'%"></span></div><small class="muted"><b>Lectura:</b> '+esc(x.reason)+'<br><b>Riesgo:</b> '+esc(x.risk)+'<br>FIFA: Ranking '+(x.fifaRank?('#'+x.fifaRank):'-')+' · GF '+statValue(f.goals)+' · xG '+statValue(f.xg)+' · TA/TR '+statValue(x.yellow)+'/'+statValue(x.red)+'</small></div>'})}else{html+='<p class="muted">Sin candidatos hasta cargar resultados o estadísticas FIFA.</p>'}
+  html+='<div class="card" style="margin-top:2px"><div class="sectionHead"><div><h2>Ranking completo de candidatos</h2><p>Modelo 0-100 con Ranking FIFA, forma, ataque, defensa, disciplina, estado matemático y avance real en rondas.</p></div><span class="tag green">Modelo v149 rondas</span></div><div class="barList">';
+  var rankingRows=combined.filter(function(x){return !(x.knockout&&x.knockout.eliminated)&&!(x.status&&x.status.status==='eliminated')});var top=rankingRows.slice(0,10);if(top.length){top.forEach(function(x,i){var width=Math.max(4,Math.round(x.score100));var f=x.fifa||{};var statusTxt=x.status?x.status.route:'En disputa';html+='<div class="barItem"><div class="barTop"><span><b>'+(i+1)+'. '+esc(name(x.team))+'</b> <small>'+code(x.team)+' · Grupo '+x.g+' · '+esc(statusTxt)+'</small></span><b>'+x.score100+'/100 · '+x.prob+'%</b></div><div class="bar"><span style="width:'+width+'%"></span></div><small class="muted"><b>Lectura:</b> '+esc(x.reason)+'<br><b>Riesgo:</b> '+esc(x.risk)+'<br>FIFA: Ranking '+(x.fifaRank?('#'+x.fifaRank):'-')+' · GF '+statValue(f.goals)+' · xG '+statValue(f.xg)+' · TA/TR '+statValue(x.yellow)+'/'+statValue(x.red)+' · Rondas: '+esc(knockoutAnalysisText(x.knockout))+'</small></div>'})}else{html+='<p class="muted">Sin candidatos hasta cargar resultados o estadísticas FIFA.</p>'}
   html+='</div></div>';
   html+='<div class="card"><div class="sectionHead"><div><h2>Detalle web y fuentes</h2><p>La información de internet se mantiene como soporte del análisis, sin duplicar los indicadores principales.</p></div></div><div id="internetResult">'+unifiedInternetBlock()+'</div></div>';
   html+=analisisActionsPanel();
