@@ -5460,14 +5460,27 @@ function koBlockHTML(title,sub,klass,inner){
   return '<section class="koThreeBlock '+esc(klass||'')+'"><div class="koBlockLabel"><b>'+esc(title||'')+'</b>'+(sub?'<span>'+esc(sub)+'</span>':'')+'</div>'+inner+'</section>';
 }
 function koR16BlockHTML(){
-  var left=[{n:0,s:[1,4],l:'M74 + M77 → M89'},{n:1,s:[0,2],l:'M73 + M75 → M90'},{n:2,s:[3,5],l:'M76 + M78 → M91'},{n:3,s:[6,7],l:'M79 + M80 → M92'}];
-  var right=[{n:4,s:[10,11],l:'M83 + M84 → M93'},{n:5,s:[8,9],l:'M81 + M82 → M94'},{n:6,s:[13,15],l:'M86 + M88 → M95'},{n:7,s:[12,14],l:'M85 + M87 → M96'}];
+  /* Orden visual corregido para que las llaves sigan la ruta completa del cuadro:
+     - Parte alta hacia M101: M90 encima de M89 en el lado izquierdo, y M93 encima de M94 en el lado derecho.
+     - Parte baja hacia M102: M91 encima de M92 en el lado izquierdo, y M95 encima de M96 en el lado derecho. */
+  var left=[
+    {n:1,s:[0,2],l:'M73 + M75 → M90'},
+    {n:0,s:[1,4],l:'M74 + M77 → M89'},
+    {n:2,s:[3,5],l:'M76 + M78 → M91'},
+    {n:3,s:[6,7],l:'M79 + M80 → M92'}
+  ];
+  var right=[
+    {n:4,s:[10,11],l:'M83 + M84 → M93'},
+    {n:5,s:[8,9],l:'M81 + M82 → M94'},
+    {n:6,s:[13,15],l:'M86 + M88 → M95'},
+    {n:7,s:[12,14],l:'M85 + M87 → M96'}
+  ];
   var html='<div class="koBlockOneGrid"><div class="koPathLane laneLeft"><div class="koLaneHeader"><span>16vos</span><b>8vos</b></div>';
   left.forEach(function(x){html+=koPathPairHTML('r32',x.s,'r16',x.n,'ltr',x.l)});
   html+='</div><div class="koCenterMark">⚽</div><div class="koPathLane laneRight"><div class="koLaneHeader"><b>8vos</b><span>16vos</span></div>';
   right.forEach(function(x){html+=koPathPairHTML('r32',x.s,'r16',x.n,'rtl',x.l)});
   html+='</div></div>';
-  return koBlockHTML('Bloque 1 · 16vos + 8vos','cruces iniciales hacia octavos', 'blockR16', html);
+  return koBlockHTML('Bloque 1 · 16vos + 8vos','ordenado por la ruta real del cuadro: arriba va hacia M101 y abajo va hacia M102', 'blockR16', html);
 }
 function koR16ToQuarterBlockHTML(){
   /* Se preserva el lado visual de origen:
@@ -5517,7 +5530,7 @@ function renderRondas(){
   var route=safeCurrentThirdRoute();
   var html='';
   if(canEdit())html+='<div class="koActions adminOnly"><button class="btn" '+lockedAttr()+' onclick="window.loadQualifiedToR32()">Cargar cruces FIFA</button><button class="btn gold" '+lockedAttr()+' onclick="window.refreshRoundGroupResults()">Actualizar grupos</button><button class="btn red" '+lockedAttr()+' onclick="window.clearAllKnockout()">Reiniciar</button></div>';
-  html+='<div class="koOfficialNote"><b>Distribución oficial FIFA 26:</b> los dieciseisavos se agrupan por ruta de octavos/cuartos, no por orden cronológico. M89 une M74+M77, M90 une M73+M75, M91 une M76+M78, M92 une M79+M80, M93 une M83+M84, M94 une M81+M82, M95 une M86+M88 y M96 une M85+M87. Visualmente, los cruces del lado izquierdo (M89–M92) se mantienen a la izquierda y los del lado derecho (M93–M96) se mantienen a la derecha; la unión oficial para semifinales se refleja recién en el bloque 3.</div>';
+  html+='<div class="koOfficialNote"><b>Distribución oficial FIFA 26:</b> los dieciseisavos se agrupan por ruta de octavos/cuartos, no por orden cronológico. M89 une M74+M77, M90 une M73+M75, M91 une M76+M78, M92 une M79+M80, M93 une M83+M84, M94 une M81+M82, M95 une M86+M88 y M96 une M85+M87. Visualmente, los cruces del lado izquierdo (M90, M89, M91 y M92) se ordenan de arriba hacia abajo según su ruta al cuadro; del lado derecho se ordenan M93, M94, M95 y M96. Así, la parte alta corresponde a la llave que termina en M101 y la parte baja a la llave que termina en M102.</div>';
   html+='<div class="koBracketScroller"><div class="koSplitShell koThreeBlockShell">';
   html+=koR16BlockHTML();
   html+=koR16ToQuarterBlockHTML();
