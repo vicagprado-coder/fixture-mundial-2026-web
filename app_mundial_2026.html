@@ -3916,6 +3916,13 @@ function thirdPossiblePassersBelow(target,idx,rows){
 }
 function thirdRaceStatus(r,idx,rows){
   rows=rows||allThirds();idx=(typeof idx==='number')?idx:rows.findIndex(function(x){return x.team===r.team});
+  var ko=knockoutProgressForTeam(r&&r.team);
+  if(ko&&ko.started){
+    if(ko.champion||ko.runnerUp||ko.thirdPlace)return {key:'qualified',label:ko.champion?'Campeón':(ko.runnerUp?'Subcampeón':'3.er puesto'),note:ko.text||knockoutAnalysisText(ko)};
+    if(ko.eliminated)return {key:'eliminated',label:'Eliminado rondas',note:ko.text||'Eliminado en fase eliminatoria'};
+    if(ko.advancedTo)return {key:'qualified',label:'Avanzó '+ko.advancedTo,note:ko.text||('Avanzó a '+ko.advancedTo)};
+    return {key:'qualified',label:'En '+(ko.round||'rondas'),note:'Ya está ubicado en fase eliminatoria '+(ko.matchNo||'')};
+  }
   var allDone=allGroupsComplete();var inTop8=idx>=0&&idx<8;var maxPts=thirdMaxPossiblePts(r);var eighth=rows[7]||null;var eighthPts=eighth?Number(eighth.pts||0):0;var complete=groupComplete(r.g);
   if(allDone)return inTop8?{key:'qualified',label:'Clasificado',note:'Dentro del Top 8 final'}:{key:'eliminated',label:'Descalificado',note:'Fuera del Top 8 final'};
   try{
@@ -4045,7 +4052,7 @@ function thirdRouteCell(r,idx,rows){
   var dest=thirdDestinationForGroup(r.g,route);if(!dest)return '<span class="thirdRoute '+(st.key==='qualified'?'qualified':'watch')+'" title="'+esc(st.note)+'">'+esc(st.label)+'</span>';
   return '<div class="thirdRoute">'+esc(dest.matchNo)+'<br><small>vs '+esc(dest.vs)+'</small></div>'
 }
-function renderTerceros(){var rows=allThirds();var route=currentThirdRoute();var eliminated=rows.filter(function(r,i){return thirdRaceStatus(r,i,rows).key==='eliminated'}).length;var html='<div class="sectionHead"><div><h2>Ranking de mejores terceros</h2><p>Los 8 mejores terceros avanzan a la ronda de 32. Si un 3.º ya jugó sus 3 partidos y queda fuera del Top 8, o si aun ganando ya no alcanza por puntos, se marca como descalificado.</p></div><span class="tag gold">Top 8</span></div><div class="card">'+tableHTML(rows,true)+'<div class="legendRow"><span class="legend qual">Verde: Clasificado / Top 8 provisional</span><span class="legend red">Descalificados: '+eliminated+'</span><span class="legend">Desempate: PTS · DG · GF · Conducta · Ranking FIFA</span></div><div class="rulesMini">Combinación actual: '+(route.ready?esc(route.key):'MEJORES TERCEROS')+'. Antes de finalizar todos los grupos, el Top 8 puede ser provisional; se marca como Clasificado cuando la simulación confirma que ya no puede caer fuera del Top 8 de terceros.</div></div>';document.getElementById('terceros').innerHTML=html}
+function renderTerceros(){var rows=allThirds();var route=currentThirdRoute();var eliminated=rows.filter(function(r,i){return thirdRaceStatus(r,i,rows).key==='eliminated'}).length;var html='<div class="sectionHead"><div><h2>Ranking de mejores terceros</h2><p>Los 8 mejores terceros avanzan a ronda de 32. Cuando una selección de terceros ya aparece en rondas, su estado se actualiza con el avance o eliminación de la llave.</p></div><span class="tag gold">Top 8</span></div><div class="card">'+tableHTML(rows,true)+'<div class="legendRow"><span class="legend qual">Verde: Clasificado / Top 8 provisional</span><span class="legend red">Descalificados: '+eliminated+'</span><span class="legend">Desempate: PTS · DG · GF · Conducta · Ranking FIFA</span></div><div class="rulesMini">Combinación actual: '+(route.ready?esc(route.key):'MEJORES TERCEROS')+'. Antes de finalizar todos los grupos, el Top 8 puede ser provisional; al iniciar rondas, esta tabla muestra si el tercero sigue activo, avanzó o quedó eliminado.</div></div>';document.getElementById('terceros').innerHTML=html}
 
 
 function groupRemainingMatches(g){return matches.filter(function(m){return m.g===g&&!isDone(m)})}
@@ -4230,6 +4237,8 @@ function guaranteedByBestThirdWorstCase(team){
 }
 function mathStatusForTeam(team){
   var prof=groupMathProfile(team),row=prof.row,g=prof.g,allDone=allGroupsComplete(),rank=prof.currentRank;
+  var koOverride=knockoutMathOverride(team,prof);
+  if(koOverride)return koOverride;
   var thirdRanges={};Object.keys(GROUPS).forEach(function(x){thirdRanges[x]=thirdPointsRangeForGroup(x)});
   if(groupComplete(g)&&rank===1){return {status:'qualified',route:'1.º lugar Grupo '+g,reason:'Grupo '+g+' completo: terminó 1.º con '+prof.currentPts+' pts. El orden final ya considera primero el desempate directo / victoria olímpica y luego DG, GF, conducta y Ranking FIFA.',profile:prof}}
   if(prof.guaranteedTop1){return {status:'qualified',route:'1.º lugar asegurado',reason:'Asegura el 1.º lugar del Grupo '+g+': al evaluar los escenarios pendientes para el primer puesto y aplicar primero victoria olímpica / enfrentamiento directo, no existe escenario donde otro equipo lo supere. Luego se usan DG, GF, conducta y Ranking FIFA. Tiene '+prof.currentPts+' pts y su peor rango posible es 1.º.',profile:prof}}
@@ -4266,24 +4275,28 @@ function allMathStatuses(){
   var out=[];Object.keys(GROUPS).forEach(function(g){(GROUPS[g]||[]).forEach(function(t){out.push(mathStatusForTeam(t))})});
   return out;
 }
-function mathTeamCard(st,kind){var p=st.profile||{},r=p.row||{},team=st.team||p.team;return '<div class="mathTeamCard '+(kind==='out'?'out':'')+'"><div class="mathTeamTop"><div class="mathTeamName"><span class="flagMini">'+flag(team)+'</span><div>'+teamSeedHTML(team)+esc(name(team))+'<small>'+esc(code(team))+' · Grupo '+esc(p.g||'')+' · '+(r.pj||0)+' PJ · '+(r.pts||0)+' pts</small></div></div><span class="mathRoute">'+esc(st.route)+'</span></div><p class="mathReason">'+esc(st.reason)+'</p><div class="mathMetaRow"><span class="mathMeta">DG '+((r.dg>0?'+':'')+(r.dg||0))+'</span><span class="mathMeta">GF '+(r.gf||0)+'</span><span class="mathMeta">Máx. pts '+(p.maxPts||0)+'</span><span class="mathMeta">Rango posible '+(p.bestPossibleRank||'-')+'.º-'+(p.worstPossibleRank||'-')+'.º</span></div></div>'}
+function mathTeamCard(st,kind){
+  var p=st.profile||{},r=p.row||{},team=st.team||p.team,ko=st.knockout||knockoutProgressForTeam(team);
+  var koMeta=(ko&&ko.started)?'<span class="mathMeta">Rondas '+esc(knockoutAnalysisText(ko))+'</span>':'';
+  return '<div class="mathTeamCard '+(kind==='out'?'out':'')+'"><div class="mathTeamTop"><div class="mathTeamName"><span class="flagMini">'+flag(team)+'</span><div>'+teamSeedHTML(team)+esc(name(team))+'<small>'+esc(code(team))+' · Grupo '+esc(p.g||'')+' · '+(r.pj||0)+' PJ · '+(r.pts||0)+' pts</small></div></div><span class="mathRoute">'+esc(st.route)+'</span></div><p class="mathReason">'+esc(st.reason)+'</p><div class="mathMetaRow"><span class="mathMeta">DG '+((r.dg>0?'+':'')+(r.dg||0))+'</span><span class="mathMeta">GF '+(r.gf||0)+'</span><span class="mathMeta">Máx. pts '+(p.maxPts||0)+'</span><span class="mathMeta">Rango posible '+(p.bestPossibleRank||'-')+'.º-'+(p.worstPossibleRank||'-')+'.º</span>'+koMeta+'</div></div>'
+}
 function renderClasificados(){
   var statuses=allMathStatuses();var q=(query||'').toLowerCase().trim();
   if(q){statuses=statuses.filter(function(st){var t=st.profile.team;return (name(t)+' '+code(t)+' '+teamSlot(t)+' '+st.route+' '+st.reason).toLowerCase().indexOf(q)>=0})}
   var qualified=statuses.filter(function(x){return x.status==='qualified'});
   var eliminated=statuses.filter(function(x){return x.status==='eliminated'});
   var alive=statuses.filter(function(x){return x.status==='alive'});
-  var done=doneCount(matches),total=matches.length,allDone=allGroupsComplete();
-  var html='<div class="mathStatusHero"><h2>Clasificados y eliminados matemáticos</h2><p>Listado automático en base a los marcadores guardados. Primero revisa el desempate directo (victoria olímpica / enfrentamiento directo) dentro del grupo y luego evalúa puntos, mejores terceros y demás criterios FIFA para detectar pases o eliminaciones matemáticas.</p></div>';
-  var top1Count=qualified.filter(function(x){return String(x.route||'').indexOf('1.º')>=0}).length;html+='<div class="mathStatusStats"><div class="mathMini"><b>'+qualified.length+'</b><span>Clasificados</span></div><div class="mathMini"><b>'+top1Count+'</b><span>1.º asegurado</span></div><div class="mathMini"><b>'+eliminated.length+'</b><span>Eliminados</span></div><div class="mathMini"><b>'+alive.length+'</b><span>En disputa</span></div><div class="mathMini"><b>'+done+'/'+total+'</b><span>Partidos jugados</span></div></div>';
+  var done=doneCount(matches),total=matches.length,allDone=allGroupsComplete(),koSum=knockoutStageSummary();
+  var html='<div class="mathStatusHero"><h2>Clasificados y eliminados matemáticos</h2><p>Listado automático conectado a fase de grupos y rondas eliminatorias. Si un equipo avanza o queda eliminado en 16vos, 8vos, 4tos, semis, final o 3er puesto, esta pestaña se actualiza con prioridad sobre el estado de grupos.</p></div>';
+  var top1Count=qualified.filter(function(x){return String(x.route||'').indexOf('1.º')>=0}).length;html+='<div class="mathStatusStats"><div class="mathMini"><b>'+qualified.length+'</b><span>Clasificados / vivos</span></div><div class="mathMini"><b>'+top1Count+'</b><span>1.º asegurado</span></div><div class="mathMini"><b>'+eliminated.length+'</b><span>Eliminados</span></div><div class="mathMini"><b>'+koSum.advanced+'</b><span>Avanzaron ronda</span></div><div class="mathMini"><b>'+done+'/'+total+'</b><span>Partidos grupo</span></div></div>';
   html+='<div class="mathColumns"><div class="mathColumn"><div class="mathColumnHead"><div><h3>✅ Clasificados</h3><p>Equipos con pase matemático a ronda de 32. Si alguno ya aseguró el 1.º lugar se marca como “1.º lugar asegurado”; si solo aseguró Top 2 por puntos máximos, se marca como “Top 2 asegurado”.</p></div><span class="tag green">'+qualified.length+'</span></div>';
   if(qualified.length){qualified.sort(function(a,b){return (a.profile.g||'').localeCompare(b.profile.g||'')||a.profile.currentRank-b.profile.currentRank||name(a.profile.team).localeCompare(name(b.profile.team))}).forEach(function(st){html+=mathTeamCard(st,'in')})}else{html+='<div class="mathEmpty">Aún no hay clasificados matemáticos con los resultados actuales.</div>'}
   html+='</div><div class="mathColumn"><div class="mathColumnHead"><div><h3>❌ Eliminados</h3><p>Equipos sin ruta matemática al Top 2 ni a mejores terceros.</p></div><span class="tag red">'+eliminated.length+'</span></div>';
   if(eliminated.length){eliminated.sort(function(a,b){return (a.profile.g||'').localeCompare(b.profile.g||'')||a.profile.currentRank-b.profile.currentRank||name(a.profile.team).localeCompare(name(b.profile.team))}).forEach(function(st){html+=mathTeamCard(st,'out')})}else{html+='<div class="mathEmpty">Aún no hay eliminados matemáticos. Hay equipos que pueden depender de terceros.</div>'}
   html+='</div></div>';
-  html+='<div class="card mathWatchList"><div class="sectionHead"><div><h2>En disputa</h2><p>Equipos que todavía no están clasificados ni eliminados matemáticamente.</p></div><span class="tag gold">'+alive.length+'</span></div>';
+  html+='<div class="card mathWatchList"><div class="sectionHead"><div><h2>En disputa</h2><p>Equipos que todavía no están clasificados ni eliminados matemáticamente y no tienen estado definitivo de rondas.</p></div><span class="tag gold">'+alive.length+'</span></div>';
   if(alive.length){html+='<div class="mathWatchGrid">';alive.sort(function(a,b){return (a.profile.g||'').localeCompare(b.profile.g||'')||b.profile.currentPts-a.profile.currentPts||name(a.profile.team).localeCompare(name(b.profile.team))}).slice(0,48).forEach(function(st){var p=st.profile,r=p.row||{};html+='<div class="mathWatchItem"><span class="flagMini">'+flag(p.team)+'</span> '+teamSeedHTML(p.team)+esc(name(p.team))+'<small>Grupo '+esc(p.g)+' · '+(r.pts||0)+' pts · Máx. '+(p.maxPts||0)+' · posible '+(p.bestPossibleRank||'-')+'.º-'+(p.worstPossibleRank||'-')+'.º</small></div>'});html+='</div>'}else{html+='<div class="mathEmpty">No quedan equipos en disputa.</div>'}
-  html+='<div class="mathRulesNote">Base FIFA usada: clasifican 1.º y 2.º de cada grupo y los 8 mejores terceros. Se prioriza primero el desempate directo (victoria olímpica / enfrentamiento directo) dentro de cada grupo; después DG/GF, conducta y Ranking FIFA. En grupos incompletos la simulación solo se usa para confirmar 1.º lugar asegurado y eliminados. Para Top 2 no se simulan marcadores: si por puntos máximos posibles ya aseguró clasificación, aparece como clasificado. Para mejores terceros ahora también se valida el peor caso: si un equipo todavía puede caer a 3.º pero, aun en ese escenario, no puede salir del Top 8 de terceros, aparece como clasificado.</div></div>';
+  html+='<div class="mathRulesNote">Base FIFA usada: clasifican 1.º y 2.º de cada grupo y los 8 mejores terceros. Se prioriza primero el desempate directo (victoria olímpica / enfrentamiento directo) dentro de cada grupo; después DG/GF, conducta y Ranking FIFA. En grupos incompletos la simulación solo se usa para confirmar 1.º lugar asegurado y eliminados. Para Top 2 no se simulan marcadores: si por puntos máximos posibles ya aseguró clasificación, aparece como clasificado. Para mejores terceros también se valida el peor caso; además, cuando empiezan las rondas, el resultado de cada llave tiene prioridad y actualiza clasificados, eliminados, análisis, sorpresas/decepciones y ranking.</div></div>';
   document.getElementById('clasificados').innerHTML=html;
 }
 
@@ -4358,6 +4371,23 @@ function knockoutAnalysisText(ko){
   if(ko.eliminated)return ko.text||'eliminado en rondas';
   if(ko.advancedTo)return 'avanzó a '+ko.advancedTo;
   return ko.text||'en disputa en rondas';
+}
+function knockoutMathOverride(team,prof){
+  var ko=knockoutProgressForTeam(team);
+  if(!ko||!ko.started)return null;
+  var profile=prof||groupMathProfile(team);
+  if(ko.champion)return {status:'qualified',route:'Campeón mundial',reason:'Resultado de rondas conectado: ganó la final M104 y queda marcado como campeón real del torneo.',profile:profile,knockout:ko};
+  if(ko.runnerUp)return {status:'qualified',route:'Subcampeón mundial',reason:'Resultado de rondas conectado: perdió la final M104 y queda marcado como segundo puesto real del torneo.',profile:profile,knockout:ko};
+  if(ko.thirdPlace)return {status:'qualified',route:'3.er puesto mundial',reason:'Resultado de rondas conectado: ganó el partido M103 por el tercer puesto.',profile:profile,knockout:ko};
+  if(ko.fourthPlace)return {status:'eliminated',route:'4.º puesto',reason:'Resultado de rondas conectado: perdió el partido M103 y finalizó en cuarto puesto.',profile:profile,knockout:ko};
+  if(ko.eliminated)return {status:'eliminated',route:'Eliminado en '+(ko.round||'rondas'),reason:'Resultado de rondas conectado: '+(ko.text||'quedó fuera en la fase eliminatoria')+'. Este estado tiene prioridad sobre la clasificación de grupos.',profile:profile,knockout:ko};
+  if(ko.advancedTo)return {status:'qualified',route:'Avanzó a '+ko.advancedTo,reason:'Resultado de rondas conectado: '+(ko.text||('avanzó a '+ko.advancedTo))+'. El avance de eliminación directa actualiza Clasificados, Análisis, Sorpresas y Ranking.',profile:profile,knockout:ko};
+  return {status:'qualified',route:'En '+(ko.round||'rondas'),reason:'Equipo ya ubicado en la fase eliminatoria '+(ko.matchNo?('('+ko.matchNo+')'):'')+'. Sigue activo en rondas y se mantiene conectado al resto de pestañas.',profile:profile,knockout:ko};
+}
+function knockoutStageSummary(){
+  var map={},active=0,eliminated=0,advanced=0,podium=0;
+  Object.keys(GROUPS).forEach(function(g){(GROUPS[g]||[]).forEach(function(t){var ko=knockoutProgressForTeam(t);if(ko&&ko.started){map[t]=ko;active++;if(ko.eliminated)eliminated++;if(ko.advancedTo)advanced++;if(ko.champion||ko.runnerUp||ko.thirdPlace||ko.fourthPlace)podium++;}})});
+  return {map:map,active:active,eliminated:eliminated,advanced:advanced,podium:podium};
 }
 function rankingCandidateScore(rank){
   rank=Number(rank);
@@ -5990,7 +6020,7 @@ function currentSectionCount(){
   if(active==='rondas'){ensureKnockoutRounds(); var ready=0,total=0; Object.keys(knockoutRounds||{}).forEach(function(key){(knockoutRounds[key]||[]).forEach(function(m){total++; if((m.home||'').trim()||(m.away||'').trim())ready++;});}); return {main:ready, label:'llaves con equipos', aux:total+' emparejamientos'};}
   if(active==='tabla'||active==='fixture'){var ms=filteredMatches(); return {main:ms.length, label:'partidos del grupo', aux:'Grupo '+selected};}
   if(active==='terceros'){var rows=allThirds(); return {main:rows.length, label:'selecciones evaluadas', aux:'Top 8 clasifican'};}
-  if(active==='clasificados'){var st=allMathStatuses();var qf=st.filter(function(x){return x.status==='qualified'}).length;var el=st.filter(function(x){return x.status==='eliminated'}).length;return {main:qf, label:'clasificados', aux:el+' eliminados'};}
+  if(active==='clasificados'){var st=allMathStatuses();var qf=st.filter(function(x){return x.status==='qualified'}).length;var el=st.filter(function(x){return x.status==='eliminated'}).length;var ko=knockoutStageSummary();return {main:qf, label:'clasificados / vivos', aux:el+' eliminados · '+ko.advanced+' avanzaron'};}
   if(active==='analisis'){return {main:doneCount(matches), label:'partidos con marcador', aux:(fifaTeamStats&&fifaTeamStats.teams?fifaTeamStats.teams.length:0)+' equipos FIFA'};}
   return {main:0,label:'items',aux:''};
 }
