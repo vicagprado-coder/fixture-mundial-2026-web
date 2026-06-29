@@ -4278,7 +4278,7 @@ function allMathStatuses(){
 function mathTeamCard(st,kind){
   var p=st.profile||{},r=p.row||{},team=st.team||p.team,ko=st.knockout||knockoutProgressForTeam(team);
   var koMeta=(ko&&ko.started)?'<span class="mathMeta">Rondas '+esc(knockoutAnalysisText(ko))+'</span>':'';
-  return '<div class="mathTeamCard '+(kind==='out'?'out':'')+'"><div class="mathTeamTop"><div class="mathTeamName"><span class="flagMini">'+flag(team)+'</span><div>'+teamSeedHTML(team)+esc(name(team))+'<small>'+esc(code(team))+' · Grupo '+esc(p.g||'')+' · '+(r.pj||0)+' PJ · '+(r.pts||0)+' pts</small></div></div><span class="mathRoute">'+esc(st.route)+'</span></div><p class="mathReason">'+esc(st.reason)+'</p><div class="mathMetaRow"><span class="mathMeta">DG '+((r.dg>0?'+':'')+(r.dg||0))+'</span><span class="mathMeta">GF '+(r.gf||0)+'</span><span class="mathMeta">Máx. pts '+(p.maxPts||0)+'</span><span class="mathMeta">Rango posible '+(p.bestPossibleRank||'-')+'.º-'+(p.worstPossibleRank||'-')+'.º</span>'+koMeta+'</div></div>'
+  return '<div class="mathTeamCard '+(kind==='out'?'out':'')+'"><div class="mathTeamTop"><div class="mathTeamName"><span class="flagMini">'+flag(team)+'</span><div>'+teamSeedHTML(team)+esc(name(team))+'<small>'+esc(code(team))+' · Grupo '+esc(p.g||'')+' · '+(r.pj||0)+' PJ · '+(r.pts||0)+' pts</small></div></div><span class="mathRoute">'+esc(st.route)+'</span></div><p class="mathReason">'+esc(footballStatusReason(st,kind))+'</p><div class="mathMetaRow"><span class="mathMeta">DG '+((r.dg>0?'+':'')+(r.dg||0))+'</span><span class="mathMeta">GF '+(r.gf||0)+'</span><span class="mathMeta">Máx. pts '+(p.maxPts||0)+'</span><span class="mathMeta">Rango posible '+(p.bestPossibleRank||'-')+'.º-'+(p.worstPossibleRank||'-')+'.º</span>'+koMeta+'</div></div>'
 }
 function renderClasificados(){
   var statuses=allMathStatuses();var q=(query||'').toLowerCase().trim();
@@ -5730,32 +5730,157 @@ function analysisStatusMetaText(st){
   if(st.status==='qualified')return 'Estado: '+(st.route||'Clasificado');
   return 'Estado: '+(st.route||'En disputa');
 }
+
+function footballHashSeed(txt){txt=String(txt||'');var h=0;for(var i=0;i<txt.length;i++){h=((h<<5)-h)+txt.charCodeAt(i);h|=0}return Math.abs(h)}
+function footballPick(arr,seed){arr=arr||[];if(!arr.length)return '';return arr[footballHashSeed(seed)%arr.length]}
+function footballTeamName(t){var k=findTeamKey(t);return k?name(k):String(t||'')}
+function koMatchContextForTeam(team){
+  ensureKnockoutRounds();
+  var key=findTeamKey(team);if(!key)return null;
+  var order=[{k:'r2',name:'Final'},{k:'r3',name:'3er puesto'},{k:'r4',name:'Semis'},{k:'r8',name:'4tos'},{k:'r16',name:'8vos'},{k:'r32',name:'16vos'}];
+  for(var oi=0;oi<order.length;oi++){
+    var r=order[oi],list=knockoutRounds[r.k]||[];
+    for(var i=0;i<list.length;i++){
+      var m=list[i],h=findTeamKey(m.home),a=findTeamKey(m.away);if(h!==key&&a!==key)continue;
+      var w=winnerFromKo(m),l=loserFromKo(m),wk=findTeamKey(w),lk=findTeamKey(l);
+      var opp=(h===key?m.away:m.home),ok=findTeamKey(opp);
+      var ctx={team:key,opponent:ok||opp,opponentName:footballTeamName(ok||opp),matchNo:m.matchNo||'',round:r.name,home:h===key,played:false,won:false,lost:false,draw:false,penalties:false,score:'',penScore:'',margin:0,totalGoals:0,tone:'pendiente',verdict:''};
+      if(m.hg!==null&&m.ag!==null&&m.hg!==undefined&&m.ag!==undefined){
+        var gf=ctx.home?Number(m.hg):Number(m.ag),ga=ctx.home?Number(m.ag):Number(m.hg);
+        ctx.played=true;ctx.score=gf+'-'+ga;ctx.margin=Math.abs(gf-ga);ctx.totalGoals=gf+ga;
+        if(gf===ga){ctx.draw=true;ctx.penalties=(m.ph!==null&&m.pa!==null&&m.ph!==undefined&&m.pa!==undefined);if(ctx.penalties){var pf=ctx.home?Number(m.ph):Number(m.pa),pa=ctx.home?Number(m.pa):Number(m.ph);ctx.penScore=pf+'-'+pa;ctx.won=pf>pa;ctx.lost=pa>pf}else{ctx.tone='empate abierto'}}
+        else {ctx.won=gf>ga;ctx.lost=ga>gf}
+        if(ctx.penalties){ctx.tone=ctx.won?'drama de penales':'crueldad de penales';ctx.verdict=ctx.won?'no fue superior con claridad, pero tuvo temple en la tanda':'compitió de igual a igual y se quedó fuera por detalles desde los doce pasos'}
+        else if(ctx.won&&ctx.margin>=3){ctx.tone='goleada';ctx.verdict='pasó por encima de su rival y no dejó discusión'}
+        else if(ctx.won&&ctx.margin===2){ctx.tone='victoria sólida';ctx.verdict='controló la llave y ganó con margen suficiente'}
+        else if(ctx.won&&ctx.margin===1){ctx.tone='victoria ajustada';ctx.verdict='lo sacó adelante por detalles y tuvo que sufrir hasta el cierre'}
+        else if(ctx.lost&&ctx.margin>=3){ctx.tone='caída pesada';ctx.verdict='la diferencia fue clara y el marcador reflejó la superioridad rival'}
+        else if(ctx.lost&&ctx.margin===2){ctx.tone='derrota clara';ctx.verdict='compitió por tramos, pero el rival pegó más fuerte'}
+        else if(ctx.lost&&ctx.margin===1){ctx.tone='derrota ajustada';ctx.verdict='quedó cerca de cambiar la historia, pero le faltó precisión en el cierre'}
+      }
+      if(wk||lk)return ctx;
+    }
+  }
+  return null;
+}
+function footballKoSentence(team,type){
+  var ctx=koMatchContextForTeam(team);if(!ctx||!ctx.played)return '';
+  var t=footballTeamName(team),opp=ctx.opponentName,baseSeed=t+'|'+opp+'|'+ctx.matchNo+'|'+type+'|'+ctx.score+'|'+ctx.penScore;
+  var score=ctx.penalties?(ctx.score+' y '+ctx.penScore+' en penales'):ctx.score;
+  if(type==='surprise'&&ctx.won){return footballPick([
+    t+' dio un golpe sobre la mesa ante '+opp+': ganó '+score+' y '+ctx.verdict+'.',
+    t+' sigue escribiendo su historia: superó a '+opp+' por '+score+' y salió vivo de una llave caliente.',
+    t+' se agrandó en el mata-mata contra '+opp+': ganó '+score+'; '+ctx.verdict+'.',
+    t+' dejó una señal fuerte ante '+opp+': victoria '+ctx.tone+' por '+score+' y boleto ganado en la cancha.'
+  ],baseSeed)}
+  if(type==='deception'&&ctx.lost){return footballPick([
+    t+' recibió un golpe duro ante '+opp+': perdió '+score+' y '+ctx.verdict+'.',
+    t+' se despidió contra '+opp+' con una '+ctx.tone+': cayó '+score+' y quedó por debajo de lo esperado.',
+    t+' no pudo sostener su cartel ante '+opp+': derrota '+ctx.tone+' por '+score+'; '+ctx.verdict+'.',
+    t+' quedó fuera frente a '+opp+': el '+score+' pesa porque llegaba con obligación de competir mejor.'
+  ],baseSeed)}
+  if(type==='qualified'&&ctx.won){return footballPick([
+    t+' avanzó ante '+opp+' con una '+ctx.tone+': ganó '+score+' y ahora mira la siguiente llave con confianza.',
+    t+' dejó en el camino a '+opp+' por '+score+'. '+ctx.verdict.charAt(0).toUpperCase()+ctx.verdict.slice(1)+'.',
+    t+' sacó boleto en el mata-mata contra '+opp+': '+score+' y clasificación ganada partido a partido.',
+    t+' sobrevivió a '+opp+' y sigue en carrera: '+score+', con una lectura clara de '+ctx.tone+'.'
+  ],baseSeed)}
+  if(type==='eliminated'&&ctx.lost){return footballPick([
+    t+' quedó eliminado ante '+opp+' tras el '+score+'. '+ctx.verdict.charAt(0).toUpperCase()+ctx.verdict.slice(1)+'.',
+    t+' se despidió del Mundial contra '+opp+': cayó '+score+' y se terminó el sueño en '+ctx.round+'.',
+    t+' no pudo con '+opp+' y quedó fuera por '+score+'. Fue una '+ctx.tone+' en eliminación directa.',
+    t+' cerró su camino ante '+opp+' con derrota '+ctx.tone+' ('+score+'). El mata-mata no perdonó.'
+  ],baseSeed)}
+  return '';
+}
+function footballGroupSentence(st,type){
+  st=st||{};var p=st.profile||{},r=p.row||{},team=st.team||p.team,t=footballTeamName(team),route=st.route||'',pts=Number(r.pts||p.currentPts||0),dg=Number(r.dg||0),rank=Number(p.currentRank||0),seed=t+'|'+route+'|'+type+'|'+pts+'|'+dg+'|'+rank;
+  if(type==='qualified'){
+    if(String(route).toLowerCase().indexOf('tercero')>=0)return footballPick([
+      t+' se metió por la ventana de los mejores terceros: '+pts+' pts, DG '+(dg>0?'+':'')+dg+' y una vida extra para seguir soñando.',
+      t+' agarró el último tren del Mundial: no le alcanzó para el Top 2, pero sus números como tercero lo mantienen en carrera.',
+      t+' será uno de esos terceros incómodos: clasificó con '+pts+' pts y ahora nadie quiere cruzárselo en mata-mata.'
+    ],seed);
+    return footballPick([
+      t+' selló boleto a 16vos: terminó en zona de clasificación con '+pts+' pts y ahora juega pensando en mejorar su cruce.',
+      t+' hizo la tarea en el grupo: '+pts+' pts, DG '+(dg>0?'+':'')+dg+' y pase confirmado a la siguiente ronda.',
+      t+' ya está adentro: sostuvo su campaña en el grupo y llega al mata-mata con margen para ilusionarse.',
+      t+' cumplió cuando tenía que cumplir: clasificación asegurada y foco puesto en el próximo rival.'
+    ],seed)
+  }
+  if(type==='eliminated')return footballPick([
+    t+' se quedó sin Mundial: terminó '+(rank?rank+'.º':'fuera de zona')+' con '+pts+' pts y ya no le alcanzan los números.',
+    t+' vio apagarse la ilusión en el grupo: '+pts+' pts, DG '+(dg>0?'+':'')+dg+' y sin camino real hacia 16vos.',
+    t+' pagó caro sus tropiezos: la tabla lo dejó fuera y no encontró margen para meterse entre los clasificados.',
+    t+' queda eliminado porque el grupo no le dio oxígeno: necesitaba más puntos y mejores diferencias para seguir vivo.'
+  ],seed);
+  return footballPick([
+    t+' todavía pelea su boleto: cada punto pesa y el grupo sigue abierto.',
+    t+' sigue en zona de tensión: depende de resultados propios y ajenos para no quedarse fuera.',
+    t+' está en modo calculadora: aún tiene vida, pero necesita cerrar fuerte.',
+    t+' no puede relajarse: el pase todavía se juega en la tabla y en los desempates.'
+  ],seed);
+}
+function footballStatusReason(st,kind){
+  st=st||{};var team=st.team||(st.profile||{}).team;var ko=st.knockout||knockoutProgressForTeam(team);
+  if(ko&&ko.started){var k=st.status==='eliminated'?'eliminated':'qualified';var s=footballKoSentence(team,k);if(s)return s+' '+(st.reason?('Base: '+st.route+'.'):'')}
+  return footballGroupSentence(st,st.status==='eliminated'?'eliminated':(st.status==='qualified'?'qualified':'alive'));
+}
 /* v148: analysisMiniTeamCard antiguo eliminado; se usa la versión compacta y legible definida junto al renderer v133. */
 function highlightReason(x){
+  var koText=footballKoSentence(x&&x.team,'surprise');
+  if(koText)return 'Sorpresa: '+koText;
   var exp=analysisExpectedProfile(x),st=x.status||mathStatusSafe(x.team)||{},team=name(x.team),pos=analysisActualRankText(x),verb=analysisGroupVerb(x),stats=analysisStatSummary(x),rank=Number(x.rank||4),route=st.route||'En disputa';
+  var seed=team+'|surprise|'+route+'|'+stats+'|'+rank;
   if(st.status==='qualified'){
-    if(String(route).toLowerCase().indexOf('tercero')>=0)return 'Sorpresa: '+team+' ya aseguró clasificación como '+route+'. Era '+exp.label+' por ranking/expectativa, pero '+verb+' '+pos+' con '+stats+'; superó el escenario previsto.';
-    return 'Sorpresa: '+team+' ya aseguró clasificación ('+route+'). Era '+exp.label+' por ranking/expectativa, pero '+verb+' '+pos+' con '+stats+'; rendimiento por encima de lo esperado.';
+    if(String(route).toLowerCase().indexOf('tercero')>=0)return footballPick([
+      'Sorpresa: '+team+' se metió como '+route+'. Era '+exp.label+', pero '+verb+' '+pos+' con '+stats+' y ahora es un tercero incómodo.',
+      'Sorpresa: '+team+' encontró vida por terceros: '+stats+'. No partía como favorito y aun así se ganó otra bala en el torneo.',
+      'Sorpresa: '+team+' se coló en el mata-mata como '+route+'. Por expectativa era '+exp.label+', pero la cancha dijo otra cosa.'
+    ],seed);
+    return footballPick([
+      'Sorpresa: '+team+' ya aseguró clasificación ('+route+'). Era '+exp.label+', pero '+verb+' '+pos+' con '+stats+' y cambió el guion del grupo.',
+      'Sorpresa: '+team+' dio un paso grande: clasificación asegurada, '+stats+' y rendimiento por encima del cartel inicial.',
+      'Sorpresa: '+team+' está rompiendo el pronóstico: '+route+', '+stats+' y sensación de equipo incómodo.'
+    ],seed);
   }
-  if(st.status==='eliminated')return 'Sorpresa descartada: '+team+' ya quedó eliminado matemáticamente ('+route+'). Aunque aparecía como posible sorpresa, su estado actual lo deja fuera.';
-  if(rank<=2)return 'Sorpresa: '+team+' está en zona de clasificación directa. Era '+exp.label+' por ranking/expectativa, pero '+verb+' '+pos+' con '+stats+'; por ahora supera claramente su expectativa.';
-  if(rank===3)return 'Sorpresa: '+team+' pelea la clasificación como mejor tercero. Era '+exp.label+' por ranking/expectativa, pero '+verb+' '+pos+' con '+stats+'; mantiene opciones reales.';
+  if(st.status==='eliminated')return 'Sorpresa descartada: '+footballStatusReason(st,'out');
+  if(rank<=2)return footballPick([
+    'Sorpresa: '+team+' está en zona directa. Era '+exp.label+', pero '+verb+' '+pos+' con '+stats+' y compite como si tuviera más cartel.',
+    'Sorpresa: '+team+' se metió arriba en la tabla: '+stats+' y rendimiento que obliga a tomarlo en serio.',
+    'Sorpresa: '+team+' está haciendo ruido en el grupo: ocupa '+pos+' y sostiene números de clasificación.'
+  ],seed);
+  if(rank===3)return footballPick([
+    'Sorpresa: '+team+' pelea por terceros. No le sobra nada, pero con '+stats+' todavía tiene una ruta real.',
+    'Sorpresa: '+team+' está vivo como posible tercero: su campaña no es perfecta, pero sigue incomodando.',
+    'Sorpresa: '+team+' se aferra a la calculadora de terceros con '+stats+' y todavía sueña.'
+  ],seed);
   return 'Sorpresa: '+team+' está rindiendo por encima de su expectativa inicial. Era '+exp.label+', pero '+verb+' '+pos+' con '+stats+'.';
 }
 function disappointmentReason(x){
-  var exp=analysisExpectedProfile(x),st=x.status||mathStatusSafe(x.team)||{},team=name(x.team),pos=analysisActualRankText(x),verb=analysisGroupVerb(x),stats=analysisStatSummary(x),route=st.route||'En disputa',parts=[];
+  var koText=footballKoSentence(x&&x.team,'deception');
+  if(koText)return 'Decepción: '+koText;
+  var exp=analysisExpectedProfile(x),st=x.status||mathStatusSafe(x.team)||{},team=name(x.team),pos=analysisActualRankText(x),verb=analysisGroupVerb(x),stats=analysisStatSummary(x),route=st.route||'En disputa',rank=Number(x.rank||0),seed=team+'|deception|'+route+'|'+stats+'|'+rank;
   if(st.status==='eliminated'){
-    return 'Decepción: '+team+' ya quedó eliminado matemáticamente ('+route+'). Era '+exp.label+' por ranking/expectativa, pero '+verb+' '+pos+' con '+stats+'; rendimiento muy por debajo de lo esperado.';
+    return footballPick([
+      'Decepción: '+team+' ya quedó eliminado ('+route+'). Era '+exp.label+', pero '+verb+' '+pos+' con '+stats+' y pagó caro su falta de contundencia.',
+      'Decepción: '+team+' se fue antes de tiempo. Llegaba con más cartel, pero la tabla lo dejó fuera: '+stats+'.',
+      'Decepción: '+team+' no respondió a la expectativa: eliminado con '+stats+' y una campaña por debajo de lo que prometía.'
+    ],seed);
   }
   if(st.status==='qualified'){
-    return 'Decepción controlada: '+team+' ya está clasificado ('+route+'), pero su rendimiento quedó por debajo de la expectativa inicial. Era '+exp.label+' y '+verb+' '+pos+' con '+stats+'.';
+    return footballPick([
+      'Decepción controlada: '+team+' clasificó ('+route+'), pero dejó dudas. Era '+exp.label+' y '+verb+' '+pos+' con '+stats+'.',
+      'Decepción controlada: '+team+' sigue vivo, aunque no convence. Clasificó, pero sus números ('+stats+') no asustan como deberían.',
+      'Decepción controlada: '+team+' salvó el boleto, pero no la sensación: avanzó con una campaña más floja de lo esperado.'
+    ],seed);
   }
-  parts.push('Decepción: '+team+' aún no asegura clasificación. Era '+exp.label+' por ranking/expectativa, pero '+verb+' '+pos+' con '+stats);
-  if(Number(x.rank||0)>=3)parts.push('fuera del Top 2 actual');
-  if(x.pj&&x.pp>0)parts.push(analysisLossText(x));
-  if(x.dg<0)parts.push('diferencia de goles negativa');
-  if(x.pj&&Number(x.pts||0)<(x.pj*1.35))parts.push('puntaje bajo para su expectativa');
-  return parts.join(' · ')+'.';
+  var tags=[];if(rank>=3)tags.push('fuera del Top 2 actual');if(x.pj&&x.pp>0)tags.push(analysisLossText(x));if(x.dg<0)tags.push('DG negativo');if(x.pj&&Number(x.pts||0)<(x.pj*1.35))tags.push('puntaje bajo');
+  return footballPick([
+    'Decepción: '+team+' todavía no asegura clasificación. Era '+exp.label+', pero '+verb+' '+pos+' con '+stats+(tags.length?' · '+tags.join(' · '):'')+'.',
+    'Decepción: '+team+' está jugando con fuego. Por expectativa debía estar más arriba, pero hoy aparece '+pos+' con '+stats+'.',
+    'Decepción: '+team+' no termina de arrancar: el contexto pedía protagonismo y ahora depende de resultados para seguir vivo.'
+  ],seed);
 }
 function analysisFirstNumber(vals,fallback){
   for(var i=0;i<(vals||[]).length;i++){
