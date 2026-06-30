@@ -3497,6 +3497,10 @@ input:disabled:not(.score):not(.koScore):not(.koTeamInput){opacity:.72!important
   .hero .heroVisuals{width:106px!important}.hero .mascotVisual{max-width:64px!important}.hero .ballVisual{width:36px!important;height:36px!important}.hero .brand h1{font-size:14px!important}.toolbar .miniBtn,.toolbar .authBtn,.toolbar .authStatus{flex:1 1 calc(50% - 6px)!important;min-width:0!important}.teams{grid-template-columns:minmax(0,1fr) 36px 12px 36px minmax(0,1fr)!important}.score{width:36px!important;min-width:36px!important;font-size:13px!important}.tabs{height:62px!important;min-height:62px!important;padding:6px 7px!important}.tabs .tab{flex-basis:60px!important;min-width:60px!important;width:60px!important;height:48px!important;min-height:48px!important;font-size:7px!important}.tabs .tab b{font-size:13px!important}
 }
 
+
+/* ===== Resumen gráfico de rondas en una sola vista ===== */
+.koSummaryToggleWrap{display:flex;justify-content:center;margin:14px 0 8px}.koSummaryToggleWrap .btn{min-width:240px}.koOneView{display:none;margin:14px 0 18px;padding:18px;border-radius:26px;background:radial-gradient(circle at 50% 35%,rgba(0,176,80,.24),rgba(2,10,22,.94) 48%,rgba(1,7,18,.98));border:1px solid rgba(255,215,90,.35);box-shadow:0 24px 60px rgba(0,0,0,.32),inset 0 0 90px rgba(0,176,80,.12);overflow:auto;color:#fff}.koOneView.open{display:block}.koOneViewInner{min-width:1180px;position:relative}.koOneViewTitle{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.koOneViewTitle b{font-size:22px;letter-spacing:.8px;color:#ffe07a;text-transform:uppercase;text-shadow:0 2px 16px rgba(255,224,122,.25)}.koOneViewTitle span{font-size:12px;font-weight:900;color:rgba(255,255,255,.72)}.koOneViewHeaders{display:grid;grid-template-columns:1.05fr .92fr .82fr .72fr 1.2fr .72fr .82fr .92fr 1.05fr;gap:12px;margin-bottom:10px}.koOneViewHeaders span{text-align:center;border:1px solid rgba(255,224,122,.35);background:rgba(2,9,18,.74);border-radius:6px 18px 6px 18px;padding:8px 6px;font-size:18px;font-weight:1000;color:#f7f7f2;text-transform:uppercase;box-shadow:inset 0 0 16px rgba(255,224,122,.05)}.koOneViewHeaders .finalHead{font-size:23px;color:#ffe07a}.koOneViewGrid{display:grid;grid-template-columns:1.05fr .92fr .82fr .72fr 1.2fr .72fr .82fr .92fr 1.05fr;gap:12px;align-items:stretch}.koSummaryCol{display:grid;gap:10px;align-content:space-around;min-height:720px;position:relative}.koSummaryCol.r32{gap:8px}.koSummaryCol.r16{padding:36px 0}.koSummaryCol.qf{padding:96px 0}.koSummaryCol.sf{padding:210px 0}.koSummaryCenter{display:grid;align-content:center;justify-items:center;gap:34px;min-height:720px}.koSummaryCard{position:relative;background:linear-gradient(180deg,rgba(11,27,34,.94),rgba(2,9,15,.96));border:1px solid rgba(213,255,214,.78);border-radius:13px;padding:9px 10px;box-shadow:0 0 18px rgba(160,255,185,.18), inset 0 0 18px rgba(255,255,255,.04);min-height:58px}.koSummaryCard::after{content:"";position:absolute;top:50%;width:13px;height:2px;background:rgba(204,255,207,.75);box-shadow:0 0 10px rgba(174,255,182,.9)}.koSummaryCard.left::after{right:-13px}.koSummaryCard.right::after{left:-13px}.koSummaryCard.center::after,.koSummaryCard.final::after,.koSummaryCard.third::after{display:none}.koSummaryNo{font-size:12px;font-weight:1000;color:#8fe07e;letter-spacing:.8px;margin-bottom:4px;text-align:center}.koSummaryTeams{display:grid;gap:5px}.koSummaryTeam{display:flex;align-items:center;gap:7px;min-height:21px;font-weight:1000;font-size:16px;letter-spacing:.6px;white-space:nowrap}.koSummaryTeam .flagMini{font-size:18px;line-height:1}.koSummarySeed{display:inline-flex;align-items:center;justify-content:center;min-width:44px;border-radius:8px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);padding:2px 6px;font-weight:1000;color:#fff}.koSummaryCard.mid .koSummaryTeam{justify-content:center;font-size:19px}.koSummaryCard.mid{min-height:82px;display:grid;align-content:center}.koSummaryCard.sfCard{min-height:104px;display:grid;align-content:center}.koSummaryCard.final{min-width:230px;border-color:rgba(255,224,122,.95);box-shadow:0 0 26px rgba(255,224,122,.2), inset 0 0 20px rgba(255,224,122,.05);padding:16px}.koSummaryCard.final .koSummaryNo{font-size:15px;color:#ffe07a}.koSummaryCard.final .koSummaryTeam{font-size:20px}.koSummaryCard.third{min-width:210px;border-color:rgba(204,164,92,.88);padding:14px;opacity:.96}.koSummaryVs{height:1px;background:rgba(255,255,255,.26);margin:2px 0}.koSummaryNote{margin-top:12px;text-align:center;color:rgba(255,255,255,.68);font-size:12px;font-weight:900}.koSummaryCol.r16:before,.koSummaryCol.qf:before,.koSummaryCol.sf:before{content:"";position:absolute;top:6%;bottom:6%;left:50%;width:2px;background:linear-gradient(180deg,transparent,rgba(174,255,182,.52),transparent);box-shadow:0 0 12px rgba(174,255,182,.6);opacity:.55}.koSummaryCol.rightLine:before{left:auto;right:50%}@media(max-width:780px){.koOneView{padding:12px;border-radius:20px}.koOneViewInner{min-width:1080px}.koOneViewTitle{position:sticky;left:0;width:calc(100vw - 48px);background:rgba(2,10,22,.86);border-radius:16px;padding:8px;z-index:2}.koOneViewTitle b{font-size:16px}.koOneViewTitle span{font-size:10px}.koOneViewHeaders span{font-size:14px}.koOneViewHeaders .finalHead{font-size:18px}.koSummaryTeam{font-size:13px}.koSummaryCard.mid .koSummaryTeam{font-size:15px}}
+
 </style>
 </head>
 <body>
@@ -5636,6 +5640,53 @@ function koSemiFinalBlockHTML(){
   return koBlockHTML('Bloque 4 · Semis + Final','semifinales conectadas con final y 3er puesto', 'blockFinal', html);
 }
 
+
+function koSummaryTeamToken(txt,seed){
+  var raw=String(txt||'').trim();
+  var k=findTeamKey(raw);
+  if(k)return '<span class="koSummaryTeam"><span class="flagMini">'+flag(k)+'</span><b>'+esc(code(k)||k.toUpperCase())+'</b></span>';
+  var val=raw||seed||'POR DEF.';
+  return '<span class="koSummaryTeam"><span class="koSummarySeed">'+esc(String(val).toUpperCase())+'</span></span>';
+}
+function koSummaryMatch(roundKey,idx,side,klass){
+  ensureKnockoutRounds();
+  var m=(knockoutRounds[roundKey]||[])[idx]||blankKoMatch(roundKey,idx);
+  var h=m.home||m.homeSeed||'';
+  var a=m.away||m.awaySeed||'';
+  var extra=klass?(' '+klass):'';
+  return '<div class="koSummaryCard '+esc(side||'center')+extra+'"><div class="koSummaryNo">'+esc(m.matchNo||'')+'</div><div class="koSummaryTeams">'+koSummaryTeamToken(h,m.homeSeed)+'<div class="koSummaryVs"></div>'+koSummaryTeamToken(a,m.awaySeed)+'</div></div>';
+}
+function koSummaryColumn(roundKey,order,side,klass){
+  var html='';
+  order.forEach(function(i){html+=koSummaryMatch(roundKey,i,side,klass||'')});
+  return html;
+}
+function renderKnockoutSummaryView(){
+  ensureKnockoutRounds();
+  var html='<section id="koOneViewSummary" class="koOneView"><div class="koOneViewInner">';
+  html+='<div class="koOneViewTitle"><b>Resumen completo de rondas</b><span>Vista tipo cuadro: bandera + abreviatura · Brasil/Japón ubicado en el lado derecho</span></div>';
+  html+='<div class="koOneViewHeaders"><span>16vos</span><span>8vos</span><span>4tos</span><span>Semis</span><span class="finalHead">Final</span><span>Semis</span><span>4tos</span><span>8vos</span><span>16vos</span></div>';
+  html+='<div class="koOneViewGrid">';
+  html+='<div class="koSummaryCol r32">'+koSummaryColumn('r32',[0,2,1,4,10,11,8,9],'left')+'</div>';
+  html+='<div class="koSummaryCol r16">'+koSummaryColumn('r16',[1,0,4,5],'left','mid')+'</div>';
+  html+='<div class="koSummaryCol qf">'+koSummaryColumn('r8',[0,1],'left','mid')+'</div>';
+  html+='<div class="koSummaryCol sf">'+koSummaryColumn('r4',[0],'left','sfCard')+'</div>';
+  html+='<div class="koSummaryCenter">'+koSummaryMatch('r2',0,'center','final')+koSummaryMatch('r3',0,'center','third')+'</div>';
+  html+='<div class="koSummaryCol sf rightLine">'+koSummaryColumn('r4',[1],'right','sfCard')+'</div>';
+  html+='<div class="koSummaryCol qf rightLine">'+koSummaryColumn('r8',[2,3],'right','mid')+'</div>';
+  html+='<div class="koSummaryCol r16 rightLine">'+koSummaryColumn('r16',[2,3,6,7],'right','mid')+'</div>';
+  html+='<div class="koSummaryCol r32 rightLine">'+koSummaryColumn('r32',[3,5,6,7,13,15,12,14],'right')+'</div>';
+  html+='</div><div class="koSummaryNote">Resumen dinámico: cuando pasas ganadores, los nombres abreviados se actualizan en 8vos, 4tos, semis, final y 3er puesto.</div>';
+  html+='</div></section>';
+  return html;
+}
+window.toggleKnockoutSummary=function(){
+  var el=document.getElementById('koOneViewSummary');
+  if(!el)return;
+  el.classList.toggle('open');
+  if(el.classList.contains('open'))setTimeout(function(){try{el.scrollIntoView({behavior:'smooth',block:'start',inline:'nearest'})}catch(e){}},30);
+};
+
 function renderRondas(){
   ensureKnockoutRounds();
   var champ=finalWinner();
@@ -5645,6 +5696,8 @@ function renderRondas(){
   var html='';
   if(canEdit())html+='<div class="koActions adminOnly"><button class="btn" '+lockedAttr()+' onclick="window.loadQualifiedToR32()">Cargar cruces FIFA</button><button class="btn gold" '+lockedAttr()+' onclick="window.refreshRoundGroupResults()">Actualizar grupos</button><button class="btn red" '+lockedAttr()+' onclick="window.clearAllKnockout()">Reiniciar</button></div>';
   html+='<div class="koOfficialNote"><b>Distribución oficial FIFA 26:</b> el lado izquierdo del cuadro que llega a M101 se arma con M90 y M89 por un lado, y con M93 y M94 por el otro. El lado derecho del cuadro que llega a M102 se arma con M91 y M92 por un lado, y con M95 y M96 por el otro. Así, Canadá queda en el lado izquierdo del camino a la final y Brasil en el lado derecho.</div>';
+  html+='<div class="koSummaryToggleWrap"><button class="btn gold" onclick="window.toggleKnockoutSummary()">🖼️ Ver resumen completo en una vista</button></div>';
+  html+=renderKnockoutSummaryView();
   html+='<div class="koBracketScroller"><div class="koSplitShell koThreeBlockShell">';
   html+=koR16BlockHTML();
   html+=koR16ToQuarterBlockHTML();
